@@ -4,7 +4,7 @@ import React from 'react'
 const Page = () => {
   return (
     <View>
-      <Text>This is first page Login/signup ahah</Text>
+      <Text>All possible ev listings in a List if user doesn't like the map</Text>
     </View>
   )
 }
