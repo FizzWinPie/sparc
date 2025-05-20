@@ -4,7 +4,7 @@ import React from 'react'
 const home = () => {
   return (
     <View>
-      <Text>Ev owner Landing page: This will have the map with different options</Text>
+      <Text>Landing page: This will have the map with different options</Text>
     </View>
   )
 }
