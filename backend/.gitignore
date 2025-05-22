@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+*.pem
+
+# typescript
+*.tsbuildinfo
+
+node_modules

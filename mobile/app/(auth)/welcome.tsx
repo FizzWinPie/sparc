@@ -1,10 +1,11 @@
 import { View, Text, Button, TouchableOpacity } from "react-native";
 import React from "react";
 import { router } from "expo-router";
+import Colors from "@/constants/Colors";
 
 const Onboarding = () => {
   return (
-    <View>
+    <View style={{backgroundColor: Colors.blueVariations.steelBlue}}>
       <Text>Onboarding to the app</Text>
       <TouchableOpacity
         onPress={() => {
