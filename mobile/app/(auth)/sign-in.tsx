@@ -23,7 +23,7 @@ export default function Page() {
 
       if (createdSessionId && setSessionActive) {
         await setSessionActive({ session: createdSessionId });
-        router.back();
+        router.replace("/(tabs)/home");
       }
     } catch (err) {
       console.error("SSO error", err);

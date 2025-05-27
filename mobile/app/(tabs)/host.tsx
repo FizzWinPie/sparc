@@ -4,7 +4,7 @@ import React from "react";
 const home = () => {
   return (
     <View>
-      <Text>Host: shows the listing of chargers</Text>
+      <Text>Host: shows the lisadcasdadvaadscting of chargers</Text>
     </View>
   );
 };

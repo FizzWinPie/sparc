@@ -4,9 +4,9 @@ import { SignOutButton } from '@/components/SignOutButton'
 
 const home = () => {
   return (
-    <View>
+    <View style={{backgroundColor: "white"}} >
       <SignOutButton />
-      <Text>Lasdasdfdasfadsanding page: Thasdfasdfadsfis will have the map with different options</Text>
+      <Text>Lasdasdfdasfadssanding spsage: Thasdfasdfadsfis will have the map with different options</Text>
     </View>
   )
 }

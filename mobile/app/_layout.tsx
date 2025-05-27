@@ -7,6 +7,8 @@ import "react-native-reanimated";
 import { ClerkLoaded, ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import Colors from "@/constants/Colors";
+import Spacing from "@/constants/Spacing";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -23,7 +25,9 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    light: require("../assets/fonts/Inter-ExtraLight.ttf"),
+    regular: require("../assets/fonts/Inter-Regular.ttf"),
+    bold: require("../assets/fonts/Inter-SemiBold.ttf"),
     ...FontAwesome.font,
   });
 
@@ -50,7 +54,7 @@ function RootLayoutNav() {
     <ClerkProvider tokenCache={tokenCache}>
       <ClerkLoaded>
         <SafeAreaProvider>
-          <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+          <SafeAreaView style={{ flex: 1, padding: Spacing.md, paddingBottom: 0, backgroundColor: Colors.primary }}>
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

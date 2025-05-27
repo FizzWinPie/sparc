@@ -1,11 +1,13 @@
-import { View, Text, Button, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { router } from "expo-router";
 import Colors from "@/constants/Colors";
+import Font from "@/constants/Font";
+import Spacing from "@/constants/Spacing";
 
 const Onboarding = () => {
   return (
-    <View style={{backgroundColor: Colors.blueVariations.steelBlue}}>
+    <View style={{ backgroundColor: "white" }}>
       <Text>Onboarding to the app</Text>
       <TouchableOpacity
         onPress={() => {
@@ -20,6 +22,15 @@ const Onboarding = () => {
         }}
       >
         <Text>Sign Up</Text>
+        <Text style={{ fontFamily: "bold", fontSize: Font.lg, padding: Spacing.xxl }}>
+          Welcome to the app
+        </Text>
+        <Text style={{ fontFamily: "regular", fontSize: Font.md, padding: Spacing.md }}>
+          Choose your listing
+        </Text>
+        <Text style={{ fontFamily: "light", fontSize: Font.sm, padding: Spacing.sm }}>
+          The best in town
+        </Text>
       </TouchableOpacity>
     </View>
   );
