@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
+import dummyData from "@/constants/dummyData/dummy.js";
 
 const Onboarding = () => {
   return (
@@ -23,7 +24,7 @@ const Onboarding = () => {
       >
         <Text>Sign Up</Text>
         <Text style={{ fontFamily: "bold", fontSize: Font.lg, padding: Spacing.xxl }}>
-          Welcome to the app
+          Welcome to the app, {dummyData.users[0].name}
         </Text>
         <Text style={{ fontFamily: "regular", fontSize: Font.md, padding: Spacing.md }}>
           Choose your listing
