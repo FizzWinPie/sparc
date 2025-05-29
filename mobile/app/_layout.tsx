@@ -54,13 +54,11 @@ function RootLayoutNav() {
     <ClerkProvider tokenCache={tokenCache}>
       <ClerkLoaded>
         <SafeAreaProvider>
-          <SafeAreaView style={{ flex: 1, padding: Spacing.md, paddingBottom: 0, backgroundColor: Colors.primary }}>
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             </Stack>
-          </SafeAreaView>
         </SafeAreaProvider>
       </ClerkLoaded>
     </ClerkProvider>
