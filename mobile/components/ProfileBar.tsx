@@ -24,8 +24,8 @@ const ProfileBar = () => {
           padding: Spacing.md,
         }}
       >
-        <Ionicons name="person-circle" style={{ fontSize: 50 }} />
-        <Text style={{ fontSize: Font.lg, fontWeight: "semibold" }}>
+        <Ionicons name="person-circle" style={{ fontSize: 40 }} />
+        <Text style={{ fontFamily: "regular", }}>
           Welcome, {dummyData.users[0].name}!
         </Text>
       </View>
