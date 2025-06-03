@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import React, { useMemo, useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import Colors from "@/constants/Colors";
@@ -30,11 +36,15 @@ const INITIAL_REGION = {
 const ListingsMap = ({ listings }: Props) => {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["30%", "70%"], []);
-  
+  const snapPoints = useMemo(() => ["45%", "70%"], []);
+
   const onMarkerSelected = (item: Listing) => {
     setSelectedListing(item);
-    bottomSheetRef.current?.snapToIndex(1);
+    bottomSheetRef.current?.snapToIndex(0);
+  };
+
+  const handleChooseListing = () => {
+    console.log("Chosen listing -> payment");
   };
 
   return (
@@ -91,16 +101,159 @@ const ListingsMap = ({ listings }: Props) => {
             {selectedListing ? (
               <>
                 <Text style={styles.sheetTitle}>Select Listing</Text>
-                <Text>ID: {selectedListing.id}</Text>
-                <Text>Lat: {selectedListing.latitude}</Text>
-                <Text>Lng: {selectedListing.longitude}</Text>
-                <Text>Price: ${selectedListing.price_per_hour}/kWh</Text>
-                <Text>
-                  Status: {selectedListing.is_active ? "Active" : "Inactive"}
-                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignContent: "center",
+                    justifyContent: "flex-start",
+                    gap: 10,
+                    marginBottom: 10,
+                    // borderBlockColor: "black",
+                    // borderWidth: 3,
+                    // borderRadius: 10
+                  }}
+                >
+                  <Image
+                    source={require("../assets/images/logo/splash-icon.png")}
+                    style={{ borderRadius: 20, width: 60, height: 60 }}
+                  />
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "flex-start",
+                      justifyContent: "space-between",
+                      flex: 1,
+                      paddingHorizontal: Spacing.sm,
+                    }}
+                  >
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "space-between",
+                        gap: 10,
+                      }}
+                    >
+                      <Text style={{ fontFamily: "bold", fontSize: Font.md }}>
+                        {selectedListing.id}
+                      </Text>
+
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignContent: "center",
+                          gap: 2,
+                        }}
+                      >
+                        <Ionicons
+                          name="location-sharp"
+                          size={Font.md}
+                          color={Colors.accent}
+                        />
+                        <Text
+                          style={{ fontFamily: "light", fontSize: Font.sm }}
+                        >
+                          3 miles away
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View>
+                      <Text style={{ fontFamily: "bold", fontSize: Font.md }}>
+                        ${selectedListing.price_per_hour} {""}
+                        <Text
+                          style={{ fontFamily: "light", fontSize: Font.sm }}
+                        >
+                          /kWh
+                        </Text>
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 2,
+                          marginTop: 4,
+                        }}
+                      >
+                        <Ionicons
+                          name="flash-sharp"
+                          size={Font.md}
+                          style={{
+                            color: selectedListing.is_active
+                              ? Colors.success
+                              : Colors.danger,
+                          }}
+                        />
+                        <Text
+                          style={{
+                            fontFamily: "regular",
+                            fontSize: Font.sm,
+                            color: selectedListing.is_active
+                              ? Colors.success
+                              : Colors.danger,
+                          }}
+                        >
+                          {selectedListing.is_active ? "Active" : "Inactive"}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 8,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      !selectedListing.is_active && { backgroundColor: "#ccc" },
+                    ]}
+                    onPress={handleChooseListing}
+                    disabled={!selectedListing.is_active}
+                  >
+                    <Text
+                      style={[
+                        styles.buttonText,
+                        !selectedListing.is_active && { color: "gray" },
+                      ]}
+                    >
+                      {selectedListing.is_active
+                        ? "Choose Listing"
+                        : "Unavailable"}
+                    </Text>
+                  </TouchableOpacity>
+                  <View
+                    style={{
+                      padding: Spacing.md,
+                      borderRadius: 10,
+                      backgroundColor: Colors.primary,
+                    }}
+                  >
+                    <Ionicons name="calendar" size={25} color={Colors.accent} />
+                  </View>
+                </View>
               </>
             ) : (
-              <Text>Select a marker</Text>
+              <View style={{ gap: 15 }}>
+                <Text style={styles.sheetTitle}>Select Listing</Text>
+                <Image
+                  source={require("../assets/images/no-result.png")}
+                  style={{ width: 170, height: 100, alignSelf: "center" }}
+                />
+                <Text
+                  style={{
+                    fontFamily: "bold",
+                    fontSize: Font.md,
+                    alignSelf: "center",
+                  }}
+                >
+                  No Results...
+                </Text>
+              </View>
             )}
           </BottomSheetView>
         </BottomSheet>
@@ -177,9 +330,21 @@ const styles = StyleSheet.create({
   },
   sheetTitle: {
     fontWeight: "bold",
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: Font.lg,
+    marginBottom: 20,
     alignSelf: "center",
+  },
+  button: {
+    flex: 1,
+    backgroundColor: Colors.accent,
+    padding: Spacing.md,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: "white",
+    alignSelf: "center",
+    fontSize: Font.md,
+    fontFamily: "bold",
   },
 });
 
