@@ -7,8 +7,7 @@ import "react-native-reanimated";
 import { ClerkLoaded, ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import Colors from "@/constants/Colors";
-import Spacing from "@/constants/Spacing";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,16 +50,18 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <ClerkProvider tokenCache={tokenCache}>
-      <ClerkLoaded>
-        <SafeAreaProvider>
+    <GestureHandlerRootView >
+      <ClerkProvider tokenCache={tokenCache}>
+        <ClerkLoaded>
+          <SafeAreaProvider>
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             </Stack>
-        </SafeAreaProvider>
-      </ClerkLoaded>
-    </ClerkProvider>
+          </SafeAreaProvider>
+        </ClerkLoaded>
+      </ClerkProvider>
+    </GestureHandlerRootView>
   );
 }
