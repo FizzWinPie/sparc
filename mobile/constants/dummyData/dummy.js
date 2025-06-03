@@ -3,7 +3,7 @@ const dummyData = {
     {
       id: "user001",
       clerkId: "ev1",
-      name: "Alice EV",
+      name: "Alice",
       email: "alice.ev@example.com",
       phone_number: 1234567890,
       host_id: null,
@@ -11,7 +11,7 @@ const dummyData = {
     {
       id: "user002",
       clerkId: "ev2",
-      name: "Bob EV",
+      name: "Bob",
       email: "bob.ev@example.com",
       phone_number: 9876543210,
       host_id: "user003",
@@ -19,7 +19,7 @@ const dummyData = {
     {
       id: "user003",
       clerkId: "ev3",
-      name: "Charlie Host",
+      name: "Charlie",
       email: "charlie.host@example.com",
       phone_number: 1112223333,
       charger_listings: [
@@ -48,7 +48,7 @@ const dummyData = {
   ],
   charger_listings: [
     {
-      id: "charger001",
+      id: "Casa Blanca",
       host_id: "user003",
       charger_type: "Level 2",
       power_output_kw: 7.2,
@@ -60,14 +60,14 @@ const dummyData = {
       price_per_hour: 5.0,
       min_price: 2.5,
       images:
-        "https://www.nyc.gov/html/dot/images/motorist/ev-charging-dot-municipal-parking-mn-2.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6ksmdijzJCIyw297PHBXvHFgm6sVJKmWK1A&s",
       is_active: true,
       instructions: "Park in spot #3 and plug in.",
       created_at: "2025-05-01T08:00:00Z",
       updated_at: "2025-05-20T10:00:00Z",
     },
     {
-      id: "charger002",
+      id: "Little Village",
       host_id: "user003",
       charger_type: "DC Fast",
       power_output_kw: 50.0,

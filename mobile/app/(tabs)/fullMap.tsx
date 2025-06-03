@@ -1,6 +1,6 @@
 import { View, StyleSheet } from "react-native";
 import React from "react";
-import ListingsMap from "@/components/Map";
+import ListingsMap from "@/components/ListingsMap";
 import dummyData from "@/constants/dummyData/dummy";
 import ProfileBar from "@/components/ProfileBar";
 import { BlurView } from "expo-blur";
@@ -17,7 +17,7 @@ const fullMap = () => {
   return (
     <View style={styles.container}>
       <ListingsMap listings={formattedListings} />
-      <BlurView intensity={12} tint="light" style={styles.blurOverlay} />
+      <BlurView intensity={6} tint="light" style={styles.blurOverlay} />
       <View style={styles.profileBarWrapper}>
         <ProfileBar />
       </View>
@@ -29,22 +29,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  
-    blurOverlay: {
+
+  blurOverlay: {
     position: "absolute",
     top: 0,
     width: "100%",
     height: 105,
-    zIndex: 1
+    zIndex: 1,
   },
 
   profileBarWrapper: {
-    position: 'absolute',
+    position: "absolute",
     top: 20,
-    width: '100%',
+    width: "100%",
     zIndex: 1,
   },
 });
-
 
 export default fullMap;

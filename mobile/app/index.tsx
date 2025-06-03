@@ -7,7 +7,7 @@ const Index = () => {
   console.log("Signed In:", isSignedIn);
 
   if (isSignedIn) {
-    return <Redirect href={"/(tabs)/fullMap"} />;
+    return <Redirect href={"/(tabs)/home"} />;
   }
 
   return <Redirect href="/(auth)/welcome" />;
