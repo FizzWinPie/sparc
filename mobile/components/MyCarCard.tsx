@@ -1,152 +1,141 @@
-import { View, Text, Image, Touchable, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-
-interface Listing {
-  id: string;
-  latitude: number;
-  longitude: number;
-  price_per_hour: number;
-  is_active: boolean;
-  images: string;
-}
+import { Booking } from "@/types";
 
 interface Props {
-  listings: Listing[];
+  bookings: Booking[];
 }
 
-const MyCarCard = ({ listings }: Props) => {
-  const [selectedListing, setSelectedListing] = useState<Listing | null>(
-    listings.length > 0 ? listings[0] : null
+const MyCarCard = ({ bookings }: Props) => {
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(
+    bookings.length > 0 ? bookings[0] : null
   );
 
-  if (!selectedListing) {
+  if (!selectedBooking) {
     return (
       <View>
-        <Text>No listing available</Text>
+        <Text>No booking available</Text>
       </View>
     );
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: "row",
-        alignContent: "center",
-        justifyContent: "space-between",
-        gap: 2,
-        borderRadius: 10,
-        backgroundColor: Colors.secondary,
-        // overflow: "hidden",
-        shadowColor: "black",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 1,
-      }}
-    >
-      <View
-        style={{
-          flex: 1,
-          paddingLeft: Spacing.md,
-          paddingVertical: Spacing.sm,
-        }}
-      >
-        <Text style={{ color: "white", fontFamily: "bold" }}>
-          ID 45672 <Text style={{ color: Colors.accent }}>ONLINE</Text>
+    <View style={styles.container}>
+      <View style={styles.leftSection}>
+        <Text style={styles.idText}>
+          ID {selectedBooking.id} <Text style={styles.onlineText}>ONLINE</Text>
         </Text>
         <Image
           source={require("../assets/images/ev_profile.png")}
-          style={{
-            width: 140,
-            height: 80,
-          }}
+          style={styles.image}
           resizeMode="contain"
         />
-        <Text style={{ color: "white", fontFamily: "bold" }}>
-          Tesla Model X
-        </Text>
+        <Text style={styles.modelText}>Tesla Model X</Text>
       </View>
 
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "column",
-          justifyContent: "flex-end",
-          padding: Spacing.sm,
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "space-between",
-            gap: 10,
-            paddingRight: Spacing.md,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignSelf: "flex-end",
-              gap: 2,
-              alignContent: "center",
-            }}
-          >
+      <View style={styles.rightSection}>
+        <View style={styles.rightContent}>
+          <View style={styles.locationRow}>
             <Ionicons
               name="location-sharp"
               size={Font.md}
               color={Colors.accent}
             />
-            <Text
-              style={{
-                fontFamily: "regular",
-                fontSize: Font.sm,
-                color: "white",
-              }}
-            >
-              {selectedListing.id}
-            </Text>
+            <Text style={styles.locationText}>{selectedBooking.charger_listings_address.split(",")[0]}</Text>
           </View>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "flex-end",
-            }}
-          >
+          <View style={styles.batteryRow}>
             <Ionicons name="flash-outline" size={42} color={Colors.accent} />
-            <Text
-              style={{ fontFamily: "regular", color: "white", fontSize: 45 }}
-            >
-              72%
-            </Text>
+            <Text style={styles.batteryText}>{selectedBooking.battery_level ?? "72%"}</Text>
           </View>
-          <TouchableOpacity
-            style={{
-              alignSelf: "flex-end",
-              // paddingRight: Spacing.md,
-              // backgroundColor: "rgba(42, 157, 143, 0.35)",
-              // borderRadius: 8,
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: "bold",
-                color: Colors.accent,
-                fontSize: Font.md,
-              }}
-            >
-              STOP
-            </Text>
+          <TouchableOpacity style={styles.stopButton}>
+            <Text style={styles.stopText}>STOP</Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: "row",
+    alignContent: "center",
+    justifyContent: "space-between",
+    gap: 2,
+    borderRadius: 10,
+    backgroundColor: Colors.secondary,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 1,
+  },
+  leftSection: {
+    flex: 1,
+    paddingLeft: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  idText: {
+    color: "white",
+    fontFamily: "bold",
+  },
+  onlineText: {
+    color: Colors.accent,
+  },
+  image: {
+    width: 140,
+    height: 80,
+  },
+  modelText: {
+    color: "white",
+    fontFamily: "bold",
+  },
+  rightSection: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    padding: Spacing.sm,
+  },
+  rightContent: {
+    flex: 1,
+    justifyContent: "space-between",
+    gap: 10,
+    paddingRight: Spacing.md,
+  },
+  locationRow: {
+    flexDirection: "row",
+    alignSelf: "flex-end",
+    gap: 2,
+    alignContent: "center",
+  },
+  locationText: {
+    fontFamily: "regular",
+    fontSize: Font.sm,
+    color: "white",
+  },
+  batteryRow: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  batteryText: {
+    fontFamily: "regular",
+    color: "white",
+    fontSize: 45,
+  },
+  stopButton: {
+    alignSelf: "flex-end",
+  },
+  stopText: {
+    fontFamily: "bold",
+    color: Colors.accent,
+    fontSize: Font.md,
+  },
+});
 
 export default MyCarCard;

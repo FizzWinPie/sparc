@@ -2,20 +2,9 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-import { Image, View } from "react-native";
+import { Image, View, StyleSheet } from "react-native";
 
-const Dot = () => (
-  <View
-    style={{
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: Colors.accent,
-      marginTop: 2,
-      alignSelf: "center",
-    }}
-  />
-);
+const Dot = () => <View style={styles.dot} />;
 
 const MainLayout = () => {
   return (
@@ -24,19 +13,7 @@ const MainLayout = () => {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: Colors.accent,
-        tabBarStyle: {
-          position: "absolute",
-          marginHorizontal: 70,
-          marginBottom: 50,
-          backgroundColor: Colors.primary,
-          height: 40,
-          width: 240,
-          borderRadius: 20,
-          shadowColor: "black",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.5,
-          shadowRadius: 1,
-        },
+        tabBarStyle: styles.tabBar,
       }}
     >
       <Tabs.Screen
@@ -44,7 +21,7 @@ const MainLayout = () => {
         options={{
           title: "Home",
           tabBarIcon: ({ color, size, focused }) => (
-            <View style={{ alignItems: "center" }}>
+            <View style={styles.iconContainer}>
               <Image
                 source={require("../../assets/images/marker.png")}
                 style={{ width: size, height: size }}
@@ -60,7 +37,7 @@ const MainLayout = () => {
         options={{
           title: "Map",
           tabBarIcon: ({ color, size, focused }) => (
-            <View style={{ alignItems: "center" }}>
+            <View style={styles.iconContainer}>
               <Ionicons name="map-outline" size={size} color={color} />
               {focused && <Dot />}
             </View>
@@ -72,7 +49,7 @@ const MainLayout = () => {
         options={{
           title: "Host",
           tabBarIcon: ({ color, size, focused }) => (
-            <View style={{ alignItems: "center" }}>
+            <View style={styles.iconContainer}>
               <Ionicons name="flash-outline" size={size} color={color} />
               {focused && <Dot />}
             </View>
@@ -84,7 +61,7 @@ const MainLayout = () => {
         options={{
           title: "Listings",
           tabBarIcon: ({ color, size, focused }) => (
-            <View style={{ alignItems: "center" }}>
+            <View style={styles.iconContainer}>
               <Ionicons name="list-outline" size={size} color={color} />
               {focused && <Dot />}
             </View>
@@ -94,5 +71,32 @@ const MainLayout = () => {
     </Tabs>
   );
 };
+
+const styles = StyleSheet.create({
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.accent,
+    marginTop: 2,
+    alignSelf: "center",
+  },
+  tabBar: {
+    position: "absolute",
+    marginHorizontal: 70,
+    marginBottom: 50,
+    backgroundColor: Colors.primary,
+    height: 40,
+    width: 240,
+    borderRadius: 20,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 1,
+  },
+  iconContainer: {
+    alignItems: "center",
+  },
+});
 
 export default MainLayout;

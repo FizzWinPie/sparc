@@ -3,27 +3,21 @@ import {
   Text,
   StyleSheet,
   Image,
-  TouchableOpacity,
 } from "react-native";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import { Ionicons } from "@expo/vector-icons";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Spacing from "@/constants/Spacing";
-
-interface Listing {
-  id: string;
-  latitude: number;
-  longitude: number;
-  price_per_hour: number;
-  is_active: boolean;
-}
+import ListingBottomSheet from "./ListingBottomSheet";
+import { Listing } from "@/types/Listing";
 
 interface Props {
   listings: Listing[];
+  snapPoints?: string[];
 }
 
 const INITIAL_REGION = {
@@ -33,10 +27,9 @@ const INITIAL_REGION = {
   longitudeDelta: 0.25,
 };
 
-const ListingsMap = ({ listings }: Props) => {
+const ListingsMap = ({ listings, snapPoints }: Props) => {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["45%", "70%"], []);
 
   const onMarkerSelected = (item: Listing) => {
     setSelectedListing(item);
@@ -97,166 +90,12 @@ const ListingsMap = ({ listings }: Props) => {
           enablePanDownToClose={true}
           enableOverDrag={true}
         >
-          <BottomSheetView style={styles.contentContainer}>
-            {selectedListing ? (
-              <>
-                <Text style={styles.sheetTitle}>Select Listing</Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignContent: "center",
-                    justifyContent: "flex-start",
-                    gap: 10,
-                    marginBottom: 10,
-                    // borderBlockColor: "black",
-                    // borderWidth: 3,
-                    // borderRadius: 10
-                  }}
-                >
-                  <Image
-                    source={require("../assets/images/logo/splash-icon.png")}
-                    style={{ borderRadius: 20, width: 60, height: 60 }}
-                  />
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "flex-start",
-                      justifyContent: "space-between",
-                      flex: 1,
-                      paddingHorizontal: Spacing.sm,
-                    }}
-                  >
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: "space-between",
-                        gap: 10,
-                      }}
-                    >
-                      <Text style={{ fontFamily: "bold", fontSize: Font.md }}>
-                        {selectedListing.id}
-                      </Text>
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignContent: "center",
-                          gap: 2,
-                        }}
-                      >
-                        <Ionicons
-                          name="location-sharp"
-                          size={Font.md}
-                          color={Colors.accent}
-                        />
-                        <Text
-                          style={{ fontFamily: "light", fontSize: Font.sm }}
-                        >
-                          3 miles away
-                        </Text>
-                      </View>
-                    </View>
-
-                    <View>
-                      <Text style={{ fontFamily: "bold", fontSize: Font.md }}>
-                        ${selectedListing.price_per_hour} {""}
-                        <Text
-                          style={{ fontFamily: "light", fontSize: Font.sm }}
-                        >
-                          /kWh
-                        </Text>
-                      </Text>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 2,
-                          marginTop: 4,
-                        }}
-                      >
-                        <Ionicons
-                          name="flash-sharp"
-                          size={Font.md}
-                          style={{
-                            color: selectedListing.is_active
-                              ? Colors.success
-                              : Colors.danger,
-                          }}
-                        />
-                        <Text
-                          style={{
-                            fontFamily: "regular",
-                            fontSize: Font.sm,
-                            color: selectedListing.is_active
-                              ? Colors.success
-                              : Colors.danger,
-                          }}
-                        >
-                          {selectedListing.is_active ? "Active" : "Inactive"}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 8,
-                  }}
-                >
-                  <TouchableOpacity
-                    style={[
-                      styles.button,
-                      !selectedListing.is_active && { backgroundColor: "#ccc" },
-                    ]}
-                    onPress={handleChooseListing}
-                    disabled={!selectedListing.is_active}
-                  >
-                    <Text
-                      style={[
-                        styles.buttonText,
-                        !selectedListing.is_active && { color: "gray" },
-                      ]}
-                    >
-                      {selectedListing.is_active
-                        ? "Choose Listing"
-                        : "Unavailable"}
-                    </Text>
-                  </TouchableOpacity>
-                  <View
-                    style={{
-                      padding: Spacing.md,
-                      borderRadius: 10,
-                      backgroundColor: Colors.primary,
-                    }}
-                  >
-                    <Ionicons name="calendar" size={25} color={Colors.accent} />
-                  </View>
-                </View>
-              </>
-            ) : (
-              <View style={{ gap: 15 }}>
-                <Text style={styles.sheetTitle}>Select Listing</Text>
-                <Image
-                  source={require("../assets/images/no-result.png")}
-                  style={{ width: 170, height: 100, alignSelf: "center" }}
-                />
-                <Text
-                  style={{
-                    fontFamily: "bold",
-                    fontSize: Font.md,
-                    alignSelf: "center",
-                  }}
-                >
-                  No Results...
-                </Text>
-              </View>
-            )}
-          </BottomSheetView>
+          <ListingBottomSheet
+            selectedListing={selectedListing} 
+            onChooseListing={handleChooseListing} 
+          />
         </BottomSheet>
+        
       </View>
     </GestureHandlerRootView>
   );

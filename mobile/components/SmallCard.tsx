@@ -1,18 +1,10 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-
-interface Listing {
-  id: string;
-  latitude: number;
-  longitude: number;
-  price_per_hour: number;
-  is_active: boolean;
-  images: string;
-}
+import { Listing } from "@/types";
 
 interface Props {
   listings: Listing[];
@@ -25,70 +17,103 @@ const SmallCard = ({ listings }: Props) => {
 
   if (!selectedListing) {
     return (
-      <View>
-        <Text>No listing available</Text>
+    <View style={styles.container}>
+      <Image
+        source={require("../assets/images/logo/splash-icon.png")}
+        style={styles.image}
+        resizeMode="cover"
+      />
+      <View style={styles.infoContainer}>
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>No Results...</Text>
+        </View>
       </View>
+    </View>
     );
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: "row",
-        alignContent: "center",
-        gap: 2,
-        borderRadius: 10,
-        backgroundColor: Colors.secondary,
-        overflow: "hidden",
-        
-      }}
-    >
+    <View style={styles.container}>
       <Image
-        // source={require("../assets/images/car1.jpg")}
         source={{ uri: selectedListing.images }}
-        style={{
-          width: 55,
-          height: 80,
-        }}
+        style={styles.image}
         resizeMode="cover"
       />
-      <View
-        style={{
-          flexDirection: "column",
-          flex: 1,
-          padding: Spacing.sm,
-        }}
-      >
-        <View style={{ flex: 1, justifyContent: "space-between", gap: 10 }}>
-          <Text
-            style={{ fontFamily: "bold", fontSize: Font.md, color: "white" }}
-          >
-            {selectedListing.id}
-          </Text>
-
-          <View
-            style={{ flexDirection: "row", gap: 2, alignContent: "center" }}
-          >
+      <View style={styles.infoContainer}>
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>{selectedListing.address.split(",")[0]}</Text>
+          <View style={styles.locationContainer}>
             <Ionicons
               name="location-sharp"
               size={Font.md}
               color={Colors.accent}
             />
-            <Text
-              style={{
-                fontFamily: "regular",
-                fontSize: Font.sm,
-                color: "white",
-              }}
-            >
-              3 miles
-            </Text>
+            <Text style={styles.locationText}>3 miles</Text>
           </View>
         </View>
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: "row",
+    alignContent: "center",
+    gap: 2,
+    borderRadius: 10,
+    backgroundColor: Colors.secondary,
+    overflow: "hidden",
+  },
+  image: {
+    width: 60,
+    height: 80,
+  },
+  infoContainer: {
+    flexDirection: "column",
+    flex: 1,
+    padding: Spacing.sm,
+  },
+  textContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  title: {
+    fontFamily: "regular",
+    fontSize: Font.sm,
+    color: "white",
+  },
+  locationContainer: {
+    flexDirection: "row",
+    gap: 2,
+    alignContent: "center",
+  },
+  locationText: {
+    fontFamily: "regular",
+    fontSize: Font.sm,
+    color: "white",
+  },
+  sheetTitle: {
+    fontWeight: "bold",
+    fontSize: Font.lg,
+    marginBottom: 20,
+    alignSelf: "center",
+  },
+  emptyState: {
+    flex: 1
+  },
+  emptyImage: {
+    width: 50,
+    height: 50,
+    alignSelf: "center",
+  },
+  emptyText: {
+    fontSize: Font.md,
+    alignSelf: "center",
+    color: "white",
+  },
+});
 
 export default SmallCard;

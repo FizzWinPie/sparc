@@ -61,45 +61,45 @@ const MapScreen = () => {
   };
 
   return (
-      <MapView
-        style={StyleSheet.absoluteFillObject}
-        provider={PROVIDER_GOOGLE}
-        showsUserLocation
-        showsMyLocationButton
-        initialRegion={INITIAL_REGION}
-        scrollEnabled
-        showsPointsOfInterest={false}
-        customMapStyle={noLabelsMapStyle}
-      >
-        {dummyData.charger_listings.map((item) => (
-          <Marker
-            key={item.id}
-            onPress={() => onMarkerSelected(item)}
-            coordinate={{
-              latitude: item.latitude,
-              longitude: item.longitude,
-            }}
-          >
-            <View style={styles.marker}>
-              <Image
-                source={require("@/assets/images/marker.png")}
-                style={styles.markerImage}
+    <MapView
+      style={StyleSheet.absoluteFillObject}
+      provider={PROVIDER_GOOGLE}
+      showsUserLocation
+      showsMyLocationButton
+      initialRegion={INITIAL_REGION}
+      scrollEnabled
+      showsPointsOfInterest={false}
+      customMapStyle={noLabelsMapStyle}
+    >
+      {dummyData.charger_listings.map((item) => (
+        <Marker
+          key={item.id}
+          onPress={() => onMarkerSelected(item)}
+          coordinate={{
+            latitude: item.latitude,
+            longitude: item.longitude,
+          }}
+        >
+          <View style={styles.marker}>
+            <Image
+              source={require("@/assets/images/marker.png")}
+              style={styles.markerImage}
+            />
+            <View style={styles.markerTextWrapper}>
+              <Ionicons
+                name="flash-sharp"
+                size={11}
+                style={{
+                  color: item.is_active ? Colors.success : Colors.danger,
+                }}
               />
-              <View style={styles.markerTextWrapper}>
-                <Ionicons
-                  name="flash-sharp"
-                  size={11}
-                  style={{
-                    color: item.is_active ? Colors.success : Colors.danger,
-                  }}
-                />
-                <Text style={styles.markerPrice}>${item.price_per_hour}</Text>
-                <Text style={styles.markerUnit}>/kWh</Text>
-              </View>
+              <Text style={styles.markerPrice}>${item.price_per_hour}</Text>
+              <Text style={styles.markerUnit}>/kWh</Text>
             </View>
-          </Marker>
-        ))}
-      </MapView>
+          </View>
+        </Marker>
+      ))}
+    </MapView>
   );
 };
 
