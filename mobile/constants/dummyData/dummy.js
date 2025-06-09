@@ -7,6 +7,7 @@ const dummyData = {
       email: "alice.ev@example.com",
       phone_number: 1234567890,
       host_id: null,
+      car_model: "Tesla Model X",
     },
     {
       id: "user002",
@@ -15,6 +16,7 @@ const dummyData = {
       email: "bob.ev@example.com",
       phone_number: 9876543210,
       host_id: "user003",
+      car_model: "Hyundai IONIQ 5",
     },
     {
       id: "user003",
@@ -23,6 +25,7 @@ const dummyData = {
       email: "charlie.host@example.com",
       phone_number: 1112223333,
       charger_listings: ["charger001", "charger002"],
+      car_model: null,
     },
   ],
   charger_listings: [
@@ -32,12 +35,14 @@ const dummyData = {
       charger_type: "Level 2",
       power_output_kw: 7.2,
       connector_type: "J1772",
-      address: "123 Main St, Springfield",
+      address: "297 Main St, Manhattan",
+      latitude: 40.7331, // Manhattan, NYC
+      longitude: -74, // Manhattan, NYC
       availability_schedule: "Mon-Fri: 9am-5pm",
       price_per_hour: 5.0,
       min_price: 2.5,
       images:
-        "https://www.nyc.gov/html/dot/images/motorist/ev-charging-dot-municipal-parking-mn-2.jpg",
+        "https://qmerit.com/wp-content/uploads/2024/05/Qmerit-home-ev-charging-station-cost.jpg",
       is_active: true,
       instructions: "Park in spot #3 and plug in.",
       created_at: "2025-05-01T08:00:00Z",
@@ -49,13 +54,15 @@ const dummyData = {
       charger_type: "DC Fast",
       power_output_kw: 50.0,
       connector_type: "CCS",
-      address: "456 Market Ave, Springfield",
+      address: "456 Market Ave, Manhattan",
+      latitude: 40.7431,
+      longitude: -73.9712,
       availability_schedule: "24/7",
       price_per_hour: 12.0,
       min_price: 5.0,
       images:
         "https://www.brickunderground.com/sites/default/files/2023-09/iStock-1344638615.jpg",
-      is_active: true,
+      is_active: false,
       instructions: "Use app to unlock charger.",
       created_at: "2025-05-05T09:00:00Z",
       updated_at: "2025-05-20T10:30:00Z",
@@ -65,6 +72,7 @@ const dummyData = {
     {
       id: "booking001",
       charger_listings_id: "charger001",
+      charger_listings_address: "297 Main St, Manhattan",
       host_id: "user003",
       ev_owner_id: "user001",
       start_time: "2025-05-21T14:00:00Z",
@@ -74,6 +82,7 @@ const dummyData = {
       payment_status: "paid",
       rating_by_driver: 5,
       rating_by_host: 4,
+      battery_level: "72%",
     },
   ],
   payment_invoice: [

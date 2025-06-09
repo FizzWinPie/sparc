@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { Text } from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const allListings = () => {
   return (
-    <View>
+    <SafeAreaView>
       <Text>Shows all possible ev listings in the form of a list</Text>
-    </View>
-  )
-}
+    </SafeAreaView>
+  );
+};
 
-export default allListings
+export default allListings;

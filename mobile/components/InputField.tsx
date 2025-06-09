@@ -7,18 +7,19 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Platform,
+  StyleSheet,
   TextInputProps,
+  ImageSourcePropType,
 } from "react-native";
 
-declare interface InputFieldProps extends TextInputProps {
+interface InputFieldProps extends TextInputProps {
   label: string;
-  icon?: any;
+  icon?: ImageSourcePropType;
   secureTextEntry?: boolean;
-  labelStyle?: string;
-  containerStyle?: string;
-  inputStyle?: string;
-  iconStyle?: string;
-  className?: string;
+  labelStyle?: object;
+  containerStyle?: object;
+  inputStyle?: object;
+  iconStyle?: object;
 }
 
 const InputField = ({
@@ -29,7 +30,6 @@ const InputField = ({
   containerStyle,
   inputStyle,
   iconStyle,
-  className,
   ...props
 }: InputFieldProps) => {
   return (
@@ -37,18 +37,12 @@ const InputField = ({
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View className="my-2 w-full">
-          <Text className={`text-lg font-JakartaSemiBold mb-3 ${labelStyle}`}>
-            {label}
-          </Text>
-          <View
-            className={`flex flex-row justify-start items-center relative bg-neutral-100 rounded-full border border-neutral-100 focus:border-primary-500  ${containerStyle}`}
-          >
-            {icon && (
-              <Image source={icon} className={`w-6 h-6 ml-4 ${iconStyle}`} />
-            )}
+        <View style={styles.wrapper}>
+          <Text style={[styles.label, labelStyle]}>{label}</Text>
+          <View style={[styles.container, containerStyle]}>
+            {icon && <Image source={icon} style={[styles.icon, iconStyle]} />}
             <TextInput
-              className={`rounded-full p-4 font-JakartaSemiBold text-[15px] flex-1 ${inputStyle} text-left`}
+              style={[styles.input, inputStyle]}
               secureTextEntry={secureTextEntry}
               {...props}
             />
@@ -58,5 +52,39 @@ const InputField = ({
     </KeyboardAvoidingView>
   );
 };
+
+const styles = StyleSheet.create({
+  wrapper: {
+    marginVertical: 8,
+    width: "100%",
+  },
+  label: {
+    fontSize: 18,
+    fontFamily: "JakartaSemiBold",
+    marginBottom: 12,
+  },
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: "#f5f5f5",
+    paddingHorizontal: 12,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
+  },
+  input: {
+    flex: 1,
+    borderRadius: 50,
+    paddingVertical: 12,
+    fontFamily: "JakartaSemiBold",
+    fontSize: 15,
+    textAlign: "left",
+  },
+});
 
 export default InputField;
