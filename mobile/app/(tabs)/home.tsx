@@ -5,6 +5,7 @@ import ProfileBar from "@/components/ProfileBar";
 import dummyData from "@/constants/dummyData/dummy";
 import ListingsMap from "@/components/ListingsMap";
 import HomeBottomScreen from "@/components/HomeBottomScreen";
+import SearchBar from "@/components/SearchBar";
 
 const formattedListings = dummyData.charger_listings.map((listing) => ({
   id: listing.id,
@@ -27,16 +28,19 @@ const formattedListings = dummyData.charger_listings.map((listing) => ({
 
 const Home = () => {
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <View style={styles.map}>
         <BlurView intensity={5} tint="light" style={styles.blurOverlay} />
         <View style={styles.profileBarWrapper}>
           <ProfileBar />
         </View>
+        <View style={{ zIndex: 2, position: "absolute", top: 80, width: "95%", alignSelf: "center" }}>
+          <SearchBar />
+        </View>
         <ListingsMap listings={formattedListings} snapPoints={["60%"]} />
       </View>
 
-      <View style={{ height: "50%" }}>
+      <View style={styles.bottomScreen}>
         <HomeBottomScreen />
       </View>
     </View>
@@ -44,8 +48,13 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
-  map: {
+  container: {
     flex: 1,
+  },
+  map: {
+    height: "50%",
+  },
+  bottomScreen: {
     height: "50%",
   },
   blurOverlay: {

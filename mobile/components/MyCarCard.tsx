@@ -24,7 +24,10 @@ const MyCarCard = ({ bookings }: Props) => {
   }
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => console.log("My Car Card pressed")}
+    >
       <View style={styles.leftSection}>
         <Text style={styles.idText}>
           ID {selectedBooking.id} <Text style={styles.onlineText}>ONLINE</Text>
@@ -45,18 +48,22 @@ const MyCarCard = ({ bookings }: Props) => {
               size={Font.md}
               color={Colors.accent}
             />
-            <Text style={styles.locationText}>{selectedBooking.charger_listings_address.split(",")[0]}</Text>
+            <Text style={styles.locationText}>
+              {selectedBooking.charger_listings_address.split(",")[0]}
+            </Text>
           </View>
           <View style={styles.batteryRow}>
             <Ionicons name="flash-outline" size={42} color={Colors.accent} />
-            <Text style={styles.batteryText}>{selectedBooking.battery_level ?? "72%"}</Text>
+            <Text style={styles.batteryText}>
+              {selectedBooking.battery_level ?? "72%"}
+            </Text>
           </View>
           <TouchableOpacity style={styles.stopButton}>
             <Text style={styles.stopText}>STOP</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

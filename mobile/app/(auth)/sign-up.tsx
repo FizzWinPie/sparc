@@ -29,33 +29,33 @@ export default function SignUpScreen() {
   const { startSSOFlow } = useSSO();
   const { isLoaded, signUp, setActive } = useSignUp();
   // const [showSuccessModal, setShowSuccessModal] = useState(false);
-  
+
   const onSelectAuth = async (strategy: Strategy) => {
     try {
       const { createdSessionId, setActive: setSessionActive } =
-      await startSSOFlow({
-        strategy,
-      });
-      
+        await startSSOFlow({
+          strategy,
+        });
+
       if (createdSessionId && setSessionActive) {
         await setSessionActive({ session: createdSessionId });
-        router.back();
+        router.replace("/(tabs)/home");
       }
     } catch (err) {
       console.error("SSO error", err);
     }
   };
-  
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const [verification, setVerification] = useState({
     state: "default",
     error: "",
     code: "",
   });
-  
+
   const onSignUpPress = async () => {
     // console.log(BACKEND_URL)
     if (!isLoaded) return;
@@ -181,7 +181,7 @@ export default function SignUpScreen() {
             </Text>
             <InputField
               label={"Code"}
-              icon={"~/assets/images/icon.png"}
+              // icon={"~/assets/images/icon.png"}
               placeholder={"12345"}
               value={verification.code}
               keyboardType="numeric"

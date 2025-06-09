@@ -12,6 +12,7 @@ import debounce from "lodash.debounce";
 import { Ionicons } from "@expo/vector-icons";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
+import Constants from "@/constants/Constants";
 
 const SearchBar = () => {
   const [addressInput, setAddressInput] = useState("");
@@ -70,7 +71,7 @@ const SearchBar = () => {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={16} />
+        <Ionicons name="search-outline" size={16} />
         <TextInput
           style={styles.input}
           value={addressInput}
@@ -116,13 +117,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 10,
+    borderRadius: Constants.borderRadius,
     paddingHorizontal: Spacing.md,
+    paddingVertical: Constants.spacing.xs,
     shadowColor: "#ccc",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.5,
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 1,
     shadowRadius: 1,
     gap: 10,
+    backgroundColor: "#fff",
   },
   input: {
     flex: 1,
@@ -132,7 +135,7 @@ const styles = StyleSheet.create({
   },
   suggestionList: {
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: Constants.borderRadius,
     marginTop: 4,
     maxHeight: 200,
   },

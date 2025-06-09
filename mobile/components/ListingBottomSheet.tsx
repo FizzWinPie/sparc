@@ -28,7 +28,9 @@ const ListingBottomSheet = ({
             />
             <View style={styles.listingInfo}>
               <View style={styles.listingDetails}>
-                <Text style={styles.listingId}>{selectedListing.id}</Text>
+                <Text style={styles.listingId}>
+                  {selectedListing.address.split(",")[0]}
+                </Text>
                 <View style={styles.locationContainer}>
                   <Ionicons
                     name="location-sharp"

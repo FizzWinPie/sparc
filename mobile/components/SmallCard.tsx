@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
@@ -8,32 +8,33 @@ import { Listing } from "@/types";
 
 interface Props {
   listings: Listing[];
+  onPress?: () => void;
 }
 
-const SmallCard = ({ listings }: Props) => {
+const SmallCard = ({ listings, onPress }: Props) => {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(
     listings.length > 0 ? listings[0] : null
   );
 
   if (!selectedListing) {
     return (
-    <View style={styles.container}>
-      <Image
-        source={require("../assets/images/logo/splash-icon.png")}
-        style={styles.image}
-        resizeMode="cover"
-      />
-      <View style={styles.infoContainer}>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>No Results...</Text>
+      <View style={styles.container}>
+        <Image
+          source={require("../assets/images/logo/splash-icon.png")}
+          style={styles.image}
+          resizeMode="cover"
+        />
+        <View style={styles.infoContainer}>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>No Results...</Text>
+          </View>
         </View>
       </View>
-    </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image
         source={{ uri: selectedListing.images }}
         style={styles.image}
@@ -41,7 +42,9 @@ const SmallCard = ({ listings }: Props) => {
       />
       <View style={styles.infoContainer}>
         <View style={styles.textContainer}>
-          <Text style={styles.title}>{selectedListing.address.split(",")[0]}</Text>
+          <Text style={styles.title}>
+            {selectedListing.address.split(",")[0]}
+          </Text>
           <View style={styles.locationContainer}>
             <Ionicons
               name="location-sharp"
@@ -52,7 +55,7 @@ const SmallCard = ({ listings }: Props) => {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -65,6 +68,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: Colors.secondary,
     overflow: "hidden",
+    maxWidth: "50%",
   },
   image: {
     width: 60,
@@ -102,7 +106,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   emptyState: {
-    flex: 1
+    flex: 1,
   },
   emptyImage: {
     width: 50,
