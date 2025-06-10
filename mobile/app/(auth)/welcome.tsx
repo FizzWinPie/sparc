@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet, Image, Button, ImageBackground } from "react-native";
 import React from "react";
 import { router } from "expo-router";
 import Colors from "@/constants/Colors";
@@ -8,33 +8,52 @@ import dummyData from "@/constants/dummyData/dummy.js";
 
 const Onboarding = () => {
   return (
-    <View style={{ backgroundColor: "white" }}>
-      <Text>Onboarding to the app</Text>
-      <TouchableOpacity
-        onPress={() => {
-          router.replace(`/(auth)/sign-in`);
-        }}
-      >
-        <Text>Sign In</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          router.replace(`/(auth)/sign-up`);
-        }}
-      >
-        <Text>Sign Up</Text>
-        <Text style={{ fontFamily: "bold", fontSize: Font.lg, padding: Spacing.xxl }}>
-          Welcome to the app, {dummyData.users[0].name}
-        </Text>
-        <Text style={{ fontFamily: "regular", fontSize: Font.md, padding: Spacing.md }}>
-          Choose your listing
-        </Text>
-        <Text style={{ fontFamily: "light", fontSize: Font.sm, padding: Spacing.sm }}>
-          The best in town
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
+    <ImageBackground
+      source={require("@/assets/images/evcharging.jpg")}
+      style={styles.background}
+    >
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Welcome to PlugPorch</Text>
+        <Button
+          color="green"
+          title="Sign In"
+          onPress={() => {
+            router.replace(`/(auth)/sign-in`);
+          } } />
+          <Button
+          title="New User? Sign Up Now"
+          onPress={() => {
+            router.replace(`/(auth)/sign-up`);
+          } } />
+      </SafeAreaView>
+    </ImageBackground>
+  );  
+}
+ 
+const styles = StyleSheet.create({
+  background:{
+    flex: 1,
+    justifyContent: "center",
+  },
+  loginButton:{
+    backgroundColor: "blue:",
+  },
+  container: {  
+    flex: 1,
+    justifyContent: "center", 
+  },
+  title: {
+    fontSize: Font.xlg,
+    fontFamily: "bold",
+    textAlign: "center",
+    marginBottom: Spacing.md,
+  },
+  subtitle: {
+    fontSize: Font.lg,
+    fontFamily: "bold",
+    textAlign: "center",
+    marginBottom: Spacing.md,
+  },
+});
 
 export default Onboarding;

@@ -18,6 +18,10 @@ import InputField from "@/components/InputField";
 import { fetchAPI } from "@/lib/fetch";
 // import { BACKEND_URL } from '@env';
 import { addNewUser } from "@/lib/auth";
+import Colors from "@/constants/Colors";
+import Font from "@/constants/Font";
+import Spacing from "@/constants/Spacing";
+import dummyData from "@/constants/dummyData/dummy.js";
 
 enum Strategy {
   Google = "oauth_google",
