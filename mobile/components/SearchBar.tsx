@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,6 @@ import {
   FlatList,
   ActivityIndicator,
 } from "react-native";
-import debounce from "lodash.debounce";
 import { Ionicons } from "@expo/vector-icons";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
@@ -19,7 +18,7 @@ const SearchBar = () => {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchSuggestions = useCallback(async (query: string) => {
+  const fetchSuggestions = async (query: string) => {
     if (!query.trim()) {
       setSuggestions([]);
       return;
@@ -30,7 +29,12 @@ const SearchBar = () => {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&countrycodes=us&q=${encodeURIComponent(
           query
-        )}`
+        )}`,
+        {
+          headers: {
+            "User-Agent": "plugPorch/1.0",
+          },
+        }
       );
       const data = await response.json();
       setSuggestions(Array.isArray(data) ? data : []);
@@ -40,20 +44,10 @@ const SearchBar = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const debouncedFetch = useMemo(
-    () => debounce(fetchSuggestions, 300),
-    [fetchSuggestions]
-  );
-
-  useEffect(() => {
-    return () => debouncedFetch.cancel();
-  }, [debouncedFetch]);
-
-  const handleInputChange = (text: string) => {
-    setAddressInput(text);
-    debouncedFetch(text);
+  const handleSearchPress = () => {
+    fetchSuggestions(addressInput);
   };
 
   const handleSelect = (item: any) => {
@@ -65,19 +59,20 @@ const SearchBar = () => {
   const handleClearInput = () => {
     setAddressInput("");
     setSuggestions([]);
-    debouncedFetch.cancel();
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={16} />
         <TextInput
           style={styles.input}
           value={addressInput}
-          onChangeText={handleInputChange}
+          onChangeText={setAddressInput}
           placeholder="Search a charger near you"
         />
+        <Pressable onPress={handleSearchPress}>
+          <Ionicons name="search-outline" size={16} />
+        </Pressable>
         {addressInput.length > 0 && (
           <Pressable onPress={handleClearInput}>
             <Ionicons name="close-circle" size={18} color="#ccc" />
