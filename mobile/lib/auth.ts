@@ -7,7 +7,9 @@ export const addNewUser = async (email: string, clerkId: string) => {
       );
     }
 
-    const res = await fetch(`http://192.168.0.100:8000/api/users`, {
+    // On your laptop, localhost points to your machine. Use: http://localhost:8000
+    // On your phone, localhost points to the phone itself — and your Node.js server isn’t running there. Use: http://<your ip address which can be found with command in terminal: 'ipconfig getifaddr en0'>:8000
+    const res = await fetch(`http://localhost:8000/api/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -87,7 +87,7 @@ export default function SignUpScreen() {
       if (completeSignUp.status === "complete") {
         if (completeSignUp.createdUserId) {
           await addNewUser(email, completeSignUp.createdUserId);
-          console.log(email, completeSignUp.createdUserId);
+          console.log("email: ", email, "\nClerkId: ", completeSignUp.createdUserId);
         } else {
           throw new Error("User ID is missing after sign up.");
         }

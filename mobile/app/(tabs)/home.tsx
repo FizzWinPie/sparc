@@ -1,5 +1,10 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import { BlurView } from "expo-blur";
 import ProfileBar from "@/components/ProfileBar";
 import dummyData from "@/constants/dummyData/dummy";
@@ -28,22 +33,23 @@ const formattedListings = dummyData.charger_listings.map((listing) => ({
 
 const Home = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.map}>
-        <BlurView intensity={5} tint="light" style={styles.blurOverlay} />
-        <View style={styles.profileBarWrapper}>
-          <ProfileBar />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <View style={styles.map}>
+          <BlurView intensity={5} tint="light" style={styles.blurOverlay} />
+          <View style={styles.profileBarWrapper}>
+            <ProfileBar />
+          </View>
+          <View style={styles.searchBar}>
+            <SearchBar />
+          </View>
+          <ListingsMap listings={formattedListings} snapPoints={["60%"]} />
         </View>
-        <View style={{ zIndex: 2, position: "absolute", top: 80, width: "95%", alignSelf: "center" }}>
-          <SearchBar />
+        <View style={styles.bottomScreen}>
+          <HomeBottomScreen />
         </View>
-        <ListingsMap listings={formattedListings} snapPoints={["60%"]} />
       </View>
-
-      <View style={styles.bottomScreen}>
-        <HomeBottomScreen />
-      </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -69,6 +75,13 @@ const styles = StyleSheet.create({
     top: 20,
     width: "100%",
     zIndex: 1,
+  },
+  searchBar: {
+    zIndex: 2,
+    position: "absolute",
+    top: 80,
+    width: "95%",
+    alignSelf: "center",
   },
 });
 
