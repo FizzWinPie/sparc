@@ -1,12 +1,17 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { View, Text, Button } from 'react-native'
+import React from 'react'
+import { SignOutButton } from '@/components/SignOutButton'
+import { useRouter } from "expo-router";
 
-const home = () => {
+const host = () => {
+  const router = useRouter();
+
   return (
-    <View>
-      <Text>Host: shows the lisadcasdadvaadscting of chargers</Text>
+    <View style={{backgroundColor: "white"}}>
+      <Text>Host Page</Text>
+      <Button title="Wallet" onPress={() => router.push("/host/wallet")} />
     </View>
-  );
-};
+  )
+}
 
-export default home;
+export default host;

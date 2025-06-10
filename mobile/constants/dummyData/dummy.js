@@ -34,8 +34,8 @@ const dummyData = {
       connector_type: "J1772",
       address: "123 Main St, Springfield",
       availability_schedule: "Mon-Fri: 9am-5pm",
-      price_per_hour: 5.0,
-      min_price: 2.5,
+      price_per_hour: 5.00,
+      min_price: 2.50,
       images:
         "https://www.nyc.gov/html/dot/images/motorist/ev-charging-dot-municipal-parking-mn-2.jpg",
       is_active: true,
@@ -51,8 +51,8 @@ const dummyData = {
       connector_type: "CCS",
       address: "456 Market Ave, Springfield",
       availability_schedule: "24/7",
-      price_per_hour: 12.0,
-      min_price: 5.0,
+      price_per_hour: 12.00,
+      min_price: 5.00,
       images:
         "https://www.brickunderground.com/sites/default/files/2023-09/iStock-1344638615.jpg",
       is_active: true,
@@ -86,6 +86,24 @@ const dummyData = {
       transaction_id: "txn_123456789",
       status: "completed",
       created_at: "2025-05-21T13:50:00Z",
+      recipient: {
+        id: "user003",
+        email: "charlie.host@example.com",
+      },
+      payer: {
+        id: "user001",
+        email: "alice.ev@example.com",
+      },
+    },
+    {
+      id: "invoice002",
+      booking_id: "booking002",
+      amount: 15.0,
+      currency: "USD",
+      payment_method: "credit_card",
+      transaction_id: "txn_123",
+      status: "completed",
+      created_at: "2025-05-26T13:50:00Z",
       recipient: {
         id: "user003",
         email: "charlie.host@example.com",

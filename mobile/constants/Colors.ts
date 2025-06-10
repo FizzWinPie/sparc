@@ -5,6 +5,7 @@ export default {
     blue: "#235789",
     yellow: "#f1d302",
     black: "#020100",
+    grey: "#808080"
   },
   blueVariations: {
     polynesianBlue: "#054a91ff",
