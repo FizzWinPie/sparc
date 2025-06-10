@@ -6,7 +6,7 @@ import { SignOutButton } from "@/components/SignOutButton";
 const allListings = () => {
   return (
     <SafeAreaView>
-      <Text>Shows all possible ev listings in the form of a list</Text>
+      <Text>Shows all possible ev listings in the form of a listasdfadsfadsf</Text>
       <SignOutButton />
     </SafeAreaView>
   );
