@@ -19,44 +19,69 @@ import Constants from "@/constants/Constants";
 import WalletCard from "@/components/WalletCardTransactions";
 import WalletCardBalance from "@/components/WalletCardBalance";
 import WalletCardTransactions from "@/components/WalletCardTransactions";
+import RequestCard from "@/components/RequestCard";
 
-const hostId = "user003";
+const formattedListings = dummyData.charger_listings.map((listing) => ({
+  id: listing.id,
+  host_id: listing.host_id,
+  charger_type: listing.charger_type,
+  power_output_kw: listing.power_output_kw,
+  connector_type: listing.connector_type,
+  address: listing.address,
+  latitude: listing.latitude,
+  longitude: listing.longitude,
+  availability_schedule: listing.availability_schedule,
+  price_per_hour: listing.price_per_hour,
+  min_price: listing.min_price,
+  images: listing.images,
+  is_active: listing.is_active,
+  instructions: listing.instructions,
+  created_at: listing.created_at,
+  updated_at: listing.updated_at,
+}));
+
+const formattedBookings = dummyData.bookings.map((booking) => ({
+  id: booking.id,
+  listing_id: booking.charger_listings_id,
+  host_id: booking.host_id,
+  start_time: booking.start_time,
+  end_time: booking.end_time,
+  total_cost: booking.total_cost,
+  status: booking.status,
+}));
+
+const formattedInvoices = dummyData.payment_invoice.map((invoice) => ({
+  id: invoice.id,
+  booking_id: invoice.booking_id,
+  host_id: invoice.recipient.id,
+  user_id: invoice.payer.id,
+  amount_paid: invoice.amount,
+  payment_method: invoice.payment_method,
+  paid_at: invoice.created_at,
+  status: invoice.status,
+  created_at: invoice.created_at,
+  updated_at: invoice.created_at,
+}));
 
 export default function Host() {
   const [openIds, setOpenIds] = useState<string[]>([]);
-  const host = dummyData.users.find((u) => u.id === hostId);
-  if (!host) return null;
 
-  const wallet = dummyData.payment_invoice
-    .filter((i) => i.recipient.id === hostId)
-    .reduce((s, i) => s + i.amount, 0);
-
-  const transactions = dummyData.payment_invoice
-    .filter((i) => i.recipient.id === hostId)
-    .map((i) => ({ id: i.id, amount: i.amount }));
-
-  const requests = dummyData.bookings
-    .filter((b) => b.host_id === hostId)
-    .map((b) => ({
-      id: b.id,
-      name: dummyData.users.find((u) => u.id === b.ev_owner_id)?.name ?? "-",
-      place:
-        dummyData.charger_listings.find((c) => c.id === b.charger_listings_id)
-          ?.address ?? "-",
-      date: b.start_time.split("T")[0],
-      time: `${new Date(b.start_time).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })} – ${new Date(b.end_time).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })}`,
-      price: b.total_cost,
-    }));
-
-  const stations = dummyData.charger_listings.filter(
-    (c) => c.host_id === hostId
-  );
+  const requests = dummyData.bookings.map((b) => ({
+    id: b.id,
+    name: dummyData.users.find((u) => u.id === b.ev_owner_id)?.name ?? "-",
+    place:
+      dummyData.charger_listings.find((c) => c.id === b.charger_listings_id)
+        ?.address ?? "-",
+    date: b.start_time.split("T")[0],
+    time: `${new Date(b.start_time).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })} – ${new Date(b.end_time).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`,
+    price: b.total_cost.toString(),
+  }));
 
   const toggle = (id: string) => {
     LayoutAnimation.easeInEaseOut();
@@ -71,14 +96,20 @@ export default function Host() {
         {/* Header */}
         <View style={s.row}>
           <Ionicons name="person-circle" size={36} color={Colors.secondary} />
-          <Text style={s.h1}>Welcome, {host.name}</Text>
+          <Text style={s.h1}>Welcome, {dummyData.users[2].id}</Text>
         </View>
         {/* <ProfileBar /> */}
 
         {/* Wallet */}
         <View style={{ flex: 1, flexDirection: "row", gap: 12 }}>
-          <WalletCardBalance wallet={wallet} transactions={transactions} />
-          <WalletCardTransactions wallet={wallet} transactions={transactions} />
+          <WalletCardBalance
+            wallet={1240}
+            transactions={dummyData.payment_invoice}
+          />
+          <WalletCardTransactions
+            wallet={1601}
+            transactions={dummyData.payment_invoice}
+          />
         </View>
 
         {/* Requests */}
@@ -95,83 +126,7 @@ export default function Host() {
             </Text>
           </View>
         ) : (
-          requests.map((r) => (
-            <View key={r.id} style={s.reqCard}>
-              <View>
-                <View style={s.reqTop}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={22}
-                    color={Colors.basic.blue}
-                  />
-                  <Text style={s.reqName}>{r.name}</Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    alignContent: "center",
-                    justifyContent: "flex-start",
-                    gap: 6,
-                  }}
-                >
-                  <Ionicons
-                    name="calendar"
-                    size={15}
-                    color={Colors.basic.blue}
-                  />
-                  <Text style={s.reqLine}>{r.date}</Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    alignContent: "center",
-                    justifyContent: "flex-start",
-                    gap: 6,
-                  }}
-                >
-                  <Ionicons
-                    name="time-outline"
-                    size={15}
-                    color={Colors.basic.blue}
-                  />
-                  <Text style={s.reqLine}>{r.time}</Text>
-                </View>
-                <Text style={s.price}>$ {r.price}</Text>
-              </View>
-
-              <View style={{ flex: 1, justifyContent: "space-between" }}>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    alignContent: "center",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <Ionicons
-                    name="location-outline"
-                    size={16}
-                    color={Colors.secondary}
-                    style={{ marginLeft: Spacing.xs }}
-                  />
-                  <Text style={s.reqLoc}>{r.place.split(",")[0]}</Text>
-                </View>
-
-                <View>
-                  <View style={s.rowBtn}>
-                    <TouchableOpacity style={[s.btn, s.btnGreen]}>
-                      <Text style={s.btnTxt}>Accept Booking</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[s.btn, s.btnGray]}>
-                      <Text style={s.btnTxt}>Decline Booking</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </View>
-          ))
+          requests.map((r) => <RequestCard key={r.id} request={r} />)
         )}
 
         {/* Stations */}
@@ -179,7 +134,7 @@ export default function Host() {
           My Charging Stations
         </Text>
 
-        {stations.map((st) => {
+        {dummyData.charger_listings.map((st) => {
           const open = openIds.includes(st.id);
           return (
             <View key={st.id} style={s.stationWrapper}>
@@ -281,7 +236,7 @@ const s = StyleSheet.create({
   },
   reqCard: {
     flex: 1,
-    flexDirection:"row",
+    flexDirection: "row",
     justifyContent: "space-between",
     borderWidth: 1,
     borderColor: Colors.blueVariations.aliceBlue,
@@ -289,7 +244,6 @@ const s = StyleSheet.create({
     padding: Spacing.md,
     gap: 6,
     // marginBottom: Spacing.lg,
-
   },
   reqTop: {
     flexDirection: "row",
