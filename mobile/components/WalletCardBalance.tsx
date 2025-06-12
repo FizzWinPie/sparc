@@ -4,7 +4,7 @@ import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
 import Constants from "@/constants/Constants";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 
 type Transaction = {
   id: string;
@@ -50,7 +50,7 @@ export default function WalletCardBalance({ wallet, transactions }: Props) {
             color: Colors.primary,
             fontSize: Font.sm,
             marginBottom: Spacing.xs,
-            fontWeight: "600",
+            fontWeight: "bold",
           }}
         >
           Account Balance (Wallet)
@@ -79,9 +79,9 @@ export default function WalletCardBalance({ wallet, transactions }: Props) {
           borderRadius: Constants.borderRadius,
         }}
       >
-        <Ionicons name="card-outline" size={18} />
+        <FontAwesome name="bank" size={18} />
         <Text style={{ fontSize: Font.sm, fontWeight: "regular" }}>
-          More Info
+          Account Info
         </Text>
       </TouchableOpacity>
     </View>

@@ -54,7 +54,7 @@ export default function WalletCardTransactions({
             color: Colors.primary,
             fontSize: Font.sm,
             marginBottom: Spacing.xs,
-            fontWeight: "600",
+            fontWeight: "bold",
           }}
         >
           All Transactions
@@ -71,7 +71,7 @@ export default function WalletCardTransactions({
             <Text style={{ color: "#eee", fontSize: Font.sm }}>ID42456</Text>
             <Text
               style={{
-                color: Constants.colors.danger,
+                color: "white",
                 fontSize: Font.sm,
                 fontWeight: "bold",
               }}

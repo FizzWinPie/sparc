@@ -1,10 +1,10 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import Spacing from "@/constants/Spacing";
-import Font from "@/constants/Font"; // if not already imported
-import Constants from "@/constants/Constants"; // if not already imported
+import Font from "@/constants/Font";
+import Constants from "@/constants/Constants";
 
 type Request = {
   id: string;
@@ -21,48 +21,189 @@ type Props = {
 
 const RequestCard: React.FC<Props> = ({ request: r }) => {
   return (
-    <View key={r.id} style={s.reqCard}>
-      <View>
-        <View style={s.reqTop}>
-          <Ionicons
-            name="person-circle-outline"
-            size={22}
-            color={Colors.basic.blue}
-          />
-          <Text style={s.reqName}>{r.name}</Text>
+    <View
+      style={{
+        shadowColor: "black",
+        shadowOffset: { width: 2, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: Constants.borderRadius,
+        borderRadius: Constants.borderRadius,
+      }}
+    >
+      <View
+        key={r.id}
+        style={{
+          flexDirection: "row",
+          borderWidth: 1,
+          borderColor: Colors.blueVariations.aliceBlue,
+          borderRadius: Constants.borderRadius,
+          padding: Spacing.md,
+          minHeight: 180,
+          backgroundColor: Colors.primary,
+          opacity: 0.97,
+        }}
+      >
+        <View style={{ flex: 1, width: "50%", justifyContent: "space-between" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+            }}
+          >
+            <Ionicons
+              name="person-circle"
+              size={35}
+              color={Constants.colors.accent}
+            />
+            <Text
+              style={{
+                fontWeight: "bold",
+                color: Colors.secondary,
+              }}
+            >
+              {r.name}
+            </Text>
+          </View>
+
+          <View style={{gap: 12}}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <Ionicons name="calendar" size={20} color={Colors.accent} />
+              <Text
+                style={{
+                  color: Colors.secondary,
+                  fontSize: Font.sm,
+                }}
+              >
+                {r.date}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <Ionicons name="time-outline" size={20} color={Colors.accent} />
+              <Text
+                style={{
+                  color: Colors.secondary,
+                  fontSize: Font.sm,
+                }}
+              >
+                {r.time}
+              </Text>
+            </View>
+          </View>
+
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: "black",
+              fontSize: Constants.fontSize.lg,
+            }}
+          >
+            $ {r.price}
+          </Text>
         </View>
 
-        <View style={s.row}>
-          <Ionicons name="calendar" size={15} color={Colors.basic.blue} />
-          <Text style={s.reqLine}>{r.date}</Text>
-        </View>
-
-        <View style={s.row}>
-          <Ionicons name="time-outline" size={15} color={Colors.basic.blue} />
-          <Text style={s.reqLine}>{r.time}</Text>
-        </View>
-
-        <Text style={s.price}>$ {r.price}</Text>
-      </View>
-
-      <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <View style={s.locRow}>
-          <Ionicons
-            name="location-outline"
-            size={16}
-            color={Colors.secondary}
-            style={{ marginLeft: Spacing.xs }}
-          />
-          <Text style={s.reqLoc}>{r.place.split(",")[0]}</Text>
-        </View>
-
-        <View>
-          <View style={s.rowBtn}>
-            <TouchableOpacity style={[s.btn, s.btnGreen]}>
-              <Text style={s.btnTxt}>Accept Booking</Text>
+        <View style={{ width: "50%", justifyContent: "space-between" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              marginBottom: Spacing.sm,
+            }}
+          >
+            <Ionicons name="location" size={16} color={Colors.accent} />
+            <Text
+              style={{
+                color: Colors.secondary,
+                fontSize: Font.sm,
+                gap: 6,
+              }}
+            >
+              {r.place.split(",")[0]}
+            </Text>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={{
+                borderRadius: Spacing.lg,
+                paddingVertical: Spacing.sm,
+                alignItems: "center",
+                backgroundColor: Colors.accent,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: Font.sm,
+                  fontWeight: "bold",
+                  color: "white",
+                }}
+              >
+                Accept Booking
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[s.btn, s.btnGray]}>
-              <Text style={s.btnTxt}>Decline Booking</Text>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={{
+                borderRadius: Spacing.lg,
+                paddingVertical: Spacing.sm,
+                alignItems: "center",
+                backgroundColor: "white",
+                borderColor: "gray",
+                borderWidth: 1,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: Font.sm,
+                  fontWeight: "bold",
+                  color: "gray",
+                }}
+              >
+                Decline Booking
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={{
+                borderRadius: Spacing.lg,
+                paddingVertical: Spacing.sm,
+                alignItems: "center",
+                backgroundColor: "white",
+                borderColor: Constants.colors.accent,
+                borderWidth: 1,
+              }}
+            >
+              <View style={{ flex: 1, flexDirection: "row", gap: 6 }}>
+                <Ionicons
+                  name="chatbubble-ellipses-outline"
+                  size={18}
+                  color={Constants.colors.accent}
+                />
+                <Text
+                  style={{
+                    fontSize: Font.sm,
+                    fontWeight: "bold",
+                    color: Constants.colors.accent,
+                  }}
+                >
+                  Send Message
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -70,73 +211,5 @@ const RequestCard: React.FC<Props> = ({ request: r }) => {
     </View>
   );
 };
-
-const s = StyleSheet.create({
-  reqCard: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderWidth: 1,
-    borderColor: Colors.blueVariations.aliceBlue,
-    borderRadius: Constants.borderRadius,
-    padding: Spacing.md,
-    gap: 6,
-  },
-  reqTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: Spacing.xs,
-  },
-  reqName: {
-    fontWeight: "600",
-    color: Colors.secondary,
-  },
-  reqLine: {
-    color: Colors.secondary,
-    fontSize: Font.sm,
-    marginLeft: Spacing.xs,
-    marginBottom: Spacing.xs,
-  },
-  reqLoc: {
-    color: Colors.secondary,
-    fontSize: Font.sm,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  locRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-  },
-  rowBtn: {
-    flexDirection: "column",
-    gap: 6,
-  },
-  btn: {
-    flex: 1,
-    borderRadius: Spacing.xs,
-    paddingVertical: Spacing.xs,
-    alignItems: "center",
-  },
-  btnGreen: {
-    backgroundColor: Colors.success,
-  },
-  btnGray: {
-    backgroundColor: Colors.blueVariations.aliceBlue,
-  },
-  btnTxt: {
-    fontSize: Font.sm,
-    fontWeight: "600",
-    color: Colors.secondary,
-  },
-  price: {
-    marginTop: Spacing.xs,
-    fontWeight: "700",
-    color: Colors.secondary,
-  },
-});
 
 export default RequestCard;
