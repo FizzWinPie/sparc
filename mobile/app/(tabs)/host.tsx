@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   LayoutAnimation,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import dummyData from "../../constants/dummyData/dummy";
@@ -75,7 +76,7 @@ export default function Host() {
         {/* <ProfileBar /> */}
 
         {/* Wallet */}
-        <View style={{ flex: 1, flexDirection: "row", gap: 12}}>
+        <View style={{ flex: 1, flexDirection: "row", gap: 12 }}>
           <WalletCardBalance wallet={wallet} transactions={transactions} />
           <WalletCardTransactions wallet={wallet} transactions={transactions} />
         </View>
@@ -84,38 +85,91 @@ export default function Host() {
         <Text style={[s.sub, { marginTop: Spacing.xl }]}>Charge requests</Text>
 
         {requests.length === 0 ? (
-          <View style={s.emptyBox}>
-            <Text style={s.emptyTxt}>No active requests</Text>
+          <View style={[s.emptyBox, { height: 120 }]}>
+            <Image
+              source={require("../../assets/images/noRequest-icon.png")}
+              style={{ width: 50, height: 50, resizeMode: "contain" }}
+            />
+            <Text style={[s.emptyTxt, { fontSize: 12 }]}>
+              No active requests
+            </Text>
           </View>
         ) : (
           requests.map((r) => (
             <View key={r.id} style={s.reqCard}>
-              <View style={s.reqTop}>
-                <Ionicons
-                  name="person-circle-outline"
-                  size={22}
-                  color={Colors.basic.blue}
-                />
-                <Text style={s.reqName}>{r.name}</Text>
-                <Ionicons
-                  name="location-outline"
-                  size={16}
-                  color={Colors.secondary}
-                  style={{ marginLeft: Spacing.xs }}
-                />
-                <Text style={s.reqLoc}>{r.place}</Text>
+              <View>
+                <View style={s.reqTop}>
+                  <Ionicons
+                    name="person-circle-outline"
+                    size={22}
+                    color={Colors.basic.blue}
+                  />
+                  <Text style={s.reqName}>{r.name}</Text>
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignContent: "center",
+                    justifyContent: "flex-start",
+                    gap: 6,
+                  }}
+                >
+                  <Ionicons
+                    name="calendar"
+                    size={15}
+                    color={Colors.basic.blue}
+                  />
+                  <Text style={s.reqLine}>{r.date}</Text>
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignContent: "center",
+                    justifyContent: "flex-start",
+                    gap: 6,
+                  }}
+                >
+                  <Ionicons
+                    name="time-outline"
+                    size={15}
+                    color={Colors.basic.blue}
+                  />
+                  <Text style={s.reqLine}>{r.time}</Text>
+                </View>
+                <Text style={s.price}>$ {r.price}</Text>
               </View>
-              <Text style={s.reqLine}>{r.date}</Text>
-              <Text style={s.reqLine}>{r.time}</Text>
-              <View style={s.rowBtn}>
-                <TouchableOpacity style={[s.btn, s.btnGreen]}>
-                  <Text style={s.btnTxt}>Accept</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[s.btn, s.btnGray]}>
-                  <Text style={s.btnTxt}>Decline</Text>
-                </TouchableOpacity>
+
+              <View style={{ flex: 1, justifyContent: "space-between" }}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignContent: "center",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <Ionicons
+                    name="location-outline"
+                    size={16}
+                    color={Colors.secondary}
+                    style={{ marginLeft: Spacing.xs }}
+                  />
+                  <Text style={s.reqLoc}>{r.place.split(",")[0]}</Text>
+                </View>
+
+                <View>
+                  <View style={s.rowBtn}>
+                    <TouchableOpacity style={[s.btn, s.btnGreen]}>
+                      <Text style={s.btnTxt}>Accept Booking</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[s.btn, s.btnGray]}>
+                      <Text style={s.btnTxt}>Decline Booking</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
-              <Text style={s.price}>€ {r.price}</Text>
             </View>
           ))
         )}
@@ -213,11 +267,12 @@ const s = StyleSheet.create({
   },
   emptyBox: {
     height: 90,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: Colors.blueVariations.aliceBlue,
     borderRadius: Spacing.sm,
     justifyContent: "center",
     alignItems: "center",
+    borderStyle: "dotted",
   },
   emptyTxt: {
     marginTop: Spacing.xs,
@@ -225,11 +280,16 @@ const s = StyleSheet.create({
     fontSize: Font.sm,
   },
   reqCard: {
+    flex: 1,
+    flexDirection:"row",
+    justifyContent: "space-between",
     borderWidth: 1,
     borderColor: Colors.blueVariations.aliceBlue,
-    borderRadius: Spacing.sm,
+    borderRadius: Constants.borderRadius,
     padding: Spacing.md,
-    marginBottom: Spacing.lg,
+    gap: 6,
+    // marginBottom: Spacing.lg,
+
   },
   reqTop: {
     flexDirection: "row",
@@ -238,7 +298,7 @@ const s = StyleSheet.create({
   },
   reqName: { fontWeight: "600", color: Colors.secondary },
   reqLoc: {
-    marginLeft: Spacing.xs,
+    // marginLeft: Spacing.xs,
     color: Colors.secondary,
     fontSize: Font.sm,
   },
@@ -247,7 +307,7 @@ const s = StyleSheet.create({
     fontSize: Font.sm,
     marginBottom: Spacing.xs,
   },
-  rowBtn: { flexDirection: "row", marginTop: Spacing.xs, gap: Spacing.sm },
+  rowBtn: { flexDirection: "column", gap: 6 },
   btn: {
     flex: 1,
     borderRadius: Spacing.xs,
