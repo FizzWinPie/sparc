@@ -116,7 +116,8 @@ function CarouselComponent() {
         snapEnabled={true}
         width={393}
         style={{ width: 393 }}
-        mode="horizontal-stack"
+        // mode="vertical-stack"
+        // mode="horizontal-stack"
         modeConfig={{
           stackInterval: 10,
           opacityInterval: 0.9,

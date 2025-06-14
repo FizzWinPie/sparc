@@ -66,6 +66,9 @@ const formattedInvoices = dummyData.payment_invoice.map((invoice) => ({
 
 export default function Host() {
   const [openIds, setOpenIds] = useState<string[]>([]);
+  const [selectedTab, setSelectedTab] = useState<"requests" | "plugged">(
+    "requests"
+  );
 
   const requests = dummyData.bookings.map((b) => ({
     id: b.id,
@@ -107,31 +110,89 @@ export default function Host() {
         {/* Wallet */}
         <View style={{ flex: 1, flexDirection: "row", gap: 12 }}>
           <WalletCardBalance
-            wallet={1240}
+            wallet={1240.97}
             transactions={dummyData.payment_invoice}
           />
           <WalletCardTransactions
-            wallet={1601}
+            wallet={1601.89}
             transactions={dummyData.payment_invoice}
           />
         </View>
 
         {/* Requests */}
-        <Text style={[s.sub, { marginTop: Spacing.xl }]}>Charge requests</Text>
-
-        {requests.length === 0 ? (
-          <View style={[s.emptyBox, { height: 120 }]}>
-            <Image
-              source={require("../../assets/images/noRequest-icon.png")}
-              style={{ width: 50, height: 50, resizeMode: "contain" }}
-            />
-            <Text style={[s.emptyTxt, { fontSize: 12 }]}>
-              No active requests
+        {/* <Text style={[s.sub, { marginTop: Spacing.xl }]}>Charge requests</Text> */}
+        <View
+          style={{ flexDirection: "row", gap: 16, marginVertical: Spacing.lg }}
+        >
+          <TouchableOpacity onPress={() => setSelectedTab("plugged")}>
+            <Text
+              style={{
+                fontWeight: selectedTab === "plugged" ? "bold" : "300",
+                color: selectedTab === "plugged" ? Colors.secondary : "gray",
+              }}
+            >
+              Plugged In
             </Text>
-          </View>
-        ) : (
-          requests.map((r) => <RequestCard key={r.id} request={r} />)
-        )}
+            <View
+              style={[
+                s.dot,
+                { marginTop: 4 },
+                selectedTab === "plugged" && s.dotSelected,
+              ]}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setSelectedTab("requests")}>
+            <Text
+              style={{
+                fontWeight: selectedTab === "requests" ? "bold" : "300",
+                color: selectedTab === "requests" ? Colors.secondary : "gray",
+              }}
+            >
+              Charge requests
+            </Text>
+            <View
+              style={[
+                s.dot,
+                { marginTop: 4 },
+                selectedTab === "requests" && s.dotSelected,
+              ]}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {(() => {
+          if (selectedTab === "requests") {
+            if (requests.length === 0) {
+              return (
+                <View style={[s.emptyBox, { height: 120 }]}>
+                  <Image
+                    source={require("../../assets/images/noRequest-icon.png")}
+                    style={{ width: 50, height: 50, resizeMode: "contain" }}
+                  />
+                  <Text style={[s.emptyTxt, { fontSize: 12 }]}>
+                    No active requests
+                  </Text>
+                </View>
+              );
+            } else {
+              return requests.map((r) => (
+                <RequestCard key={r.id} request={r} />
+              ));
+            }
+          } else {
+            return (
+              <View style={[s.emptyBox, { height: 120 }]}>
+                <Image
+                  source={require("../../assets/images/no-charge-session.png")}
+                  style={{ width: 50, height: 50, resizeMode: "contain" }}
+                />
+                <Text style={[s.emptyTxt, { fontSize: 12 }]}>
+                  No plugged-in sessions
+                </Text>
+              </View>
+            );
+          }
+        })()}
 
         {/* Stations */}
         <Text style={[s.sub, { marginTop: Spacing.xl }]}>
@@ -261,4 +322,13 @@ const s = StyleSheet.create({
   infoLabel: { width: 110, fontWeight: "600", color: Colors.secondary },
   infoValue: { flex: 1, color: Colors.secondary },
   detailText: { color: Colors.secondary, fontSize: Font.sm },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 6,
+  },
+  dotSelected: {
+    backgroundColor: Colors.accent,
+    alignSelf: "center",
+  },
 });

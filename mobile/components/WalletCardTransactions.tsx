@@ -57,7 +57,7 @@ export default function WalletCardTransactions({
             fontWeight: "bold",
           }}
         >
-          All Transactions
+          Recent Transactions
         </Text>
 
         <ScrollView style={{ gap: 2 }}>

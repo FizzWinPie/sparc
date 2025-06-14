@@ -63,7 +63,7 @@ export default function WalletCardBalance({ wallet, transactions }: Props) {
             fontWeight: "bold",
           }}
         >
-          $ 1512.32
+          $ {wallet}
         </Text>
       </View>
 
