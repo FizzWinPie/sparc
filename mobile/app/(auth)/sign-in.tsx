@@ -78,7 +78,7 @@ export default function Page() {
       }}
     >
       <Image
-        source={require("../../assets/images/onboard2.png")}
+        source={require("../../assets/images/onboard/onboard2.png")}
         style={{ height: 220, width: 400, marginBottom: Spacing.md }}
         resizeMode="contain"
       />

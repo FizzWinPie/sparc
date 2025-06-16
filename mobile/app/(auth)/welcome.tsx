@@ -1,113 +1,121 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
-import React from "react";
-import { router } from "expo-router";
+import React, { useRef, useState } from "react";
+import {
+  View,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import Carousel, {
+  ICarouselInstance,
+  Pagination,
+} from "react-native-reanimated-carousel";
+import Spacing from "@/constants/Spacing";
+import OtherPage from "@/components/onboarding/OtherPage";
+import WelcomePage from "@/components/onboarding/WelcomePage";
 import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
-import Spacing from "@/constants/Spacing";
-import dummyData from "@/constants/dummyData/dummy.js";
-import { SafeAreaView } from "react-native-safe-area-context";
-import Constants from "@/constants/Constants";
-import { Ionicons } from "@expo/vector-icons";
+import { useSharedValue } from "react-native-reanimated";
+
+const { width, height } = Dimensions.get("window");
+
+const onboardingData = [
+  {
+    type: "page",
+    title: "Charge Anywhere, Anytime",
+    subtitle:
+      "Find home EV chargers nearby — skip the lines and power up from driveways and garages around you.",
+    image: require("../../assets/images/onboard/onboard3.png"),
+  },
+  {
+    type: "page",
+    title: "Turn Your Charger Into Income",
+    subtitle:
+      "Got a home charger? List it and earn money every time someone charges.",
+    image: require("../../assets/images/onboard/house.png"),
+  },
+  {
+    type: "component",
+    title: "Welcome to plugPorch",
+    subtitle: "Let's Get Started.",
+    image: require("../../assets/images/onboard/onboard2.png"),
+  },
+];
 
 const Onboarding = () => {
+  const carouselRef = useRef<ICarouselInstance | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const progress = useSharedValue<number>(0);
+
+  const skipToEnd = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollTo({ index: onboardingData.length - 1 });
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          source={require("../../assets/images/onboard1.png")}
-          style={styles.image}
-          resizeMode="contain"
-        />
-        <Text style={styles.welcome}>
-          Welcome to{" "}
-          <Text style={styles.brand}>
-            plug
-            <Text style={styles.brandHighlight}>Porch</Text>
-          </Text>
-        </Text>
-        <Text>Let's get started!</Text>
-        <Ionicons name="chevron-down" />
-      </View>
-
-      <View style={styles.buttons}>
-        <TouchableOpacity
-          onPress={() => router.replace(`/(auth)/sign-in`)}
-          style={[styles.button, { backgroundColor: Colors.secondary }]}
-        >
-          <Text style={styles.buttonText}>SIGN IN</Text>
+    <View style={{ flex: 1 }}>
+      {currentIndex !== onboardingData.length - 1 && (
+        <TouchableOpacity onPress={skipToEnd} style={styles.skipButton}>
+          <Text style={styles.skipText}>Skip</Text>
         </TouchableOpacity>
+      )}
 
-        <TouchableOpacity
-          onPress={() => router.replace(`/(auth)/sign-up`)}
-          style={[
-            styles.button,
-            { backgroundColor: Colors.accent, marginTop: Spacing.md },
-          ]}
-        >
-          <Text style={styles.signUpLine}>
-            <Text style={styles.newUserText}>New User?</Text>
-            <Text style={styles.signUpText}> SIGN UP NOW</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      <Carousel
+        ref={carouselRef}
+        loop={false}
+        width={width}
+        height={height}
+        autoPlay={false}
+        data={onboardingData}
+        onProgressChange={progress}
+        scrollAnimationDuration={500}
+        onSnapToItem={(index) => setCurrentIndex(index)}
+        renderItem={({ index }) => {
+          const item = onboardingData[index];
+
+          if (item.type === "component") {
+            return <WelcomePage />;
+          }
+
+          return (
+            <View style={styles.slide}>
+              <OtherPage
+                title={item.title}
+                subtitle={item.subtitle}
+                image={item.image}
+                nextPage={() => {
+                  if (carouselRef.current) {
+                    carouselRef.current.next();
+                  }
+                }}
+                progress={progress}
+                data={onboardingData}
+                carouselRef={carouselRef}
+              />
+            </View>
+          );
+        }}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  slide: {
     flex: 1,
-    backgroundColor: "white",
-    justifyContent: "space-around",
-    alignItems: "center",
-    // padding: Spacing.lg,
   },
-  header: {
-    alignItems: "center",
+  skipButton: {
+    position: "absolute",
+    top: 60,
+    right: 30,
+    zIndex: 1,
+    padding: 10,
   },
-  image: {
-    height: 220,
-    width: 400,
-    marginBottom: Spacing.md,
-  },
-  welcome: {
-    fontSize: Spacing.lg,
-    fontFamily: "regular",
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  brand: {
-    fontFamily: "bold",
+  skipText: {
     color: Colors.accent,
-  },
-  brandHighlight: {
-    color: Colors.secondary,
-    fontFamily: "bold",
-  },
-  buttons: {
-    alignItems: "center",
-  },
-  button: {
-    width: 250,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: Constants.borderRadius,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontFamily: "bold",
-  },
-  signUpLine: {
-    textAlign: "center",
-  },
-  newUserText: {
-    color: "#D3D3D3",
-    fontFamily: "bold",
-  },
-  signUpText: {
-    color: "white",
-    fontFamily: "bold",
+    fontSize: Font.md,
+    fontWeight: "regular",
   },
 });
 

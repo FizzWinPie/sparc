@@ -129,7 +129,7 @@ export default function SignUpScreen() {
       }}
     >
       <Image
-        source={require("../../assets/images/onboard3.png")}
+        source={require("../../assets/images/onboard/world.png")}
         style={{ height: 220, width: 400, marginBottom: Spacing.md }}
         resizeMode="contain"
       />
