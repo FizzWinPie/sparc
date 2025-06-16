@@ -11,6 +11,7 @@ import dummyData from "@/constants/dummyData/dummy";
 import ListingsMap from "@/components/ListingsMap";
 import HomeBottomScreen from "@/components/HomeBottomScreen";
 import SearchBar from "@/components/SearchBar";
+import Spacing from "@/constants/Spacing";
 
 const formattedListings = dummyData.charger_listings.map((listing) => ({
   id: listing.id,
@@ -72,7 +73,8 @@ const styles = StyleSheet.create({
   },
   profileBarWrapper: {
     position: "absolute",
-    top: 20,
+    top: 60,
+    paddingHorizontal: Spacing.lg,
     width: "100%",
     zIndex: 1,
   },

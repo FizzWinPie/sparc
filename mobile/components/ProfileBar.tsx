@@ -1,19 +1,23 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import dummyData from "@/constants/dummyData/dummy";
 import { Ionicons } from "@expo/vector-icons";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
+import { router, useNavigation } from "expo-router";
+import Colors from "@/constants/Colors";
 
 const ProfileBar = () => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
-      <View style={styles.userSection}>
-        <Ionicons name="person-circle" style={styles.userIcon} />
+      <TouchableOpacity style={styles.userSection} onPress={() => router.push("./profile")}>
+        <Ionicons name="person-circle" style={styles.userIcon} color={Colors.secondary}/>
         <Text style={styles.welcomeText}>
           Welcome, {dummyData.users[0].name}!
         </Text>
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.iconSection}>
         <Ionicons
@@ -30,25 +34,26 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "space-between",
-    margin: Spacing.md,
+    // marginHorizontal: Spacing.lg,
   },
   userSection: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    padding: Spacing.md,
+    // padding: Spacing.md,
   },
   userIcon: {
     fontSize: 40,
   },
   welcomeText: {
     fontFamily: "regular",
+    color: Colors.secondary,
   },
   iconSection: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    padding: Spacing.md,
+    // padding: Spacing.md,
   },
   icon: {
     fontSize: Font.lg,

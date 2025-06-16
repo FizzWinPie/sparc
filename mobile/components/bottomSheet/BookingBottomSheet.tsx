@@ -5,31 +5,31 @@ import { BottomSheetView } from "@gorhom/bottom-sheet";
 import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
-import { Listing } from "@/types";
+import { Booking } from "@/types";
 
-interface ListingBottomSheetProps {
-  selectedListing: Listing | null;
-  onChooseListing: () => void;
+interface BookingBottomSheetProps {
+  selectedBooking: Booking | null;
+  onChooseBooking: () => void;
 }
 
-const ListingBottomSheet = ({
-  selectedListing,
-  onChooseListing,
-}: ListingBottomSheetProps) => {
+const BookingBottomSheet = ({
+  selectedBooking,
+  onChooseBooking,
+}: BookingBottomSheetProps) => {
   return (
     <BottomSheetView style={styles.contentContainer}>
-      {selectedListing ? (
+      {selectedBooking ? (
         <>
-          <Text style={styles.sheetTitle}>Select Listing</Text>
-          <View style={styles.listingHeader}>
+          <Text style={styles.sheetTitle}>Booking Details</Text>
+          <View style={styles.bookingHeader}>
             <Image
-              source={require("../assets/images/logo/splash-icon.png")}
-              style={styles.listingImage}
+              source={require("../../assets/images/logo/splash-icon.png")}
+              style={styles.bookingImage}
             />
-            <View style={styles.listingInfo}>
-              <View style={styles.listingDetails}>
-                <Text style={styles.listingId}>
-                  {selectedListing.address.split(",")[0]}
+            <View style={styles.bookingInfo}>
+              <View style={styles.bookingDetails}>
+                <Text style={styles.bookingId}>
+                  {selectedBooking.charger_listings_address.split(",")[0]}
                 </Text>
                 <View style={styles.locationContainer}>
                   <Ionicons
@@ -37,58 +37,33 @@ const ListingBottomSheet = ({
                     size={Font.md}
                     color={Colors.accent}
                   />
-                  <Text style={styles.locationText}>3 miles away</Text>
+                  <Text style={styles.locationText}>
+                    Battery: {selectedBooking.battery_level}
+                  </Text>
                 </View>
+                <Text style={styles.statusText}>
+                  {new Date(selectedBooking.start_time).toLocaleString()} -{" "}
+                  {new Date(selectedBooking.end_time).toLocaleTimeString()}
+                </Text>
               </View>
 
               <View style={styles.priceContainer}>
                 <Text style={styles.priceText}>
-                  ${selectedListing.price_per_hour}{" "}
-                  <Text style={styles.priceUnit}>/kWh</Text>
+                  ${selectedBooking.total_cost}
                 </Text>
-                <View style={styles.statusContainer}>
-                  <Ionicons
-                    name="flash-sharp"
-                    size={Font.md}
-                    style={{
-                      color: selectedListing.is_active
-                        ? Colors.success
-                        : Colors.danger,
-                    }}
-                  />
-                  <Text
-                    style={[
-                      styles.statusText,
-                      {
-                        color: selectedListing.is_active
-                          ? Colors.success
-                          : Colors.danger,
-                      },
-                    ]}
-                  >
-                    {selectedListing.is_active ? "Active" : "Inactive"}
-                  </Text>
-                </View>
+                <Text style={styles.statusText}>
+                  Status: {selectedBooking.status}
+                </Text>
+                <Text style={styles.statusText}>
+                  Payment: {selectedBooking.payment_status}
+                </Text>
               </View>
             </View>
           </View>
+
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                !selectedListing.is_active && styles.disabledButton,
-              ]}
-              onPress={onChooseListing}
-              disabled={!selectedListing.is_active}
-            >
-              <Text
-                style={[
-                  styles.buttonText,
-                  !selectedListing.is_active && styles.disabledButtonText,
-                ]}
-              >
-                {selectedListing.is_active ? "Choose Listing" : "Unavailable"}
-              </Text>
+            <TouchableOpacity style={styles.button} onPress={onChooseBooking}>
+              <Text style={styles.buttonText}>View Invoice</Text>
             </TouchableOpacity>
             <View style={styles.calendarButton}>
               <Ionicons name="calendar" size={25} color={Colors.accent} />
@@ -97,12 +72,12 @@ const ListingBottomSheet = ({
         </>
       ) : (
         <View style={styles.emptyState}>
-          <Text style={styles.sheetTitle}>Select Listing</Text>
+          <Text style={styles.sheetTitle}>No Booking Selected</Text>
           <Image
-            source={require("../assets/images/no-result.png")}
+            source={require("../../assets/images/no-result.png")}
             style={styles.emptyImage}
           />
-          <Text style={styles.emptyText}>No Results...</Text>
+          <Text style={styles.emptyText}>No Booking Data Available</Text>
         </View>
       )}
     </BottomSheetView>
@@ -121,31 +96,31 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignSelf: "center",
   },
-  listingHeader: {
+  bookingHeader: {
     flexDirection: "row",
     alignContent: "center",
     justifyContent: "flex-start",
     gap: 10,
     marginBottom: 10,
   },
-  listingImage: {
+  bookingImage: {
     borderRadius: 20,
     width: 60,
     height: 60,
   },
-  listingInfo: {
+  bookingInfo: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     flex: 1,
     paddingHorizontal: Spacing.sm,
   },
-  listingDetails: {
+  bookingDetails: {
     flex: 1,
     justifyContent: "space-between",
     gap: 10,
   },
-  listingId: {
+  bookingId: {
     fontFamily: "bold",
     fontSize: Font.md,
   },
@@ -224,4 +199,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListingBottomSheet;
+export default BookingBottomSheet;

@@ -100,11 +100,12 @@ export default function Host() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 50 }}
       >
+      <ProfileBar />
         {/* Header */}
-        <View style={s.row}>
+        {/* <View style={s.row}>
           <Ionicons name="person-circle" size={36} color={Colors.secondary} />
           <Text style={s.h1}>Welcome, {dummyData.users[2].id}</Text>
-        </View>
+        </View> */}
         {/* <ProfileBar /> */}
 
         {/* Wallet */}

@@ -72,17 +72,19 @@ const dummyData = {
     {
       id: "booking001",
       charger_listings_id: "charger001",
-      charger_listings_address: "297 Main St, Manhattan",
+      charger_listings_address: "142 Main St, Manhattan",
       host_id: "user003",
       ev_owner_id: "user001",
       start_time: "2025-05-21T14:00:00Z",
       end_time: "2025-05-21T16:00:00Z",
       total_cost: 10.0,
-      status: "confirmed",
+      status: "online",
       payment_status: "paid",
       rating_by_driver: 5,
       rating_by_host: 4,
       battery_level: "72%",
+      images:
+        "https://www.brickunderground.com/sites/default/files/2023-09/iStock-1344638615.jpg",
     },
   ],
   payment_invoice: [

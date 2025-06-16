@@ -7,7 +7,7 @@ import SmallCard from "./SmallCard";
 import Spacing from "@/constants/Spacing";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Listing } from "@/types";
-import ListingBottomSheet from "./ListingBottomSheet";
+import ListingBottomSheet from "./bottomSheet/ListingBottomSheet";
 
 const HomeBottomScreen = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);

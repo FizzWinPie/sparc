@@ -1,9 +1,16 @@
-import { View, StyleSheet } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import React from "react";
 import ListingsMap from "@/components/ListingsMap";
 import dummyData from "@/constants/dummyData/dummy";
 import ProfileBar from "@/components/ProfileBar";
 import { BlurView } from "expo-blur";
+import Spacing from "@/constants/Spacing";
+import SearchBar from "@/components/SearchBar";
 
 const formattedListings = dummyData.charger_listings.map((listing) => ({
   id: listing.id,
@@ -26,13 +33,18 @@ const formattedListings = dummyData.charger_listings.map((listing) => ({
 
 const fullMap = () => {
   return (
-    <View style={styles.container}>
-      <ListingsMap listings={formattedListings} snapPoints={["45%", "70%"]} />
-      <BlurView intensity={6} tint="light" style={styles.blurOverlay} />
-      <View style={styles.profileBarWrapper}>
-        <ProfileBar />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <ListingsMap listings={formattedListings} snapPoints={["45%", "70%"]} />
+        <View style={styles.searchBar}>
+          <SearchBar />
+        </View>
+        <BlurView intensity={6} tint="light" style={styles.blurOverlay} />
+        <View style={styles.profileBarWrapper}>
+          <ProfileBar />
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -48,10 +60,18 @@ const styles = StyleSheet.create({
     height: 105,
     zIndex: 1,
   },
+  searchBar: {
+    zIndex: 2,
+    position: "absolute",
+    top: 80,
+    width: "95%",
+    alignSelf: "center",
+  },
 
   profileBarWrapper: {
     position: "absolute",
-    top: 20,
+    top: 60,
+    paddingHorizontal: Spacing.lg,
     width: "100%",
     zIndex: 1,
   },

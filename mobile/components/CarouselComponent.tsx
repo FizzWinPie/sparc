@@ -6,98 +6,109 @@ import Constants from "@/constants/Constants";
 import Spacing from "@/constants/Spacing";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import ListingBottomSheet from "./bottomSheet/ListingBottomSheet";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { Booking, Listing } from "@/types";
+import BookingBottomSheet from "./bottomSheet/BookingBottomSheet";
+import dummyData from "@/constants/dummyData/dummy";
 
-const imageData = [
-  "https://qmerit.com/wp-content/uploads/2024/05/Qmerit-home-ev-charging-station-cost.jpg",
-  "https://www.brickunderground.com/sites/default/files/2023-09/iStock-1344638615.jpg",
-];
+const bookingData = dummyData.bookings;
 
 function CarouselComponent() {
   const progress = useSharedValue<number>(0);
 
-  const renderItem = ({ item }: { item: string }) => (
-    <View
-      style={{
-        width: "85%",
-        height: "100%",
-        borderRadius: Constants.borderRadius,
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
-      <Image
-        source={{ uri: item }}
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
-        resizeMode="cover"
-      />
+  const bottomSheetRef = React.useRef<BottomSheet>(null);
+  const snapPoints = React.useMemo(() => ["85%"], []);
+  const [selectedBooking, setSelectedBooking] = React.useState<Booking | null>(
+    null
+  );
+  const handleCardPress = (booking: Booking) => {
+    setSelectedBooking(booking);
+    bottomSheetRef.current?.snapToIndex(0);
+  };
 
+  const renderItem = ({ item }: { item: Booking }) => (
+    <View>
       <View
         style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: "rgba(0, 48, 73, 0.92)",
-          paddingVertical: Spacing.md,
-          paddingHorizontal: Spacing.md,
+          width: "85%",
+          height: "100%",
+          borderRadius: Constants.borderRadius,
+          overflow: "hidden",
+          position: "relative",
         }}
       >
-        <View style={{ flex: 1, flexDirection: "row" }}>
-          <View style={{ width: "80%", gap: 4 }}>
-            <Text
-              style={{
-                color: "#fff",
-                fontSize: Constants.fontSize.md,
-                fontWeight: "bold",
-              }}
-            >
-              Casa Blanca
-            </Text>
-            <Text
-              style={{
-                color: "#fff",
-                fontSize: Constants.fontSize.sm,
-                fontWeight: "400",
-              }}
-            >
-              1/2 plugs available
-            </Text>
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                gap: 6,
-                justifyContent: "flex-start",
-                alignItems: "center",
-              }}
-            >
-              <Ionicons
-                name="arrow-forward-outline"
-                color={Colors.accent}
-                size={15}
-              />
+        <Image
+          source={{
+            uri: item.images,
+          }}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="cover"
+        />
+        <View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: "rgba(0, 48, 73, 0.92)",
+            paddingVertical: Spacing.md,
+            paddingHorizontal: Spacing.md,
+          }}
+        >
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <View style={{ width: "80%", gap: 4 }}>
               <Text
                 style={{
-                  color: Colors.accent,
-                  fontSize: Constants.fontSize.sm,
-                  fontWeight: "regular",
+                  color: "#fff",
+                  fontSize: Constants.fontSize.md,
+                  fontWeight: "bold",
                 }}
               >
-                View
+                {item.charger_listings_address.split(",")[0]}
               </Text>
-            </TouchableOpacity>
-          </View>
-          <View>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: Constants.fontSize.sm,
+                }}
+              >
+                Battery: {item.battery_level}
+              </Text>
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  gap: 6,
+                  alignItems: "center",
+                }}
+                onPress={() => handleCardPress(item)}
+              >
+                <Ionicons
+                  name="arrow-forward-outline"
+                  color={Colors.accent}
+                  size={15}
+                />
+                <Text
+                  style={{
+                    color: Colors.accent,
+                    fontSize: Constants.fontSize.sm,
+                  }}
+                >
+                  View More
+                </Text>
+              </TouchableOpacity>
+            </View>
             <Text
               style={{
                 color: Constants.colors.accent,
                 fontSize: 16,
                 fontWeight: "bold",
+                alignSelf: "center",
               }}
             >
-              ONLINE
+              {item.status.toUpperCase()}
             </Text>
           </View>
         </View>
@@ -109,11 +120,11 @@ function CarouselComponent() {
     <View id="carousel-component">
       <Carousel
         autoPlayInterval={2000}
-        data={imageData}
+        data={bookingData}
         height={258}
-        loop={true}
-        pagingEnabled={true}
-        snapEnabled={true}
+        loop={bookingData.length > 1}
+        pagingEnabled={bookingData.length > 1}
+        snapEnabled={bookingData.length > 1}
         width={393}
         style={{ width: 393 }}
         // mode="vertical-stack"
@@ -125,6 +136,17 @@ function CarouselComponent() {
         onProgressChange={progress}
         renderItem={renderItem}
       />
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+      >
+        <BookingBottomSheet
+          selectedBooking={selectedBooking}
+          onChooseBooking={() => bottomSheetRef.current?.close()}
+        />
+      </BottomSheet>
     </View>
   );
 }
