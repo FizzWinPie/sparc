@@ -14,7 +14,7 @@ const Onboarding = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={require("../../assets/images/onboard1.jpg")}
+          source={require("../../assets/images/onboard1.png")}
           style={styles.image}
           resizeMode="contain"
         />

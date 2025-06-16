@@ -1,8 +1,20 @@
 import { useSignIn, useSSO } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
-import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Spacing from "@/constants/Spacing";
+import Colors from "@/constants/Colors";
+import Constants from "@/constants/Constants";
+import Font from "@/constants/Font";
 
 enum Strategy {
   Google = "oauth_google",
@@ -56,37 +68,163 @@ export default function Page() {
   };
 
   return (
-    <View>
-      <Text>Sign in</Text>
-      <TextInput
-        autoCapitalize="none"
-        value={email}
-        placeholder="Enter email"
-        onChangeText={(email) => setEmail(email)}
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+        justifyContent: "space-evenly",
+        alignItems: "center",
+        paddingHorizontal: Spacing.lg,
+      }}
+    >
+      <Image
+        source={require("../../assets/images/onboard2.png")}
+        style={{ height: 220, width: 400, marginBottom: Spacing.md }}
+        resizeMode="contain"
       />
-      <TextInput
-        value={password}
-        placeholder="Enter password"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      <TouchableOpacity onPress={onSignInPress}>
-        <Text>Continue</Text>
-      </TouchableOpacity>
-      <View style={{ display: "flex", flexDirection: "row", gap: 3 }}>
+      <View
+        style={{
+          width: "100%",
+          paddingHorizontal: 50,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: Font.lg,
+            fontWeight: "bold",
+            marginBottom: Spacing.sm,
+          }}
+        >
+          Welcome back!
+        </Text>
+        <Text style={{ fontSize: Font.md, marginBottom: Spacing.lg }}>
+          <Text style={{color: Colors.accent}}>Sign In</Text> to your account
+        </Text>
+        <View
+          style={{ alignSelf: "flex-start", width: "100%", gap: Spacing.md }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#f0f0f0",
+              borderRadius: 30,
+              paddingHorizontal: Spacing.md,
+              paddingVertical: 12,
+            }}
+          >
+            <Ionicons
+              name="mail-outline"
+              size={20}
+              color={Colors.accent}
+              style={{ marginRight: Spacing.sm, marginLeft: Spacing.xs }}
+            />
+            <TextInput
+              autoCapitalize="none"
+              value={email}
+              placeholder="Enter email"
+              placeholderTextColor="#888"
+              onChangeText={setEmail}
+              style={{
+                flex: 1,
+                color: "#222",
+              }}
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#f0f0f0",
+              borderRadius: 30,
+              paddingHorizontal: Spacing.md,
+              paddingVertical: 12,
+            }}
+          >
+            <Ionicons
+              name="lock-open-outline"
+              size={20}
+              color={Colors.accent}
+              style={{ marginRight: Spacing.sm, marginLeft: Spacing.xs }}
+            />
+            <TextInput
+              value={password}
+              placeholder="Enter password"
+              secureTextEntry
+              placeholderTextColor="#888"
+              onChangeText={setPassword}
+              style={{
+                flex: 1,
+                color: "#222",
+              }}
+            />
+          </View>
+        </View>
+      </View>
+
+      <View style={{ alignItems: "center" }}>
+        <TouchableOpacity
+          onPress={() => onSignInPress()}
+          style={{
+            backgroundColor: Colors.secondary,
+            width: 250,
+            paddingVertical: Spacing.md,
+            paddingHorizontal: Spacing.lg,
+            borderRadius: Constants.borderRadius,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: "white", fontFamily: "bold" }}>Continue</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={{ display: "flex", flexDirection: "row" }}>
         <Link href="/sign-up">
-          <Text>Don't have an account? Sign up</Text>
+          <Text style={{ color: "gray" }}>
+            Don't have an account?{" "}
+            <Text style={{ color: Colors.accent }}>Sign up</Text>
+          </Text>
         </Link>
       </View>
-      <TouchableOpacity onPress={() => onSelectAuth(Strategy.Apple)}>
-        <Ionicons name="logo-apple" size={24} />
-        <Text>Continue with Apple</Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => onSelectAuth(Strategy.Google)}>
-        <Ionicons name="logo-google" size={24} />
-        <Text>Continue with Google</Text>
-      </TouchableOpacity>
-    </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: 45
+        }}
+      >
+        <View style={{ flex: 1, height: 1, backgroundColor: "#ccc" }} />
+        <Text
+          style={{
+            marginHorizontal: Spacing.sm,
+            color: "#888",
+            fontWeight: "regular",
+          }}
+        >
+          OR
+        </Text>
+        <View style={{ flex: 1, height: 1, backgroundColor: "#ccc" }} />
+      </View>
+
+      <View style={{ gap: 15, alignSelf: "center" }}>
+        <TouchableOpacity onPress={() => onSelectAuth(Strategy.Google)}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Image
+              source={require("../../assets/images/google-logo.png")}
+              style={{ width: 20, height: 20 }}
+            />
+            <Text style={{ fontFamily: "regular" }}>Continue with Google</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => onSelectAuth(Strategy.Apple)}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Ionicons name="logo-apple" size={20} />
+            <Text>Continue with Apple</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
