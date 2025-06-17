@@ -68,6 +68,13 @@ const MainLayout = () => {
           ),
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          href: null,
+          headerShown: false
+        }}
+      />
     </Tabs>
   );
 };

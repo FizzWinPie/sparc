@@ -1,3 +1,4 @@
+import Colors from "@/constants/Colors";
 import { useClerk } from "@clerk/clerk-expo";
 import { router } from "expo-router";
 import { Text, TouchableOpacity } from "react-native";
@@ -16,7 +17,7 @@ export const SignOutButton = () => {
 
   return (
     <TouchableOpacity onPress={handleSignOut}>
-      <Text>Sign out</Text>
+      <Text style={{fontFamily: "regular", color: Colors.accent}}>Sign out</Text>
     </TouchableOpacity>
   );
 };

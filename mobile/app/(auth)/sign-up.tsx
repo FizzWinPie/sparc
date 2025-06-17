@@ -9,6 +9,7 @@ import {
   Image,
   Alert,
   Button,
+  SafeAreaView,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useAuth, useSignUp, useSSO } from "@clerk/clerk-expo";
@@ -18,6 +19,10 @@ import InputField from "@/components/InputField";
 import { fetchAPI } from "@/lib/fetch";
 // import { BACKEND_URL } from '@env';
 import { addNewUser } from "@/lib/auth";
+import Spacing from "@/constants/Spacing";
+import Font from "@/constants/Font";
+import Colors from "@/constants/Colors";
+import Constants from "@/constants/Constants";
 
 enum Strategy {
   Google = "oauth_google",
@@ -114,119 +119,165 @@ export default function SignUpScreen() {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: "white" }}>
-      <View style={styles.mainContainer}>
-        <View>
-          <Image
-            source={require("../../assets/images/car1.jpg")}
-            style={styles.image}
-          />
-        </View>
-        <Text style={{ fontWeight: "bold", fontSize: 24 }}>
-          Create New Account
-        </Text>
-        {/* <TextInput
-          autoCapitalize="none"
-          value={username}
-          placeholder="Enter username"
-          onChangeText={(username) => setUsername(username)}
-        /> */}
-        <TextInput
-          autoCapitalize="none"
-          value={email}
-          placeholder="Enter email"
-          onChangeText={(email) => setEmail(email)}
-        />
-        <TextInput
-          autoCapitalize="none"
-          value={password}
-          placeholder="Enter password"
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        />
-        <TouchableOpacity onPress={onSignUpPress}>
-          <Text>Continue</Text>
-        </TouchableOpacity>
-        <View style={styles.container}>
-          <Text>Already have an account?</Text>
-          <Link href="/sign-in">
-            <Text>Sign in</Text>
-          </Link>
-        </View>
-        <TouchableOpacity onPress={() => onSelectAuth(Strategy.Apple)}>
-          <Ionicons name="logo-apple" size={24} />
-          <Text>Continue with Apple</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => onSelectAuth(Strategy.Google)}>
-          <Ionicons name="logo-google" size={24} />
-          <Text>Continue with Google</Text>
-        </TouchableOpacity>
-
-        <ReactNativeModal
-          isVisible={verification.state === "pending"}
-          onBackdropPress={() =>
-            setVerification({ ...verification, state: "default" })
-          }
-          onModalHide={() => {
-            if (verification.state === "success") {
-              // setShowSuccessModal(true);
-            }
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+        justifyContent: "space-evenly",
+        alignItems: "center",
+        paddingHorizontal: Spacing.lg,
+      }}
+    >
+      <Image
+        source={require("../../assets/images/onboard/world.png")}
+        style={{ height: 220, width: 400, marginBottom: Spacing.md }}
+        resizeMode="contain"
+      />
+      <View
+        style={{
+          width: "100%",
+          paddingHorizontal: 50,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: Font.lg,
+            fontWeight: "bold",
+            marginBottom: Spacing.sm,
           }}
         >
-          <View style={styles.container}>
-            <Text style={styles.title}>Verification</Text>
-            <Text style={styles.subtitle}>
-              We've sent a verification code to {email}.
-            </Text>
-            <InputField
-              label={"Code"}
-              // icon={"~/assets/images/icon.png"}
-              placeholder={"12345"}
-              value={verification.code}
-              keyboardType="numeric"
-              onChangeText={(code) =>
-                setVerification({ ...verification, code })
-              }
+          Hello!
+        </Text>
+        <Text style={{ fontSize: Font.md, marginBottom: Spacing.lg }}>
+          <Text style={{ color: Colors.accent }}>Sign Up</Text> for a new
+          account
+        </Text>
+        <View
+          style={{ alignSelf: "flex-start", width: "100%", gap: Spacing.md }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#f0f0f0",
+              borderRadius: 30,
+              paddingHorizontal: Spacing.md,
+              paddingVertical: 12,
+            }}
+          >
+            <Ionicons
+              name="mail-outline"
+              size={20}
+              color={Colors.accent}
+              style={{ marginRight: Spacing.sm, marginLeft: Spacing.xs }}
             />
-            {verification.error && (
-              <Text style={styles.error}>{verification.error}</Text>
-            )}
-            <Button title="Verify Email" onPress={onPressVerify} />
+            <TextInput
+              autoCapitalize="none"
+              value={email}
+              placeholder="Enter email"
+              placeholderTextColor="#888"
+              onChangeText={setEmail}
+              style={{
+                flex: 1,
+                color: "#222",
+              }}
+            />
           </View>
-        </ReactNativeModal>
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#f0f0f0",
+              borderRadius: 30,
+              paddingHorizontal: Spacing.md,
+              paddingVertical: 12,
+            }}
+          >
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color={Colors.accent}
+              style={{ marginRight: Spacing.sm, marginLeft: Spacing.xs }}
+            />
+            <TextInput
+              value={password}
+              placeholder="Enter password"
+              secureTextEntry
+              placeholderTextColor="#888"
+              onChangeText={setPassword}
+              style={{
+                flex: 1,
+                color: "#222",
+              }}
+            />
+          </View>
+        </View>
       </View>
-    </ScrollView>
+
+      <View style={{ alignItems: "center" }}>
+        <TouchableOpacity
+          onPress={() => onSignUpPress()}
+          style={{
+            backgroundColor: Colors.secondary,
+            width: 250,
+            paddingVertical: Spacing.md,
+            paddingHorizontal: Spacing.lg,
+            borderRadius: Constants.borderRadius,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: "white", fontFamily: "bold" }}>Continue</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={{ display: "flex", flexDirection: "row" }}>
+        <Link href="/sign-in">
+          <Text style={{ color: "gray" }}>
+            Already have an account?{" "}
+            <Text style={{ color: Colors.accent }}>Sign In</Text>
+          </Text>
+        </Link>
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: 45,
+        }}
+      >
+        <View style={{ flex: 1, height: 1, backgroundColor: "#ccc" }} />
+        <Text
+          style={{
+            marginHorizontal: Spacing.sm,
+            color: "#888",
+            fontWeight: "regular",
+          }}
+        >
+          OR
+        </Text>
+        <View style={{ flex: 1, height: 1, backgroundColor: "#ccc" }} />
+      </View>
+
+      <View style={{ gap: 15, alignSelf: "center" }}>
+        <TouchableOpacity onPress={() => onSelectAuth(Strategy.Google)}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Image
+              source={require("../../assets/images/google-logo.png")}
+              style={{ width: 20, height: 20 }}
+            />
+            <Text style={{ fontFamily: "regular" }}>Continue with Google</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => onSelectAuth(Strategy.Apple)}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Ionicons name="logo-apple" size={20} />
+            <Text>Continue with Apple</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: {
-    backgroundColor: "white",
-    gap: 3,
-  },
-  image: {
-    width: "100%",
-    height: 250,
-  },
-  container: {
-    backgroundColor: "white",
-    paddingHorizontal: 28,
-    paddingVertical: 36,
-    borderRadius: 24,
-    minHeight: 300,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    marginBottom: 8,
-  },
-  subtitle: {
-    marginBottom: 20,
-  },
-  error: {
-    color: "red",
-    fontSize: 14,
-    marginTop: 4,
-  },
-});

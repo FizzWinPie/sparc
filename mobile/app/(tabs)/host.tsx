@@ -1,12 +1,335 @@
-import { View, Text } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  LayoutAnimation,
+  Image,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import dummyData from "../../constants/dummyData/dummy";
+import Colors from "../../constants/Colors";
+import Font from "../../constants/Font";
+import Spacing from "../../constants/Spacing";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ProfileBar from "@/components/ProfileBar";
+import Constants from "@/constants/Constants";
+import WalletCard from "@/components/WalletCardTransactions";
+import WalletCardBalance from "@/components/WalletCardBalance";
+import WalletCardTransactions from "@/components/WalletCardTransactions";
+import RequestCard from "@/components/RequestCard";
+import CarouselComponent from "@/components/CarouselComponent";
 
-const home = () => {
-  return (
-    <View>
-      <Text>Host: shows the lisadcasdadvaadscting of chargers</Text>
-    </View>
+const formattedListings = dummyData.charger_listings.map((listing) => ({
+  id: listing.id,
+  host_id: listing.host_id,
+  charger_type: listing.charger_type,
+  power_output_kw: listing.power_output_kw,
+  connector_type: listing.connector_type,
+  address: listing.address,
+  latitude: listing.latitude,
+  longitude: listing.longitude,
+  availability_schedule: listing.availability_schedule,
+  price_per_hour: listing.price_per_hour,
+  min_price: listing.min_price,
+  images: listing.images,
+  is_active: listing.is_active,
+  instructions: listing.instructions,
+  created_at: listing.created_at,
+  updated_at: listing.updated_at,
+}));
+
+const formattedBookings = dummyData.bookings.map((booking) => ({
+  id: booking.id,
+  listing_id: booking.charger_listings_id,
+  host_id: booking.host_id,
+  start_time: booking.start_time,
+  end_time: booking.end_time,
+  total_cost: booking.total_cost,
+  status: booking.status,
+}));
+
+const formattedInvoices = dummyData.payment_invoice.map((invoice) => ({
+  id: invoice.id,
+  booking_id: invoice.booking_id,
+  host_id: invoice.recipient.id,
+  user_id: invoice.payer.id,
+  amount_paid: invoice.amount,
+  payment_method: invoice.payment_method,
+  paid_at: invoice.created_at,
+  status: invoice.status,
+  created_at: invoice.created_at,
+  updated_at: invoice.created_at,
+}));
+
+export default function Host() {
+  const [openIds, setOpenIds] = useState<string[]>([]);
+  const [selectedTab, setSelectedTab] = useState<"requests" | "plugged">(
+    "requests"
   );
-};
 
-export default home;
+  const requests = dummyData.bookings.map((b) => ({
+    id: b.id,
+    name: dummyData.users.find((u) => u.id === b.ev_owner_id)?.name ?? "-",
+    place:
+      dummyData.charger_listings.find((c) => c.id === b.charger_listings_id)
+        ?.address ?? "-",
+    date: b.start_time.split("T")[0],
+    time: `${new Date(b.start_time).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })} -${new Date(b.end_time).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`,
+    price: b.total_cost.toString(),
+  }));
+
+  const toggle = (id: string) => {
+    LayoutAnimation.easeInEaseOut();
+    setOpenIds((p) =>
+      p.includes(id) ? p.filter((x) => x !== id) : [...p, id]
+    );
+  };
+
+  return (
+    <SafeAreaView style={s.page}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 50 }}
+      >
+      <ProfileBar />
+        {/* Header */}
+        {/* <View style={s.row}>
+          <Ionicons name="person-circle" size={36} color={Colors.secondary} />
+          <Text style={s.h1}>Welcome, {dummyData.users[2].id}</Text>
+        </View> */}
+        {/* <ProfileBar /> */}
+
+        {/* Wallet */}
+        <View style={{ flex: 1, flexDirection: "row", gap: 12 }}>
+          <WalletCardBalance
+            wallet={1240.97}
+            transactions={dummyData.payment_invoice}
+          />
+          <WalletCardTransactions
+            wallet={1601.89}
+            transactions={dummyData.payment_invoice}
+          />
+        </View>
+
+        {/* Requests */}
+        {/* <Text style={[s.sub, { marginTop: Spacing.xl }]}>Charge requests</Text> */}
+        <View
+          style={{ flexDirection: "row", gap: 16, marginVertical: Spacing.lg }}
+        >
+          <TouchableOpacity onPress={() => setSelectedTab("plugged")}>
+            <Text
+              style={{
+                fontWeight: selectedTab === "plugged" ? "bold" : "300",
+                color: selectedTab === "plugged" ? Colors.secondary : "gray",
+              }}
+            >
+              Plugged In
+            </Text>
+            <View
+              style={[
+                s.dot,
+                { marginTop: 4 },
+                selectedTab === "plugged" && s.dotSelected,
+              ]}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setSelectedTab("requests")}>
+            <Text
+              style={{
+                fontWeight: selectedTab === "requests" ? "bold" : "300",
+                color: selectedTab === "requests" ? Colors.secondary : "gray",
+              }}
+            >
+              Charge requests
+            </Text>
+            <View
+              style={[
+                s.dot,
+                { marginTop: 4 },
+                selectedTab === "requests" && s.dotSelected,
+              ]}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {(() => {
+          if (selectedTab === "requests") {
+            if (requests.length === 0) {
+              return (
+                <View style={[s.emptyBox, { height: 120 }]}>
+                  <Image
+                    source={require("../../assets/images/noRequest-icon.png")}
+                    style={{ width: 50, height: 50, resizeMode: "contain" }}
+                  />
+                  <Text style={[s.emptyTxt, { fontSize: 12 }]}>
+                    No active requests
+                  </Text>
+                </View>
+              );
+            } else {
+              return requests.map((r) => (
+                <RequestCard key={r.id} request={r} />
+              ));
+            }
+          } else {
+            return (
+              <View style={[s.emptyBox, { height: 120 }]}>
+                <Image
+                  source={require("../../assets/images/noRequest-icon.png")}
+                  style={{ width: 50, height: 50, resizeMode: "contain" }}
+                />
+                <Text style={[s.emptyTxt, { fontSize: 12 }]}>
+                  No plugged-in sessions
+                </Text>
+              </View>
+            );
+          }
+        })()}
+
+        {/* Stations */}
+        <Text style={[s.sub, { marginTop: Spacing.xl }]}>
+          My Charging Stations
+        </Text>
+
+        <CarouselComponent />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const s = StyleSheet.create({
+  page: { flex: 1, backgroundColor: Colors.primary, padding: Spacing.lg },
+  row: { flexDirection: "row", alignItems: "center" },
+  h1: {
+    flex: 1,
+    marginLeft: Spacing.sm,
+    fontSize: Font.md,
+    fontWeight: "600",
+    color: Colors.secondary,
+  },
+  card: {
+    flex: 1,
+    backgroundColor: Colors.secondary,
+    borderRadius: Constants.borderRadius,
+    padding: Spacing.sm,
+    margin: Spacing.sm,
+  },
+  label: {
+    color: Colors.primary,
+    fontSize: Font.sm,
+    marginBottom: Spacing.xs,
+    fontWeight: "regular",
+  },
+  big: { color: Colors.primary, fontSize: Font.lg, fontWeight: "bold" },
+  txn: { color: "#eee", fontSize: Font.sm, fontWeight: "light" },
+  sub: {
+    fontSize: Font.md,
+    fontWeight: "700",
+    color: Colors.secondary,
+    marginBottom: Spacing.sm,
+  },
+  emptyBox: {
+    height: 90,
+    borderWidth: 2,
+    borderColor: Colors.blueVariations.aliceBlue,
+    borderRadius: Spacing.sm,
+    justifyContent: "center",
+    alignItems: "center",
+    borderStyle: "dotted",
+  },
+  emptyTxt: {
+    marginTop: Spacing.xs,
+    color: Colors.basic.blue,
+    fontSize: Font.sm,
+  },
+  reqCard: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: Colors.blueVariations.aliceBlue,
+    borderRadius: Constants.borderRadius,
+    padding: Spacing.md,
+    gap: 6,
+    // marginBottom: Spacing.lg,
+  },
+  reqTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: Spacing.xs,
+  },
+  reqName: { fontWeight: "600", color: Colors.secondary },
+  reqLoc: {
+    // marginLeft: Spacing.xs,
+    color: Colors.secondary,
+    fontSize: Font.sm,
+  },
+  reqLine: {
+    color: Colors.secondary,
+    fontSize: Font.sm,
+    marginBottom: Spacing.xs,
+  },
+  rowBtn: { flexDirection: "column", gap: 6 },
+  btn: {
+    flex: 1,
+    borderRadius: Spacing.xs,
+    paddingVertical: Spacing.xs,
+    alignItems: "center",
+  },
+  btnGreen: { backgroundColor: Colors.success },
+  btnGray: { backgroundColor: Colors.blueVariations.aliceBlue },
+  btnTxt: { fontSize: Font.sm, fontWeight: "600", color: Colors.secondary },
+  price: { marginTop: Spacing.xs, fontWeight: "700", color: Colors.secondary },
+  stationWrapper: { marginTop: Spacing.sm },
+  stationHeader: {
+    borderRadius: Spacing.sm,
+    overflow: "hidden",
+    backgroundColor: Colors.secondary,
+  },
+  stationInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: Spacing.sm,
+  },
+  stationRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+  },
+  title: { color: Colors.primary, fontSize: Font.sm, fontWeight: "700" },
+  small: { color: Colors.blueVariations.aliceBlue, fontSize: Font.sm },
+  online: { color: Colors.success, fontSize: Font.sm },
+
+  detailBox: {
+    borderWidth: 1,
+    borderColor: Colors.blueVariations.aliceBlue,
+    borderTopWidth: 0,
+    borderBottomLeftRadius: Spacing.sm,
+    borderBottomRightRadius: Spacing.sm,
+    padding: Spacing.md,
+    backgroundColor: Colors.primary,
+  },
+  infoRow: { flexDirection: "row", marginBottom: Spacing.xs },
+  infoLabel: { width: 110, fontWeight: "600", color: Colors.secondary },
+  infoValue: { flex: 1, color: Colors.secondary },
+  detailText: { color: Colors.secondary, fontSize: Font.sm },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 6,
+  },
+  dotSelected: {
+    backgroundColor: Colors.accent,
+    alignSelf: "center",
+  },
+});

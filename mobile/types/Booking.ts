@@ -12,4 +12,5 @@ export interface Booking {
   rating_by_driver: number;
   rating_by_host: number;
   battery_level: string;
+  images: string;
 }

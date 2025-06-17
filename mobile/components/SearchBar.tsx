@@ -60,22 +60,33 @@ const SearchBar = () => {
     setAddressInput("");
     setSuggestions([]);
   };
+  // <Ionicons
+  //   name="search"
+  //   size={Font.lg}
+  //   color="gray"
+  //   style={styles.iconLeft}
+  // />
+  // <TextInput
+  //   placeholder="Search for a charger near you"
+  //   style={styles.searchInput}
+  //   placeholderTextColor="gray"
+  // />
 
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
+        <Pressable onPress={handleSearchPress}>
+          <Ionicons name="search-outline" size={Font.lg} style={{paddingRight: 8}} />
+        </Pressable>
         <TextInput
           style={styles.input}
           value={addressInput}
           onChangeText={setAddressInput}
           placeholder="Search a charger near you"
         />
-        <Pressable onPress={handleSearchPress}>
-          <Ionicons name="search-outline" size={16} />
-        </Pressable>
         {addressInput.length > 0 && (
           <Pressable onPress={handleClearInput}>
-            <Ionicons name="close-circle" size={18} color="#ccc" />
+            <Ionicons name="close-circle" size={Font.lg} color="#ccc" />
           </Pressable>
         )}
         {loading && <ActivityIndicator size="small" />}
@@ -110,16 +121,18 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: Constants.borderRadius,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Constants.spacing.xs,
+    // borderWidth: 1,
+    // borderColor: "#ccc",
+    marginTop: 6,
+    borderRadius: 15,
+    paddingHorizontal: 16,
+    height: 48,
     shadowColor: "#ccc",
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 1,
     shadowRadius: 1,
-    gap: 10,
+    // gap: 10,
+    // backgroundColor: "#f0f0f0",
     backgroundColor: "#fff",
   },
   input: {

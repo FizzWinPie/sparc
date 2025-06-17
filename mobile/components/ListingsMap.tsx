@@ -1,9 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import React, { useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import Colors from "@/constants/Colors";
@@ -12,7 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Spacing from "@/constants/Spacing";
-import ListingBottomSheet from "./ListingBottomSheet";
+import ListingBottomSheet from "./bottomSheet/ListingBottomSheet";
 import { Listing } from "@/types/Listing";
 
 interface Props {
@@ -91,11 +86,10 @@ const ListingsMap = ({ listings, snapPoints }: Props) => {
           enableOverDrag={true}
         >
           <ListingBottomSheet
-            selectedListing={selectedListing} 
-            onChooseListing={handleChooseListing} 
+            selectedListing={selectedListing}
+            onChooseListing={handleChooseListing}
           />
         </BottomSheet>
-        
       </View>
     </GestureHandlerRootView>
   );

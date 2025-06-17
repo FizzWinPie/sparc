@@ -7,7 +7,7 @@ const Index = () => {
   console.log("Signed In:", isSignedIn);
 
   if (isSignedIn) {
-    return <Redirect href={"/(tabs)/home"} />;
+    return <Redirect href={"/(tabs)/allListings"} />;
   }
 
   return <Redirect href="/(auth)/welcome" />;
