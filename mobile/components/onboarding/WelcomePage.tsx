@@ -25,7 +25,7 @@ const WelcomePage = () => {
             <Text style={styles.brandHighlight}>Porch</Text>
           </Text>
         </Text>
-        <Text>Let's get started!</Text>
+        <Text style={{fontFamily: "light"}}>Let's get started!</Text>
         <Ionicons name="chevron-down" color={Colors.accent} style={{fontFamily: "bold"}}/>
       </View>
 
@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     fontFamily: "regular",
     textAlign: "center",
     marginBottom: 4,
+    // color: Colors.secondary
   },
   brand: {
     fontFamily: "bold",

@@ -6,6 +6,7 @@ import Spacing from "@/constants/Spacing";
 import Constants from "@/constants/Constants";
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
+import { router } from "expo-router";
 
 type Transaction = {
   id: string;
@@ -111,6 +112,7 @@ export default function WalletCardTransactions({
           paddingVertical: Spacing.sm,
           borderRadius: Constants.borderRadius,
         }}
+        onPress={() => router.push("/(tabs)/profile")}
       >
         <Ionicons name="arrow-forward-outline" size={15} />
         <Text style={{ fontSize: Font.sm, fontWeight: "regular" }}>

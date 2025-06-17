@@ -34,8 +34,7 @@ const Wallet = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.basic.white }}>
-      <TouchableOpacity onPress={() => router.back()}><Ionicons name='arrow-back'/></TouchableOpacity>
+    <View style={{ backgroundColor: Colors.basic.white }}>
       <View style={styles.balanceCard}>
         <View style={styles.headerRow}>
           <Text style={{ fontSize: Font.md, color: Colors.basic.white }}>
@@ -93,8 +92,7 @@ const Wallet = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingHorizontal: 20 }}
       />
-      <SignOutButton />
-    </SafeAreaView>
+    </View>
   );
 };
 

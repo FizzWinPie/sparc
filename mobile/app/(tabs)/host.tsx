@@ -184,7 +184,7 @@ export default function Host() {
             return (
               <View style={[s.emptyBox, { height: 120 }]}>
                 <Image
-                  source={require("../../assets/images/no-charge-session.png")}
+                  source={require("../../assets/images/noRequest-icon.png")}
                   style={{ width: 50, height: 50, resizeMode: "contain" }}
                 />
                 <Text style={[s.emptyTxt, { fontSize: 12 }]}>

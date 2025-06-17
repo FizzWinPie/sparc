@@ -5,6 +5,7 @@ import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
 import Constants from "@/constants/Constants";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 type Transaction = {
   id: string;
@@ -78,6 +79,7 @@ export default function WalletCardBalance({ wallet, transactions }: Props) {
           paddingVertical: Spacing.sm,
           borderRadius: Constants.borderRadius,
         }}
+        onPress={()=> router.push('/(tabs)/profile')}
       >
         <FontAwesome name="bank" size={18} />
         <Text style={{ fontSize: Font.sm, fontWeight: "regular" }}>
