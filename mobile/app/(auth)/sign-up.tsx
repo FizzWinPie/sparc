@@ -3,26 +3,22 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   View,
   StyleSheet,
   Image,
   Alert,
-  Button,
   SafeAreaView,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
-import { useAuth, useSignUp, useSSO } from "@clerk/clerk-expo";
+import { useSignUp, useSSO } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { ReactNativeModal } from "react-native-modal";
-import InputField from "@/components/InputField";
-import { fetchAPI } from "@/lib/fetch";
-// import { BACKEND_URL } from '@env';
 import { addNewUser } from "@/lib/auth";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
 import Colors from "@/constants/Colors";
 import Constants from "@/constants/Constants";
+import { VerificationCodeInput } from "@/components/CodeVerification";
 
 enum Strategy {
   Google = "oauth_google",
@@ -33,7 +29,8 @@ export default function SignUpScreen() {
   const router = useRouter();
   const { startSSOFlow } = useSSO();
   const { isLoaded, signUp, setActive } = useSignUp();
-  // const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [code, setCode] = useState("");
 
   const onSelectAuth = async (strategy: Strategy) => {
     try {
@@ -52,7 +49,6 @@ export default function SignUpScreen() {
   };
 
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const [verification, setVerification] = useState({
@@ -62,11 +58,9 @@ export default function SignUpScreen() {
   });
 
   const onSignUpPress = async () => {
-    // console.log(BACKEND_URL)
     if (!isLoaded) return;
     try {
       await signUp.create({
-        // username: username,
         emailAddress: email,
         password: password,
       });
@@ -83,16 +77,35 @@ export default function SignUpScreen() {
     }
   };
 
+  const handleResendCode = async () => {
+    if (!isLoaded) return;
+    try {
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      Alert.alert(
+        "Code resent",
+        "Check your email for the new verification code."
+      );
+    } catch (err: any) {
+      console.log("Resend error:", err);
+      Alert.alert("Error", err.errors?.[0]?.message || "Failed to resend code");
+    }
+  };
+
   const onPressVerify = async () => {
     if (!isLoaded) return;
     try {
       const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code: verification.code,
+        code: code,
       });
       if (completeSignUp.status === "complete") {
         if (completeSignUp.createdUserId) {
           await addNewUser(email, completeSignUp.createdUserId);
-          console.log("email: ", email, "\nClerkId: ", completeSignUp.createdUserId);
+          console.log(
+            "email: ",
+            email,
+            "\nClerkId: ",
+            completeSignUp.createdUserId
+          );
         } else {
           throw new Error("User ID is missing after sign up.");
         }
@@ -119,57 +132,25 @@ export default function SignUpScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: "white",
-        justifyContent: "space-evenly",
-        alignItems: "center",
-        paddingHorizontal: Spacing.lg,
-      }}
-    >
+    <SafeAreaView style={styles.safeArea}>
       <Image
         source={require("../../assets/images/onboard/world.png")}
-        style={{ height: 220, width: 400, marginBottom: Spacing.md }}
+        style={styles.headerImage}
         resizeMode="contain"
       />
-      <View
-        style={{
-          width: "100%",
-          paddingHorizontal: 50,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: Font.lg,
-            fontWeight: "bold",
-            marginBottom: Spacing.sm,
-          }}
-        >
-          Hello!
-        </Text>
-        <Text style={{ fontSize: Font.md, marginBottom: Spacing.lg }}>
+      <View style={styles.formContainer}>
+        <Text style={styles.helloText}>Hello!</Text>
+        <Text style={styles.signUpText}>
           <Text style={{ color: Colors.accent }}>Sign Up</Text> for a new
           account
         </Text>
-        <View
-          style={{ alignSelf: "flex-start", width: "100%", gap: Spacing.md }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#f0f0f0",
-              borderRadius: 30,
-              paddingHorizontal: Spacing.md,
-              paddingVertical: 12,
-            }}
-          >
+        <View style={styles.inputFieldsContainer}>
+          <View style={styles.inputRow}>
             <Ionicons
               name="mail-outline"
               size={20}
               color={Colors.accent}
-              style={{ marginRight: Spacing.sm, marginLeft: Spacing.xs }}
+              style={styles.inputIcon}
             />
             <TextInput
               autoCapitalize="none"
@@ -177,28 +158,15 @@ export default function SignUpScreen() {
               placeholder="Enter email"
               placeholderTextColor="#888"
               onChangeText={setEmail}
-              style={{
-                flex: 1,
-                color: "#222",
-              }}
+              style={styles.input}
             />
           </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#f0f0f0",
-              borderRadius: 30,
-              paddingHorizontal: Spacing.md,
-              paddingVertical: 12,
-            }}
-          >
+          <View style={styles.inputRow}>
             <Ionicons
               name="lock-closed-outline"
               size={20}
               color={Colors.accent}
-              style={{ marginRight: Spacing.sm, marginLeft: Spacing.xs }}
+              style={styles.inputIcon}
             />
             <TextInput
               value={password}
@@ -206,32 +174,19 @@ export default function SignUpScreen() {
               secureTextEntry
               placeholderTextColor="#888"
               onChangeText={setPassword}
-              style={{
-                flex: 1,
-                color: "#222",
-              }}
+              style={styles.input}
             />
           </View>
         </View>
       </View>
 
-      <View style={{ alignItems: "center" }}>
-        <TouchableOpacity
-          onPress={() => onSignUpPress()}
-          style={{
-            backgroundColor: Colors.secondary,
-            width: 250,
-            paddingVertical: Spacing.md,
-            paddingHorizontal: Spacing.lg,
-            borderRadius: Constants.borderRadius,
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ color: "white", fontFamily: "bold" }}>Continue</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={onSignUpPress} style={styles.continueButton}>
+          <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={{ display: "flex", flexDirection: "row" }}>
+      <View style={styles.signInLinkContainer}>
         <Link href="/sign-in">
           <Text style={{ color: "gray" }}>
             Already have an account?{" "}
@@ -240,44 +195,233 @@ export default function SignUpScreen() {
         </Link>
       </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 45,
-        }}
-      >
-        <View style={{ flex: 1, height: 1, backgroundColor: "#ccc" }} />
-        <Text
-          style={{
-            marginHorizontal: Spacing.sm,
-            color: "#888",
-            fontWeight: "regular",
-          }}
-        >
-          OR
-        </Text>
-        <View style={{ flex: 1, height: 1, backgroundColor: "#ccc" }} />
+      <View style={styles.orContainer}>
+        <View style={styles.orLine} />
+        <Text style={styles.orText}>OR</Text>
+        <View style={styles.orLine} />
       </View>
 
-      <View style={{ gap: 15, alignSelf: "center" }}>
+      <View style={styles.socialContainer}>
         <TouchableOpacity onPress={() => onSelectAuth(Strategy.Google)}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <View style={styles.socialButton}>
             <Image
               source={require("../../assets/images/google-logo.png")}
-              style={{ width: 20, height: 20 }}
+              style={styles.socialIcon}
             />
-            <Text style={{ fontFamily: "regular" }}>Continue with Google</Text>
+            <Text style={styles.socialText}>Continue with Google</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => onSelectAuth(Strategy.Apple)}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <View style={styles.socialButton}>
             <Ionicons name="logo-apple" size={20} />
             <Text>Continue with Apple</Text>
           </View>
         </TouchableOpacity>
+
+        <ReactNativeModal
+          isVisible={verification.state === "pending"}
+          onBackdropPress={() =>
+            setVerification({ ...verification, state: "default" })
+          }
+          onModalHide={() => {
+            if (verification.state === "success") {
+              setShowSuccessModal(true);
+            }
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalIconContainer}>
+              <Ionicons name="mail" size={20} color={Colors.accent} />
+            </View>
+            <Text style={styles.modalTitle}>Verify your email</Text>
+            <Text style={styles.modalSubtitle}>
+              We have sent a verification code to your email{"\n"}
+              <Text style={styles.modalEmail}>{email}</Text>
+            </Text>
+            <VerificationCodeInput value={code} setValue={setCode} />
+            {verification.error && (
+              <Text style={styles.errorText}>{verification.error}</Text>
+            )}
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                onPress={onPressVerify}
+                style={styles.verifyButton}
+              >
+                <Text style={styles.verifyButtonText}>Verify</Text>
+              </TouchableOpacity>
+              <View style={styles.resendContainer}>
+                <Text style={{ color: "gray" }}>Didn't receive a code? </Text>
+                <TouchableOpacity onPress={handleResendCode}>
+                  <Text style={{ color: Colors.accent }}>Resend Code</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ReactNativeModal>
       </View>
     </SafeAreaView>
   );
 }
 
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "white",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    paddingHorizontal: Spacing.lg,
+  },
+  headerImage: {
+    height: 220,
+    width: 400,
+    marginBottom: Spacing.md,
+  },
+  formContainer: {
+    width: "100%",
+    paddingHorizontal: 50,
+  },
+  helloText: {
+    fontSize: Font.lg,
+    fontWeight: "bold",
+    marginBottom: Spacing.sm,
+  },
+  signUpText: {
+    fontSize: Font.md,
+    marginBottom: Spacing.lg,
+  },
+  inputFieldsContainer: {
+    alignSelf: "flex-start",
+    width: "100%",
+    gap: Spacing.md,
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 30,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 12,
+  },
+  inputIcon: {
+    marginRight: Spacing.sm,
+    marginLeft: Spacing.xs,
+  },
+  input: {
+    flex: 1,
+    color: "#222",
+  },
+  buttonContainer: {
+    alignItems: "center",
+  },
+  continueButton: {
+    backgroundColor: Colors.secondary,
+    width: 250,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Constants.borderRadius,
+    alignItems: "center",
+  },
+  continueButtonText: {
+    color: "white",
+    fontFamily: "bold",
+  },
+  signInLinkContainer: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  orContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 45,
+  },
+  orLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#ccc",
+  },
+  orText: {
+    marginHorizontal: Spacing.sm,
+    color: "#888",
+    fontWeight: "400",
+  },
+  socialContainer: {
+    gap: 15,
+    alignSelf: "center",
+  },
+  socialButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  socialIcon: {
+    width: 20,
+    height: 20,
+  },
+  socialText: {
+    fontFamily: "regular",
+  },
+  modalContainer: {
+    backgroundColor: Colors.primary,
+    padding: Spacing.lg,
+    borderRadius: Constants.borderRadius,
+  },
+  modalIconContainer: {
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#a1eade",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 6,
+    borderColor: "#c8f4ec",
+    borderWidth: 3,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontFamily: "bold",
+    marginBottom: 8,
+    alignSelf: "center",
+    color: Colors.secondary,
+  },
+  modalSubtitle: {
+    fontSize: Font.sm,
+    fontFamily: "light",
+    marginBottom: 20,
+    textAlign: "center",
+    color: Colors.secondary,
+  },
+  modalEmail: {
+    color: Colors.accent,
+    fontFamily: "regular",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginTop: 4,
+  },
+  modalButtonContainer: {
+    alignItems: "center",
+    marginTop: Spacing.lg,
+  },
+  verifyButton: {
+    backgroundColor: Colors.secondary,
+    width: 250,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Constants.borderRadius,
+    alignItems: "center",
+  },
+  verifyButtonText: {
+    color: "white",
+    fontFamily: "bold",
+  },
+  resendContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: Spacing.md,
+  },
+});
