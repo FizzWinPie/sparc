@@ -10,7 +10,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
-import { useSignUp, useSSO } from "@clerk/clerk-expo";
+import { useSignUp, useSSO, useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { ReactNativeModal } from "react-native-modal";
 import { addNewUser } from "@/lib/auth";
@@ -31,6 +31,7 @@ export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [code, setCode] = useState("");
+  const { user } = useUser();
 
   const onSelectAuth = async (strategy: Strategy) => {
     try {
@@ -41,6 +42,14 @@ export default function SignUpScreen() {
 
       if (createdSessionId && setSessionActive) {
         await setSessionActive({ session: createdSessionId });
+        
+        // const clerkId = user?.id;
+        // if (!clerkId) {
+        //   console.log("no clerkId yet");
+        //   return;
+        // }
+        // await addNewUser(email, clerkId);
+
         router.replace("/(tabs)/home");
       }
     } catch (err) {
@@ -63,6 +72,7 @@ export default function SignUpScreen() {
       await signUp.create({
         emailAddress: email,
         password: password,
+        firstName: email.split("@")[0],
       });
       await signUp.prepareEmailAddressVerification({
         strategy: "email_code",
@@ -100,12 +110,6 @@ export default function SignUpScreen() {
       if (completeSignUp.status === "complete") {
         if (completeSignUp.createdUserId) {
           await addNewUser(email, completeSignUp.createdUserId);
-          console.log(
-            "email: ",
-            email,
-            "\nClerkId: ",
-            completeSignUp.createdUserId
-          );
         } else {
           throw new Error("User ID is missing after sign up.");
         }
