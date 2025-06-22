@@ -13,7 +13,7 @@ import { Link, useRouter } from "expo-router";
 import { useSignUp, useSSO, useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { ReactNativeModal } from "react-native-modal";
-import { addNewUser } from "@/lib/auth";
+import { addNewUser } from "@/lib/user";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
 import Colors from "@/constants/Colors";
@@ -42,7 +42,7 @@ export default function SignUpScreen() {
 
       if (createdSessionId && setSessionActive) {
         await setSessionActive({ session: createdSessionId });
-        
+
         // const clerkId = user?.id;
         // if (!clerkId) {
         //   console.log("no clerkId yet");

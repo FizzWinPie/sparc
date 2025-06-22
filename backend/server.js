@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/UserRoutes.js";
+import listingRoutes from "./routes/ListingsRoutes.js";
+import bookingRoutes from "./routes/BookingsRoute.js";
 
 dotenv.config();
 const app = express();
@@ -10,6 +12,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use("/api", userRoutes);
+app.use("/api", listingRoutes);
+app.use("/api", bookingRoutes);
 
 const PORT = process.env.PORT || 5000;
 

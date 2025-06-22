@@ -51,7 +51,7 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <GestureHandlerRootView >
-      <ClerkProvider tokenCache={tokenCache}>
+      <ClerkProvider tokenCache={tokenCache} publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}>
         <ClerkLoaded>
           <SafeAreaProvider>
             <Stack>

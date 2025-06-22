@@ -14,7 +14,7 @@ import ReactNativeModal from "react-native-modal";
 import { useUser } from "@clerk/clerk-expo";
 import Constants from "@/constants/Constants";
 import Font from "@/constants/Font";
-import { deleteUser, updateUser } from "@/lib/auth";
+import { deleteUser, updateUser } from "@/lib/user";
 import { router } from "expo-router";
 
 const ProfileUser = () => {

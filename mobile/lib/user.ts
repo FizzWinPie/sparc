@@ -10,13 +10,16 @@ export const addNewUser = async (email: string, clerkId: string) => {
     // On your laptop, if using an emulator localhost points to your machine. Use: http://localhost:8000
     // On your phone, localhost points to the phone itself — and your Node.js server isn’t running there. Use: http://<your ip address which can be found with command in terminal: 'ipconfig getifaddr en0'>:8000
     // const res = await fetch(`http://localhost:8000/api/users`, {
-    const res = await fetch(`http://192.168.0.122:8000/api/users`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, clerkId }),
-    });
+    const res = await fetch(
+      `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/users`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, clerkId }),
+      }
+    );
     return await res.json();
   } catch (err) {
     console.error("Failed to create user:", err);
@@ -24,7 +27,11 @@ export const addNewUser = async (email: string, clerkId: string) => {
   }
 };
 
-export const updateUser = async (email: string, clerkId: string, firstName: string) => {
+export const updateUser = async (
+  email: string,
+  clerkId: string,
+  firstName: string
+) => {
   try {
     if (!email || !clerkId) {
       return Response.json(
@@ -36,13 +43,16 @@ export const updateUser = async (email: string, clerkId: string, firstName: stri
     // On your laptop, if using an emulator localhost points to your machine. Use: http://localhost:8000
     // On your phone, localhost points to the phone itself — and your Node.js server isn’t running there. Use: http://<your ip address which can be found with command in terminal: 'ipconfig getifaddr en0'>:8000
     // const res = await fetch(`http://localhost:8000/api/users`, {
-    const res = await fetch(`http://192.168.0.122:8000/api/users`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, clerkId, firstName }),
-    });
+    const res = await fetch(
+      `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/users`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, clerkId, firstName }),
+      }
+    );
     return await res.json();
   } catch (err) {
     console.error("Failed to update user:", err);
@@ -62,13 +72,16 @@ export const deleteUser = async (email: string, clerkId: string) => {
     // On your laptop, if using an emulator localhost points to your machine. Use: http://localhost:8000
     // On your phone, localhost points to the phone itself — and your Node.js server isn’t running there. Use: http://<your ip address which can be found with command in terminal: 'ipconfig getifaddr en0'>:8000
     // const res = await fetch(`http://localhost:8000/api/users`, {
-    const res = await fetch(`http://192.168.0.122:8000/api/users`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, clerkId }),
-    });
+    const res = await fetch(
+      `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/users`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, clerkId }),
+      }
+    );
     return await res.json();
   } catch (err) {
     console.error("Failed to delete user:", err);
