@@ -15,8 +15,9 @@ const Wallet = () => {
   const renderTransaction = ({ item }: { item: typeof dummyData.payment_invoice[0] }) => {
     const date = new Date(item.created_at);
     const formattedDate = date.toDateString() === new Date().toDateString()
-      ? `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-      : `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  ? `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+  : `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
 
     return (
       <View style={styles.transactionCard}>

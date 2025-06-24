@@ -9,7 +9,8 @@ const host = () => {
   return (
     <View style={{backgroundColor: "white"}}>
       <Text>Host Page</Text>
-      <Button title="Wallet" onPress={() => router.push("/host/wallet")} />
+      <Button title="lallet" onPress={() => router.push("/host/wallet")} /> 
+      <Button title="List Charger" onPress={() => router.push("/host/listcharger")} /> 
     </View>
   )
 }

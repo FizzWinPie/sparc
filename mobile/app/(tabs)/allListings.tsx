@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, FlatList, Image, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState }from 'react';
 import dummyData from '@/constants/dummyData/dummy';
 import Colors from '@/constants/Colors';
 import Font from '@/constants/Font';
@@ -24,7 +24,22 @@ type ChargerListing = {
 };
 
 const allListings = () => {
-  const listings = dummyData.charger_listings;
+  //const listings = dummyData.charger_listings;
+  const [listings, setListings] = useState<ChargerListing[]>([]);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const res = await fetch(`{}:8000/api/listings`); //need to add IP
+        const data = await res.json();
+        setListings(data);
+      } catch (err) {
+        console.error('Failed to fetch listings:', err);
+      }
+    };
+    fetchListings();
+  }, [])
+
 
   const extractAddress = (address: string) => {
     const addr =  address.split(',')[0];
@@ -34,7 +49,7 @@ const allListings = () => {
 
   const renderItem = ({ item }: { item: ChargerListing }) => (
     <View style={styles.box}>
-      <Image source={{ uri: item.images }} style={styles.image} />
+      <Image source={{ uri: item.images || 'https://via.placeholder.com/100' }} style={styles.image} />
       <View style={styles.middleContent}>
         <Text style={{ fontFamily: "bold", fontSize: Font.md, padding: Spacing.sm}}>{extractAddress(item.address)}</Text>
         <View style={styles.bottomRow}>
