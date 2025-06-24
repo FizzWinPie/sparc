@@ -12,9 +12,7 @@ interface Props {
 }
 
 const SmallCard = ({ listings, onPress }: Props) => {
-  const [selectedListing, setSelectedListing] = useState<Listing | null>(
-    listings.length > 0 ? listings[0] : null
-  );
+  const selectedListing = listings.length > 0 ? listings[0] : null;
 
   if (!selectedListing) {
     return (

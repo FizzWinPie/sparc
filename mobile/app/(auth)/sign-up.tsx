@@ -19,6 +19,7 @@ import Font from "@/constants/Font";
 import Colors from "@/constants/Colors";
 import Constants from "@/constants/Constants";
 import { VerificationCodeInput } from "@/components/CodeVerification";
+import { useLoading } from "@/utils/LoadingContext";
 
 enum Strategy {
   Google = "oauth_google",
@@ -32,9 +33,12 @@ export default function SignUpScreen() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [code, setCode] = useState("");
   const { user } = useUser();
+  const { setLoading } = useLoading();
 
   const onSelectAuth = async (strategy: Strategy) => {
     try {
+      setLoading(true);
+
       const { createdSessionId, setActive: setSessionActive } =
         await startSSOFlow({
           strategy,
@@ -54,6 +58,8 @@ export default function SignUpScreen() {
       }
     } catch (err) {
       console.error("SSO error", err);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -69,6 +75,8 @@ export default function SignUpScreen() {
   const onSignUpPress = async () => {
     if (!isLoaded) return;
     try {
+      setLoading(true);
+
       await signUp.create({
         emailAddress: email,
         password: password,
@@ -84,6 +92,8 @@ export default function SignUpScreen() {
     } catch (err: any) {
       console.log(JSON.stringify(err, null, 2));
       Alert.alert("Error", err.errors[0].longMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,6 +114,8 @@ export default function SignUpScreen() {
   const onPressVerify = async () => {
     if (!isLoaded) return;
     try {
+      setLoading(true);
+
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code: code,
       });
@@ -132,6 +144,8 @@ export default function SignUpScreen() {
         error: err.errors[0].longMessage,
         state: "failed",
       });
+    } finally {
+      setLoading(false);
     }
   };
 

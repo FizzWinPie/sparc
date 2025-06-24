@@ -15,6 +15,7 @@ import Spacing from "@/constants/Spacing";
 import Colors from "@/constants/Colors";
 import Constants from "@/constants/Constants";
 import Font from "@/constants/Font";
+import { useLoading } from "@/utils/LoadingContext";
 
 enum Strategy {
   Google = "oauth_google",
@@ -25,8 +26,10 @@ export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
   const { startSSOFlow } = useSSO();
+  const{ setLoading } = useLoading();
 
   const onSelectAuth = async (strategy: Strategy) => {
+    setLoading(true);
     try {
       const { createdSessionId, setActive: setSessionActive } =
         await startSSOFlow({
@@ -39,6 +42,8 @@ export default function Page() {
       }
     } catch (err) {
       console.error("SSO error", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,6 +52,7 @@ export default function Page() {
 
   const onSignInPress = async () => {
     if (!isLoaded) return;
+    setLoading(true);
 
     try {
       const signInAttempt = await signIn.create({
@@ -64,6 +70,8 @@ export default function Page() {
     } catch (err: any) {
       console.log(JSON.stringify(err, null, 2));
       Alert.alert("Error", err.errors[0].longMessage);
+    } finally {
+      setLoading(false);
     }
   };
 

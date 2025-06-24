@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -7,32 +7,28 @@ import {
 } from "react-native";
 import { BlurView } from "expo-blur";
 import ProfileBar from "@/components/ProfileBar";
-import dummyData from "@/constants/dummyData/dummy";
 import ListingsMap from "@/components/ListingsMap";
 import HomeBottomScreen from "@/components/HomeBottomScreen";
 import SearchBar from "@/components/SearchBar";
 import Spacing from "@/constants/Spacing";
-
-const formattedListings = dummyData.charger_listings.map((listing) => ({
-  id: listing.id,
-  host_id: listing.host_id,
-  charger_type: listing.charger_type,
-  power_output_kw: listing.power_output_kw,
-  connector_type: listing.connector_type,
-  address: listing.address,
-  latitude: listing.latitude,
-  longitude: listing.longitude,
-  availability_schedule: listing.availability_schedule,
-  price_per_hour: listing.price_per_hour,
-  min_price: listing.min_price,
-  images: listing.images,
-  is_active: listing.is_active,
-  instructions: listing.instructions,
-  created_at: listing.created_at,
-  updated_at: listing.updated_at,
-}));
+import { Listing } from "@/types";
+import { getListings } from "@/lib/listing";
 
 const Home = () => {
+  const [listings, setListings] = useState<Listing[]>([]);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const data = await getListings();
+        setListings(data);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+      }
+    };
+    fetchListings();
+  }, []);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
@@ -44,7 +40,7 @@ const Home = () => {
           <View style={styles.searchBar}>
             <SearchBar />
           </View>
-          <ListingsMap listings={formattedListings} snapPoints={["60%"]} />
+          <ListingsMap listings={listings} snapPoints={["60%"]} />
         </View>
         <View style={styles.bottomScreen}>
           <HomeBottomScreen />

@@ -30,7 +30,6 @@ const ProfileUser = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
-  // Updated handleUpdate
   const handleUpdate = async () => {
     try {
       if (!user) return;
@@ -59,7 +58,6 @@ const ProfileUser = () => {
     }
   };
 
-  // Updated handlePasswordUpdate
   const handlePasswordUpdate = async () => {
     try {
       if (!user) return;
@@ -247,7 +245,7 @@ const ProfileUser = () => {
               />
             </View> */}
           </View>
-          {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+          {!!errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
           <View style={styles.modalButtonContainer}>
             <TouchableOpacity

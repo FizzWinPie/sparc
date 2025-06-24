@@ -8,6 +8,7 @@ import { ClerkLoaded, ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { LoadingProvider } from "@/utils/LoadingContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -50,18 +51,23 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <GestureHandlerRootView >
-      <ClerkProvider tokenCache={tokenCache} publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-        <ClerkLoaded>
-          <SafeAreaProvider>
-            <Stack>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            </Stack>
-          </SafeAreaProvider>
-        </ClerkLoaded>
-      </ClerkProvider>
+    <GestureHandlerRootView>
+      <LoadingProvider>
+        <ClerkProvider
+          tokenCache={tokenCache}
+          publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        >
+          <ClerkLoaded>
+            <SafeAreaProvider>
+              <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              </Stack>
+            </SafeAreaProvider>
+          </ClerkLoaded>
+        </ClerkProvider>
+      </LoadingProvider>
     </GestureHandlerRootView>
   );
 }

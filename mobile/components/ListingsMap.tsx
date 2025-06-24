@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Alert } from "react-native";
 import React, { useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import Colors from "@/constants/Colors";
@@ -9,6 +9,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Spacing from "@/constants/Spacing";
 import ListingBottomSheet from "./bottomSheet/ListingBottomSheet";
 import { Listing } from "@/types/Listing";
+import { router } from "expo-router";
+import { useLoading } from "@/utils/LoadingContext";
+import { useUser } from "@clerk/clerk-expo";
+import { createBooking } from "@/lib/booking";
 
 interface Props {
   listings: Listing[];
@@ -25,6 +29,13 @@ const INITIAL_REGION = {
 const ListingsMap = ({ listings, snapPoints }: Props) => {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const { setLoading } = useLoading();
+  const { user } = useUser();
+
+  const bookingStartTime = new Date().toISOString();
+  const bookingEndTime = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+  const calculatedCost = selectedListing?.price_per_hour || 10;
+  const selectedBatteryLevel = "50%";
 
   const onMarkerSelected = (item: Listing) => {
     setSelectedListing(item);
@@ -32,7 +43,43 @@ const ListingsMap = ({ listings, snapPoints }: Props) => {
   };
 
   const handleChooseListing = () => {
-    console.log("Chosen listing -> payment");
+    bottomSheetRef.current?.close();
+
+    Alert.alert(
+      "Confirm Booking",
+      "Are you sure you want to book this listing?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Confirm",
+          style: "default",
+          onPress: async () => {
+            if (!selectedListing || !user) return;
+            setLoading(true);
+            const res = await createBooking({
+              charger_listings_id: selectedListing._id,
+              charger_listings_address: selectedListing.address,
+              host_id: selectedListing.host_id,
+              ev_owner_id: user.id,
+              start_time: bookingStartTime,
+              end_time: bookingEndTime,
+              total_cost: calculatedCost,
+              status: "pending",
+              payment_status: "unpaid",
+              rating_by_driver: null,
+              rating_by_host: null,
+              battery_level: selectedBatteryLevel,
+              images: selectedListing.images,
+            });
+            console.log(res);
+            setLoading(false);
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -50,7 +97,7 @@ const ListingsMap = ({ listings, snapPoints }: Props) => {
         >
           {listings.map((item) => (
             <Marker
-              key={item.id}
+              key={item._id}
               onPress={() => onMarkerSelected(item)}
               coordinate={{
                 latitude: item.latitude,

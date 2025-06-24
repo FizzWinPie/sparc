@@ -9,25 +9,86 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from "react-native";
-import React, { useMemo, useRef, useState } from "react";
-import dummyData from "@/constants/dummyData/dummy";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
-import { Ionicons, FontAwesome5, Entypo } from "@expo/vector-icons";
+import { Ionicons, Entypo } from "@expo/vector-icons";
 import { Listing } from "@/types";
-import Constants from "@/constants/Constants";
 import BottomSheet from "@gorhom/bottom-sheet";
 import ListingBottomSheet from "@/components/bottomSheet/ListingBottomSheet";
 import ProfileBar from "@/components/ProfileBar";
 import SearchBar from "@/components/SearchBar";
+import { getListings } from "@/lib/listing";
+import { useLoading } from "@/utils/LoadingContext";
+import { createBooking } from "@/lib/booking";
+import { useUser } from "@clerk/clerk-expo";
 
 const allListings = () => {
-  const listings = dummyData.charger_listings;
+  const [listings, setListings] = useState<Listing[]>([]);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["45%", "70%"], []);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+  const { setLoading } = useLoading();
+  const {user} = useUser();
+
+  const bookingStartTime = new Date().toISOString();
+  const bookingEndTime = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+  const calculatedCost = selectedListing?.price_per_hour || 10;
+  const selectedBatteryLevel = "50%";
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const data = await getListings();
+        setListings(data);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+      }
+    };
+    fetchListings();
+  }, []);
+
+  const handleChooseListing = () => {
+    bottomSheetRef.current?.close();
+    Alert.alert(
+      "Confirm Booking",
+      "Are you sure you want to book this listing?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Confirm",
+          style: "default",
+          onPress: async () => {
+            if (!selectedListing || !user) return;
+            setLoading(true);
+            const res = await createBooking({
+              charger_listings_id: selectedListing._id,
+              charger_listings_address: selectedListing.address,
+              host_id: selectedListing.host_id,
+              ev_owner_id: user.id,
+              start_time: bookingStartTime,
+              end_time: bookingEndTime,
+              total_cost: calculatedCost,
+              status: "pending",
+              payment_status: "unpaid",
+              rating_by_driver: null,
+              rating_by_host: null,
+              battery_level: selectedBatteryLevel,
+              images: selectedListing.images,
+            });
+            console.log(res);
+            setLoading(false);
+          },
+        },
+      ]
+    );
+  };
 
   const extractAddress = (address: string) => {
     const addr = address.split(",")[0];
@@ -187,7 +248,7 @@ const allListings = () => {
             <FlatList
               data={listings}
               renderItem={renderItem}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item._id}
             />
           </View>
         </View>
@@ -199,7 +260,9 @@ const allListings = () => {
         >
           <ListingBottomSheet
             selectedListing={selectedListing}
-            onChooseListing={() => bottomSheetRef.current?.close()}
+            onChooseListing={() => {
+              handleChooseListing();
+            }}
           />
         </BottomSheet>
       </SafeAreaView>

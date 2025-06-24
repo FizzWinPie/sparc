@@ -15,7 +15,7 @@ app.use("/api", userRoutes);
 app.use("/api", listingRoutes);
 app.use("/api", bookingRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 mongoose
   .connect(process.env.MONGODB_URI)

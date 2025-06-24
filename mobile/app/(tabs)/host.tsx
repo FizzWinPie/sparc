@@ -5,10 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  LayoutAnimation,
   Image,
+  TextInput,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import dummyData from "../../constants/dummyData/dummy";
 import Colors from "../../constants/Colors";
 import Font from "../../constants/Font";
@@ -16,60 +15,60 @@ import Spacing from "../../constants/Spacing";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileBar from "@/components/ProfileBar";
 import Constants from "@/constants/Constants";
-import WalletCard from "@/components/WalletCardTransactions";
 import WalletCardBalance from "@/components/WalletCardBalance";
 import WalletCardTransactions from "@/components/WalletCardTransactions";
 import RequestCard from "@/components/RequestCard";
 import CarouselComponent from "@/components/CarouselComponent";
-
-const formattedListings = dummyData.charger_listings.map((listing) => ({
-  id: listing.id,
-  host_id: listing.host_id,
-  charger_type: listing.charger_type,
-  power_output_kw: listing.power_output_kw,
-  connector_type: listing.connector_type,
-  address: listing.address,
-  latitude: listing.latitude,
-  longitude: listing.longitude,
-  availability_schedule: listing.availability_schedule,
-  price_per_hour: listing.price_per_hour,
-  min_price: listing.min_price,
-  images: listing.images,
-  is_active: listing.is_active,
-  instructions: listing.instructions,
-  created_at: listing.created_at,
-  updated_at: listing.updated_at,
-}));
-
-const formattedBookings = dummyData.bookings.map((booking) => ({
-  id: booking.id,
-  listing_id: booking.charger_listings_id,
-  host_id: booking.host_id,
-  start_time: booking.start_time,
-  end_time: booking.end_time,
-  total_cost: booking.total_cost,
-  status: booking.status,
-}));
-
-const formattedInvoices = dummyData.payment_invoice.map((invoice) => ({
-  id: invoice.id,
-  booking_id: invoice.booking_id,
-  host_id: invoice.recipient.id,
-  user_id: invoice.payer.id,
-  amount_paid: invoice.amount,
-  payment_method: invoice.payment_method,
-  paid_at: invoice.created_at,
-  status: invoice.status,
-  created_at: invoice.created_at,
-  updated_at: invoice.created_at,
-}));
+import { Ionicons } from "@expo/vector-icons";
+import ReactNativeModal from "react-native-modal";
+import { createListing } from "@/lib/listing";
+import { useUser } from "@clerk/clerk-expo";
 
 export default function Host() {
-  const [openIds, setOpenIds] = useState<string[]>([]);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [address, setAddress] = useState("");
+  const [availabilitySchedule, setAvailabilitySchedule] = useState("");
+  const [chargerType, setChargerType] = useState("");
+  const [connectorType, setConnectorType] = useState("");
+  const [powerOutput, setPowerOutput] = useState("");
+  const [pricePerHour, setPricePerHour] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [instructions, setInstructions] = useState("");
+  const [images, setImages] = useState("");
+
+  const { user } = useUser();
+
   const [selectedTab, setSelectedTab] = useState<"requests" | "plugged">(
     "requests"
   );
 
+  const handleCreateListing = async () => {
+    if (!user) return;
+    try {
+      const newListing = await createListing({
+        host_id: user.id,
+        charger_type: chargerType,
+        power_output_kw: powerOutput,
+        connector_type: connectorType,
+        address: address,
+        latitude: 40.7831, // fix
+        longitude: -73.9712,
+        availability_schedule: availabilitySchedule,
+        price_per_hour: pricePerHour,
+        min_price: minPrice,
+        images: images,
+        instructions: instructions,
+        is_active: true,
+      });
+      console.log("Created listing:", newListing);
+      setEditModalVisible(false);
+    } catch (error) {
+      console.error("Listing creation failed", error);
+    }
+  };
+
+  // Static needs to be fixed to be updated using the data
   const requests = dummyData.bookings.map((b) => ({
     id: b.id,
     name: dummyData.users.find((u) => u.id === b.ev_owner_id)?.name ?? "-",
@@ -87,26 +86,13 @@ export default function Host() {
     price: b.total_cost.toString(),
   }));
 
-  const toggle = (id: string) => {
-    LayoutAnimation.easeInEaseOut();
-    setOpenIds((p) =>
-      p.includes(id) ? p.filter((x) => x !== id) : [...p, id]
-    );
-  };
-
   return (
-    <SafeAreaView style={s.page}>
+    <SafeAreaView style={styles.page}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 50 }}
       >
-      <ProfileBar />
-        {/* Header */}
-        {/* <View style={s.row}>
-          <Ionicons name="person-circle" size={36} color={Colors.secondary} />
-          <Text style={s.h1}>Welcome, {dummyData.users[2].id}</Text>
-        </View> */}
-        {/* <ProfileBar /> */}
+        <ProfileBar />
 
         {/* Wallet */}
         <View style={{ flex: 1, flexDirection: "row", gap: 12 }}>
@@ -121,7 +107,6 @@ export default function Host() {
         </View>
 
         {/* Requests */}
-        {/* <Text style={[s.sub, { marginTop: Spacing.xl }]}>Charge requests</Text> */}
         <View
           style={{ flexDirection: "row", gap: 16, marginVertical: Spacing.lg }}
         >
@@ -136,9 +121,9 @@ export default function Host() {
             </Text>
             <View
               style={[
-                s.dot,
+                styles.dot,
                 { marginTop: 4 },
-                selectedTab === "plugged" && s.dotSelected,
+                selectedTab === "plugged" && styles.dotSelected,
               ]}
             />
           </TouchableOpacity>
@@ -153,9 +138,9 @@ export default function Host() {
             </Text>
             <View
               style={[
-                s.dot,
+                styles.dot,
                 { marginTop: 4 },
-                selectedTab === "requests" && s.dotSelected,
+                selectedTab === "requests" && styles.dotSelected,
               ]}
             />
           </TouchableOpacity>
@@ -165,12 +150,12 @@ export default function Host() {
           if (selectedTab === "requests") {
             if (requests.length === 0) {
               return (
-                <View style={[s.emptyBox, { height: 120 }]}>
+                <View style={[styles.emptyBox, { height: 120 }]}>
                   <Image
                     source={require("../../assets/images/noRequest-icon.png")}
                     style={{ width: 50, height: 50, resizeMode: "contain" }}
                   />
-                  <Text style={[s.emptyTxt, { fontSize: 12 }]}>
+                  <Text style={[styles.emptyTxt, { fontSize: 12 }]}>
                     No active requests
                   </Text>
                 </View>
@@ -182,12 +167,12 @@ export default function Host() {
             }
           } else {
             return (
-              <View style={[s.emptyBox, { height: 120 }]}>
+              <View style={[styles.emptyBox, { height: 120 }]}>
                 <Image
                   source={require("../../assets/images/noRequest-icon.png")}
                   style={{ width: 50, height: 50, resizeMode: "contain" }}
                 />
-                <Text style={[s.emptyTxt, { fontSize: 12 }]}>
+                <Text style={[styles.emptyTxt, { fontSize: 12 }]}>
                   No plugged-in sessions
                 </Text>
               </View>
@@ -196,17 +181,234 @@ export default function Host() {
         })()}
 
         {/* Stations */}
-        <Text style={[s.sub, { marginTop: Spacing.xl }]}>
-          My Charging Stations
-        </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: Spacing.sm,
+            marginTop: Spacing.xl,
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.secondary,
+              fontSize: Font.md,
+              fontWeight: "700",
+            }}
+          >
+            My Charging Stations (Host)
+          </Text>
+          <TouchableOpacity onPress={() => setEditModalVisible(true)}>
+            <Ionicons
+              name="add-circle-sharp"
+              size={25}
+              style={{ color: Colors.accent, paddingRight: 20 }}
+            />
+          </TouchableOpacity>
+        </View>
 
         <CarouselComponent />
+        <ReactNativeModal
+          isVisible={editModalVisible}
+          onBackdropPress={() => setEditModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <ScrollView
+              contentContainerStyle={{ paddingBottom: 10 }}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.modalIconContainer}>
+                <Ionicons
+                  name="create-outline"
+                  size={20}
+                  color={Colors.accent}
+                />
+              </View>
+              <Text style={styles.modalTitle}>Create New Listing</Text>
+              <Text style={styles.modalSubtitle}>
+                Fill out all fields below
+              </Text>
+
+              <View style={styles.inputFieldsContainer}>
+                {/* Address */}
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="location-outline"
+                    size={20}
+                    color={Colors.accent}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={address}
+                    onChangeText={setAddress}
+                    placeholder="Address"
+                    placeholderTextColor="#888"
+                    style={styles.input}
+                  />
+                </View>
+
+                {/* Availability Schedule */}
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="calendar-outline"
+                    size={20}
+                    color={Colors.accent}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={availabilitySchedule}
+                    onChangeText={setAvailabilitySchedule}
+                    placeholder="Availability (e.g. Mon-Fri: 9am-5pm)"
+                    placeholderTextColor="#888"
+                    style={styles.input}
+                  />
+                </View>
+
+                {/* Charger Type */}
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="flash-outline"
+                    size={20}
+                    color={Colors.accent}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={chargerType}
+                    onChangeText={setChargerType}
+                    placeholder="Charger Type (e.g. Level 1)"
+                    placeholderTextColor="#888"
+                    style={styles.input}
+                  />
+                </View>
+
+                {/* Connector Type */}
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="swap-horizontal-outline"
+                    size={20}
+                    color={Colors.accent}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={connectorType}
+                    onChangeText={setConnectorType}
+                    placeholder="Connector Type (e.g. J1772)"
+                    placeholderTextColor="#888"
+                    style={styles.input}
+                  />
+                </View>
+
+                {/* Power Output (kW) */}
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="battery-charging-outline"
+                    size={20}
+                    color={Colors.accent}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={powerOutput}
+                    onChangeText={setPowerOutput}
+                    placeholder="Power Output (kW)"
+                    placeholderTextColor="#888"
+                    keyboardType="numeric"
+                    style={styles.input}
+                  />
+                </View>
+
+                {/* Price Per Hour */}
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="pricetag-outline"
+                    size={20}
+                    color={Colors.accent}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={pricePerHour}
+                    onChangeText={setPricePerHour}
+                    placeholder="Price Per Hour"
+                    placeholderTextColor="#888"
+                    keyboardType="numeric"
+                    style={styles.input}
+                  />
+                </View>
+
+                {/* Minimum Price */}
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="cash-outline"
+                    size={20}
+                    color={Colors.accent}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={minPrice}
+                    onChangeText={setMinPrice}
+                    placeholder="Minimum Price"
+                    placeholderTextColor="#888"
+                    keyboardType="numeric"
+                    style={styles.input}
+                  />
+                </View>
+
+                {/* Instructions */}
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="information-circle-outline"
+                    size={20}
+                    color={Colors.accent}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={instructions}
+                    onChangeText={setInstructions}
+                    placeholder="Special Instructions"
+                    placeholderTextColor="#888"
+                    style={styles.input}
+                  />
+                </View>
+
+                {/* Image URL */}
+                <View style={styles.inputRow}>
+                  <Ionicons
+                    name="image-outline"
+                    size={20}
+                    color={Colors.accent}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={images}
+                    onChangeText={setImages}
+                    placeholder="Image URL"
+                    placeholderTextColor="#888"
+                    style={styles.input}
+                  />
+                </View>
+              </View>
+
+              {!!errorMessage && (
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              )}
+
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                  onPress={handleCreateListing}
+                  style={styles.verifyButton}
+                >
+                  <Text style={styles.verifyButtonText}>Create Listing</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </ReactNativeModal>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const s = StyleSheet.create({
+const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: Colors.primary, padding: Spacing.lg },
   row: { flexDirection: "row", alignItems: "center" },
   h1: {
@@ -232,10 +434,7 @@ const s = StyleSheet.create({
   big: { color: Colors.primary, fontSize: Font.lg, fontWeight: "bold" },
   txn: { color: "#eee", fontSize: Font.sm, fontWeight: "light" },
   sub: {
-    fontSize: Font.md,
-    fontWeight: "700",
     color: Colors.secondary,
-    marginBottom: Spacing.sm,
   },
   emptyBox: {
     height: 90,
@@ -260,7 +459,6 @@ const s = StyleSheet.create({
     borderRadius: Constants.borderRadius,
     padding: Spacing.md,
     gap: 6,
-    // marginBottom: Spacing.lg,
   },
   reqTop: {
     flexDirection: "row",
@@ -269,7 +467,6 @@ const s = StyleSheet.create({
   },
   reqName: { fontWeight: "600", color: Colors.secondary },
   reqLoc: {
-    // marginLeft: Spacing.xs,
     color: Colors.secondary,
     fontSize: Font.sm,
   },
@@ -309,7 +506,6 @@ const s = StyleSheet.create({
   title: { color: Colors.primary, fontSize: Font.sm, fontWeight: "700" },
   small: { color: Colors.blueVariations.aliceBlue, fontSize: Font.sm },
   online: { color: Colors.success, fontSize: Font.sm },
-
   detailBox: {
     borderWidth: 1,
     borderColor: Colors.blueVariations.aliceBlue,
@@ -331,5 +527,82 @@ const s = StyleSheet.create({
   dotSelected: {
     backgroundColor: Colors.accent,
     alignSelf: "center",
+  },
+  modalContainer: {
+    backgroundColor: Colors.primary,
+    padding: Spacing.lg,
+    borderRadius: Constants.borderRadius,
+    maxHeight: "70%",
+  },
+  modalIconContainer: {
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#a1eade",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 6,
+    borderColor: "#c8f4ec",
+    borderWidth: 3,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 8,
+    alignSelf: "center",
+    color: Colors.secondary,
+  },
+  modalSubtitle: {
+    fontSize: Font.sm,
+    fontWeight: "300",
+    marginBottom: 20,
+    textAlign: "center",
+    color: Colors.secondary,
+  },
+  inputFieldsContainer: {
+    alignSelf: "flex-start",
+    width: "100%",
+    gap: Spacing.md,
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 30,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 12,
+  },
+  inputIcon: {
+    marginRight: Spacing.sm,
+    marginLeft: Spacing.xs,
+  },
+  input: {
+    flex: 1,
+    color: "#222",
+  },
+  modalButtonContainer: {
+    alignItems: "center",
+    marginTop: Spacing.lg,
+    gap: Spacing.md,
+  },
+  verifyButton: {
+    backgroundColor: Colors.secondary,
+    width: 250,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Constants.borderRadius,
+    alignItems: "center",
+  },
+  verifyButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginTop: 4,
   },
 });
