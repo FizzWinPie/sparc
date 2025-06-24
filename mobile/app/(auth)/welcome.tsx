@@ -8,9 +8,7 @@ import {
 } from "react-native";
 import Carousel, {
   ICarouselInstance,
-  Pagination,
 } from "react-native-reanimated-carousel";
-import Spacing from "@/constants/Spacing";
 import OtherPage from "@/components/onboarding/OtherPage";
 import WelcomePage from "@/components/onboarding/WelcomePage";
 import Colors from "@/constants/Colors";

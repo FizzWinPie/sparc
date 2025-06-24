@@ -11,9 +11,7 @@ interface Props {
 }
 
 const MyCarCard = ({ bookings }: Props) => {
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(
-    bookings.length > 0 ? bookings[0] : null
-  );
+  const selectedBooking = bookings.length > 0 ? bookings[0] : null;
 
   if (!selectedBooking) {
     return (
@@ -30,7 +28,7 @@ const MyCarCard = ({ bookings }: Props) => {
     >
       <View style={styles.leftSection}>
         <Text style={styles.idText}>
-          ID {selectedBooking.id} <Text style={styles.onlineText}>ONLINE</Text>
+          ID {selectedBooking._id.slice(-5)} <Text style={styles.onlineText}>ONLINE</Text>
         </Text>
         <Image
           source={require("../assets/images/ev_profile.png")}

@@ -1,5 +1,5 @@
 export interface Listing {
-  id: string;
+  _id: string;
   host_id: string;
   charger_type: string;
   power_output_kw: number;

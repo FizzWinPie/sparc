@@ -1,5 +1,5 @@
 export interface Booking {
-  id: string;
+  _id: string;
   charger_listings_id: string;
   charger_listings_address: string;
   host_id: string;
