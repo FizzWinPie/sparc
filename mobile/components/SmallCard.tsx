@@ -5,6 +5,7 @@ import Font from "@/constants/Font";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { Listing } from "@/types";
+import Constants from "@/constants/Constants";
 
 interface Props {
   listings: Listing[];
@@ -16,17 +17,13 @@ const SmallCard = ({ listings, onPress }: Props) => {
 
   if (!selectedListing) {
     return (
-      <View style={styles.container}>
+      <View style={styles.emptyContainer}>
         <Image
-          source={require("../assets/images/logo/splash-icon.png")}
-          style={styles.image}
+          source={require("../assets/images/no-result.png")}
+          style={styles.emptyImage}
           resizeMode="cover"
         />
-        <View style={styles.infoContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>No Results...</Text>
-          </View>
-        </View>
+        <Text style={styles.emptyTitle}>No Listings...</Text>
       </View>
     );
   }
@@ -68,6 +65,23 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     maxWidth: "50%",
   },
+  emptyContainer: {
+    flex: 1,
+    flexDirection: "column",
+    alignItems: "center",
+    borderRadius: Constants.borderRadius,
+    backgroundColor: "white",
+    maxWidth: "50%",
+    borderWidth: 2,
+    borderColor: Colors.blueVariations.aliceBlue,
+    borderStyle: "dotted",
+    height: 85,
+  },
+  emptyImage: {
+    width: 70,
+    height: 70,
+    resizeMode: "contain"
+  },
   image: {
     width: 60,
     height: 80,
@@ -87,6 +101,11 @@ const styles = StyleSheet.create({
     fontSize: Font.sm,
     color: "white",
   },
+  emptyTitle: {
+    fontFamily: "regular",
+    color: Colors.basic.blue,
+    fontSize: Font.xs,
+  },
   locationContainer: {
     flexDirection: "row",
     gap: 2,
@@ -105,11 +124,6 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
-  },
-  emptyImage: {
-    width: 50,
-    height: 50,
-    alignSelf: "center",
   },
   emptyText: {
     fontSize: Font.md,
