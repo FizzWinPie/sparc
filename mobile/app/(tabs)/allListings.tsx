@@ -25,6 +25,7 @@ import { getListings } from "@/lib/listing";
 import { useLoading } from "@/utils/LoadingContext";
 import { createBooking } from "@/lib/booking";
 import { useUser } from "@clerk/clerk-expo";
+import AllListingsNav from "@/components/allListingsNav";
 
 const allListings = () => {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -107,14 +108,6 @@ const allListings = () => {
         style={styles.box}
         onPress={() => handleCardPress(item)}
       >
-        {/* <View style={{ alignItems: "center" }}>
-          <Ionicons
-            name="star"
-            size={15}
-            color={Constants.colors.accent}
-            style={{ position: "absolute", top: -8, zIndex: 1, backgroundColor: Colors.primary, borderRadius: 12 }}
-            
-          /> */}
         <Image source={{ uri: item.images }} style={styles.image} />
         {/* </View> */}
         <View style={styles.middleContent}>
@@ -133,11 +126,6 @@ const allListings = () => {
               <Text style={{ fontSize: Font.sm }}>3 miles away</Text>
             </View>
             <View style={styles.bottomRight}>
-              {/* <FontAwesome5
-                name="plug"
-                size={14}
-                color={Colors.blueVariations.steelBlue}
-              /> */}
               <Image
                 source={require("../../assets/images/level2a.png")}
                 style={{ width: 16, height: 16 }}
@@ -168,7 +156,6 @@ const allListings = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.basic.white }}>
-        {/* <Text style={{fontFamily: "bold",fontSize: Font.lg, textAlign: 'center',}}>All Listing</Text> */}
         <View style={{ paddingHorizontal: Spacing.lg, paddingTop: Spacing.lg }}>
           <ProfileBar />
         </View>
@@ -177,72 +164,7 @@ const allListings = () => {
             <SearchBar />
           </View>
 
-          {/* <View style={styles.searchcontainer}>
-          <View style={styles.searchBar}>
-            <Ionicons
-              name="search"
-              size={Font.lg}
-              color="gray"
-              style={styles.iconLeft}
-            />
-            <TextInput
-              placeholder="Search for a charger near you"
-              style={styles.searchInput}
-              placeholderTextColor="gray"
-            />
-            <TouchableOpacity>
-              <Ionicons
-                name="filter"
-                size={Font.lg}
-                color="gray"
-                style={styles.iconRight}
-              />
-            </TouchableOpacity>
-          </View>
-        </View> */}
-
-          <View style={styles.navcontainer}>
-            <View style={styles.navItem}>
-              <Entypo name="map" size={Font.lg} color={Colors.basic.white} />
-              <Text
-                style={{
-                  fontSize: Font.sm,
-                  color: Colors.basic.white,
-                  padding: Spacing.xs,
-                }}
-              >
-                Map
-              </Text>
-            </View>
-            <View style={styles.navItem}>
-              <Ionicons name="list" size={Font.lg} color={Colors.basic.white} />
-              <Text
-                style={{
-                  fontSize: Font.sm,
-                  color: Colors.basic.white,
-                  padding: Spacing.xs,
-                }}
-              >
-                List
-              </Text>
-            </View>
-            <View style={styles.navItem}>
-              <Ionicons
-                name="heart"
-                size={Font.lg}
-                color={Colors.basic.white}
-              />
-              <Text
-                style={{
-                  fontSize: Font.sm,
-                  color: Colors.basic.white,
-                  padding: Spacing.xs,
-                }}
-              >
-                Favorites
-              </Text>
-            </View>
-          </View>
+          <AllListingsNav />
 
           <View style={styles.listcontainer}>
             <FlatList

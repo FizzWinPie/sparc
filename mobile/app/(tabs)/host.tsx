@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  TextInput,
 } from "react-native";
 import dummyData from "../../constants/dummyData/dummy";
 import Colors from "../../constants/Colors";
@@ -14,61 +13,20 @@ import Font from "../../constants/Font";
 import Spacing from "../../constants/Spacing";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileBar from "@/components/ProfileBar";
-import Constants from "@/constants/Constants";
 import WalletCardBalance from "@/components/WalletCardBalance";
 import WalletCardTransactions from "@/components/WalletCardTransactions";
 import RequestCard from "@/components/RequestCard";
 import CarouselComponent from "@/components/CarouselComponent";
 import { Ionicons } from "@expo/vector-icons";
-import ReactNativeModal from "react-native-modal";
 import { createListing } from "@/lib/listing";
 import { useUser } from "@clerk/clerk-expo";
+import ListingModal from "@/components/modals/ListingModal";
 
 export default function Host() {
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [address, setAddress] = useState("");
-  const [availabilitySchedule, setAvailabilitySchedule] = useState("");
-  const [chargerType, setChargerType] = useState("");
-  const [connectorType, setConnectorType] = useState("");
-  const [powerOutput, setPowerOutput] = useState("");
-  const [pricePerHour, setPricePerHour] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [instructions, setInstructions] = useState("");
-  const [images, setImages] = useState("");
-
   const { user } = useUser();
+  const [selectedTab, setSelectedTab] = useState<"requests" | "plugged">("requests");
 
-  const [selectedTab, setSelectedTab] = useState<"requests" | "plugged">(
-    "requests"
-  );
-
-  const handleCreateListing = async () => {
-    if (!user) return;
-    try {
-      const newListing = await createListing({
-        host_id: user.id,
-        charger_type: chargerType,
-        power_output_kw: powerOutput,
-        connector_type: connectorType,
-        address: address,
-        latitude: 40.7831, // fix
-        longitude: -73.9712,
-        availability_schedule: availabilitySchedule,
-        price_per_hour: pricePerHour,
-        min_price: minPrice,
-        images: images,
-        instructions: instructions,
-        is_active: true,
-      });
-      console.log("Created listing:", newListing);
-      setEditModalVisible(false);
-    } catch (error) {
-      console.error("Listing creation failed", error);
-    }
-  };
-
-  // Static needs to be fixed to be updated using the data
   const requests = dummyData.bookings.map((b) => ({
     id: b.id,
     name: dummyData.users.find((u) => u.id === b.ev_owner_id)?.name ?? "-",
@@ -86,16 +44,53 @@ export default function Host() {
     price: b.total_cost.toString(),
   }));
 
+  const handleCreateListing = async (listingData: {
+    address: string;
+    availabilitySchedule: string;
+    chargerType: string;
+    connectorType: string;
+    powerOutput: string;
+    pricePerHour: string;
+    minPrice: string;
+    instructions: string;
+    images: string;
+  }) => {
+    if (!user) return;
+    
+    try {
+      const newListing = await createListing({
+        host_id: user.id,
+        charger_type: listingData.chargerType,
+        power_output_kw: listingData.powerOutput,
+        connector_type: listingData.connectorType,
+        address: listingData.address,
+        latitude: 40.7831,
+        longitude: -73.9712,
+        availability_schedule: listingData.availabilitySchedule,
+        price_per_hour: listingData.pricePerHour,
+        min_price: listingData.minPrice,
+        images: listingData.images,
+        instructions: listingData.instructions,
+        is_active: true,
+      });
+      console.log("Created listing:", newListing);
+      setEditModalVisible(false);
+    } catch (error) {
+      console.error("Listing creation failed", error);
+      throw error;
+    }
+  };
+
   return (
     <SafeAreaView style={styles.page}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 50 }}
+        contentContainerStyle={styles.scrollViewContent}
       >
         <ProfileBar />
 
-        {/* Wallet */}
-        <View style={{ flex: 1, flexDirection: "row", gap: 12 }}>
+        {/* Wallet Cards */}
+        <View style={styles.walletContainer}>
           <WalletCardBalance
             wallet={1240.97}
             transactions={dummyData.payment_invoice}
@@ -106,40 +101,36 @@ export default function Host() {
           />
         </View>
 
-        {/* Requests */}
-        <View
-          style={{ flexDirection: "row", gap: 16, marginVertical: Spacing.lg }}
-        >
+        {/* Requests and Plugged In Bar */}
+        <View style={styles.tabContainer}>
           <TouchableOpacity onPress={() => setSelectedTab("plugged")}>
             <Text
-              style={{
-                fontWeight: selectedTab === "plugged" ? "bold" : "300",
-                color: selectedTab === "plugged" ? Colors.secondary : "gray",
-              }}
+              style={[
+                styles.tabText,
+                selectedTab === "plugged" && styles.tabTextSelected,
+              ]}
             >
               Plugged In
             </Text>
             <View
               style={[
                 styles.dot,
-                { marginTop: 4 },
                 selectedTab === "plugged" && styles.dotSelected,
               ]}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setSelectedTab("requests")}>
             <Text
-              style={{
-                fontWeight: selectedTab === "requests" ? "bold" : "300",
-                color: selectedTab === "requests" ? Colors.secondary : "gray",
-              }}
+              style={[
+                styles.tabText,
+                selectedTab === "requests" && styles.tabTextSelected,
+              ]}
             >
               Charge requests
             </Text>
             <View
               style={[
                 styles.dot,
-                { marginTop: 4 },
                 selectedTab === "requests" && styles.dotSelected,
               ]}
             />
@@ -149,460 +140,122 @@ export default function Host() {
         {(() => {
           if (selectedTab === "requests") {
             if (requests.length === 0) {
-              return (
-                <View style={[styles.emptyBox, { height: 120 }]}>
-                  <Image
-                    source={require("../../assets/images/noRequest-icon.png")}
-                    style={{ width: 50, height: 50, resizeMode: "contain" }}
-                  />
-                  <Text style={[styles.emptyTxt, { fontSize: 12 }]}>
-                    No active requests
-                  </Text>
-                </View>
-              );
+              return <EmptyState message="No active requests" />;
             } else {
               return requests.map((r) => (
                 <RequestCard key={r.id} request={r} />
               ));
             }
           } else {
-            return (
-              <View style={[styles.emptyBox, { height: 120 }]}>
-                <Image
-                  source={require("../../assets/images/noRequest-icon.png")}
-                  style={{ width: 50, height: 50, resizeMode: "contain" }}
-                />
-                <Text style={[styles.emptyTxt, { fontSize: 12 }]}>
-                  No plugged-in sessions
-                </Text>
-              </View>
-            );
+            return <EmptyState message="No plugged-in sessions" />;
           }
         })()}
 
-        {/* Stations */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: Spacing.sm,
-            marginTop: Spacing.xl,
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.secondary,
-              fontSize: Font.md,
-              fontWeight: "700",
-            }}
-          >
-            My Charging Stations (Host)
-          </Text>
+        {/* Charging Stations */}
+        <View style={styles.stationsHeader}>
+          <Text style={styles.stationsTitle}>My Charging Stations (Host)</Text>
           <TouchableOpacity onPress={() => setEditModalVisible(true)}>
             <Ionicons
               name="add-circle-sharp"
               size={25}
-              style={{ color: Colors.accent, paddingRight: 20 }}
+              style={styles.addIcon}
             />
           </TouchableOpacity>
         </View>
 
         <CarouselComponent />
-        <ReactNativeModal
+
+        <ListingModal
           isVisible={editModalVisible}
-          onBackdropPress={() => setEditModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <ScrollView
-              contentContainerStyle={{ paddingBottom: 10 }}
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.modalIconContainer}>
-                <Ionicons
-                  name="create-outline"
-                  size={20}
-                  color={Colors.accent}
-                />
-              </View>
-              <Text style={styles.modalTitle}>Create New Listing</Text>
-              <Text style={styles.modalSubtitle}>
-                Fill out all fields below
-              </Text>
-
-              <View style={styles.inputFieldsContainer}>
-                {/* Address */}
-                <View style={styles.inputRow}>
-                  <Ionicons
-                    name="location-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    value={address}
-                    onChangeText={setAddress}
-                    placeholder="Address"
-                    placeholderTextColor="#888"
-                    style={styles.input}
-                  />
-                </View>
-
-                {/* Availability Schedule */}
-                <View style={styles.inputRow}>
-                  <Ionicons
-                    name="calendar-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    value={availabilitySchedule}
-                    onChangeText={setAvailabilitySchedule}
-                    placeholder="Availability (e.g. Mon-Fri: 9am-5pm)"
-                    placeholderTextColor="#888"
-                    style={styles.input}
-                  />
-                </View>
-
-                {/* Charger Type */}
-                <View style={styles.inputRow}>
-                  <Ionicons
-                    name="flash-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    value={chargerType}
-                    onChangeText={setChargerType}
-                    placeholder="Charger Type (e.g. Level 1)"
-                    placeholderTextColor="#888"
-                    style={styles.input}
-                  />
-                </View>
-
-                {/* Connector Type */}
-                <View style={styles.inputRow}>
-                  <Ionicons
-                    name="swap-horizontal-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    value={connectorType}
-                    onChangeText={setConnectorType}
-                    placeholder="Connector Type (e.g. J1772)"
-                    placeholderTextColor="#888"
-                    style={styles.input}
-                  />
-                </View>
-
-                {/* Power Output (kW) */}
-                <View style={styles.inputRow}>
-                  <Ionicons
-                    name="battery-charging-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    value={powerOutput}
-                    onChangeText={setPowerOutput}
-                    placeholder="Power Output (kW)"
-                    placeholderTextColor="#888"
-                    keyboardType="numeric"
-                    style={styles.input}
-                  />
-                </View>
-
-                {/* Price Per Hour */}
-                <View style={styles.inputRow}>
-                  <Ionicons
-                    name="pricetag-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    value={pricePerHour}
-                    onChangeText={setPricePerHour}
-                    placeholder="Price Per Hour"
-                    placeholderTextColor="#888"
-                    keyboardType="numeric"
-                    style={styles.input}
-                  />
-                </View>
-
-                {/* Minimum Price */}
-                <View style={styles.inputRow}>
-                  <Ionicons
-                    name="cash-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    value={minPrice}
-                    onChangeText={setMinPrice}
-                    placeholder="Minimum Price"
-                    placeholderTextColor="#888"
-                    keyboardType="numeric"
-                    style={styles.input}
-                  />
-                </View>
-
-                {/* Instructions */}
-                <View style={styles.inputRow}>
-                  <Ionicons
-                    name="information-circle-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    value={instructions}
-                    onChangeText={setInstructions}
-                    placeholder="Special Instructions"
-                    placeholderTextColor="#888"
-                    style={styles.input}
-                  />
-                </View>
-
-                {/* Image URL */}
-                <View style={styles.inputRow}>
-                  <Ionicons
-                    name="image-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    value={images}
-                    onChangeText={setImages}
-                    placeholder="Image URL"
-                    placeholderTextColor="#888"
-                    style={styles.input}
-                  />
-                </View>
-              </View>
-
-              {!!errorMessage && (
-                <Text style={styles.errorText}>{errorMessage}</Text>
-              )}
-
-              <View style={styles.modalButtonContainer}>
-                <TouchableOpacity
-                  onPress={handleCreateListing}
-                  style={styles.verifyButton}
-                >
-                  <Text style={styles.verifyButtonText}>Create Listing</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </View>
-        </ReactNativeModal>
+          onClose={() => setEditModalVisible(false)}
+          onCreateListing={handleCreateListing}
+        />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
+const EmptyState = ({ message }: { message: string }) => (
+  <View style={styles.emptyBox}>
+    <Image
+      source={require("../../assets/images/onboard/charging_request.png")}
+      style={styles.emptyImage}
+    />
+    <Text style={styles.emptyText}>{message}</Text>
+  </View>
+);
+
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: Colors.primary, padding: Spacing.lg },
-  row: { flexDirection: "row", alignItems: "center" },
-  h1: {
+  page: { 
+    flex: 1, 
+    backgroundColor: Colors.primary, 
+    padding: Spacing.lg 
+  },
+  scrollViewContent: {
+    paddingBottom: 50
+  },
+  walletContainer: {
     flex: 1,
-    marginLeft: Spacing.sm,
-    fontSize: Font.md,
-    fontWeight: "600",
-    color: Colors.secondary,
+    flexDirection: "row",
+    gap: 12,
+    marginTop: Spacing.lg
   },
-  card: {
-    flex: 1,
-    backgroundColor: Colors.secondary,
-    borderRadius: Constants.borderRadius,
-    padding: Spacing.sm,
-    margin: Spacing.sm,
+  tabContainer: {
+    flexDirection: "row",
+    gap: 16,
+    marginVertical: Spacing.lg
   },
-  label: {
-    color: Colors.primary,
-    fontSize: Font.sm,
-    marginBottom: Spacing.xs,
-    fontWeight: "regular",
+  tabText: {
+    fontWeight: "300",
+    color: "gray"
   },
-  big: { color: Colors.primary, fontSize: Font.lg, fontWeight: "bold" },
-  txn: { color: "#eee", fontSize: Font.sm, fontWeight: "light" },
-  sub: {
-    color: Colors.secondary,
+  tabTextSelected: {
+    fontWeight: "bold",
+    color: Colors.secondary
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 6,
+    marginTop: 4
+  },
+  dotSelected: {
+    backgroundColor: Colors.accent,
+    alignSelf: "center"
   },
   emptyBox: {
-    height: 90,
+    height: 180,
     borderWidth: 2,
     borderColor: Colors.blueVariations.aliceBlue,
     borderRadius: Spacing.sm,
     justifyContent: "center",
     alignItems: "center",
-    borderStyle: "dotted",
+    borderStyle: "dotted"
   },
-  emptyTxt: {
+  emptyImage: {
+    width: 120,
+    height: 80,
+    resizeMode: "contain"
+  },
+  emptyText: {
     marginTop: Spacing.xs,
     color: Colors.basic.blue,
-    fontSize: Font.sm,
+    fontSize: 12
   },
-  reqCard: {
-    flex: 1,
+  stationsHeader: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
-    borderWidth: 1,
-    borderColor: Colors.blueVariations.aliceBlue,
-    borderRadius: Constants.borderRadius,
-    padding: Spacing.md,
-    gap: 6,
+    marginBottom: Spacing.sm,
+    marginTop: Spacing.xl
   },
-  reqTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: Spacing.xs,
-  },
-  reqName: { fontWeight: "600", color: Colors.secondary },
-  reqLoc: {
+  stationsTitle: {
     color: Colors.secondary,
-    fontSize: Font.sm,
+    fontSize: Font.md,
+    fontWeight: "700"
   },
-  reqLine: {
-    color: Colors.secondary,
-    fontSize: Font.sm,
-    marginBottom: Spacing.xs,
-  },
-  rowBtn: { flexDirection: "column", gap: 6 },
-  btn: {
-    flex: 1,
-    borderRadius: Spacing.xs,
-    paddingVertical: Spacing.xs,
-    alignItems: "center",
-  },
-  btnGreen: { backgroundColor: Colors.success },
-  btnGray: { backgroundColor: Colors.blueVariations.aliceBlue },
-  btnTxt: { fontSize: Font.sm, fontWeight: "600", color: Colors.secondary },
-  price: { marginTop: Spacing.xs, fontWeight: "700", color: Colors.secondary },
-  stationWrapper: { marginTop: Spacing.sm },
-  stationHeader: {
-    borderRadius: Spacing.sm,
-    overflow: "hidden",
-    backgroundColor: Colors.secondary,
-  },
-  stationInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: Spacing.sm,
-  },
-  stationRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.xs,
-  },
-  title: { color: Colors.primary, fontSize: Font.sm, fontWeight: "700" },
-  small: { color: Colors.blueVariations.aliceBlue, fontSize: Font.sm },
-  online: { color: Colors.success, fontSize: Font.sm },
-  detailBox: {
-    borderWidth: 1,
-    borderColor: Colors.blueVariations.aliceBlue,
-    borderTopWidth: 0,
-    borderBottomLeftRadius: Spacing.sm,
-    borderBottomRightRadius: Spacing.sm,
-    padding: Spacing.md,
-    backgroundColor: Colors.primary,
-  },
-  infoRow: { flexDirection: "row", marginBottom: Spacing.xs },
-  infoLabel: { width: 110, fontWeight: "600", color: Colors.secondary },
-  infoValue: { flex: 1, color: Colors.secondary },
-  detailText: { color: Colors.secondary, fontSize: Font.sm },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 6,
-  },
-  dotSelected: {
-    backgroundColor: Colors.accent,
-    alignSelf: "center",
-  },
-  modalContainer: {
-    backgroundColor: Colors.primary,
-    padding: Spacing.lg,
-    borderRadius: Constants.borderRadius,
-    maxHeight: "70%",
-  },
-  modalIconContainer: {
-    alignSelf: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#a1eade",
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginBottom: 6,
-    borderColor: "#c8f4ec",
-    borderWidth: 3,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 8,
-    alignSelf: "center",
-    color: Colors.secondary,
-  },
-  modalSubtitle: {
-    fontSize: Font.sm,
-    fontWeight: "300",
-    marginBottom: 20,
-    textAlign: "center",
-    color: Colors.secondary,
-  },
-  inputFieldsContainer: {
-    alignSelf: "flex-start",
-    width: "100%",
-    gap: Spacing.md,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 30,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 12,
-  },
-  inputIcon: {
-    marginRight: Spacing.sm,
-    marginLeft: Spacing.xs,
-  },
-  input: {
-    flex: 1,
-    color: "#222",
-  },
-  modalButtonContainer: {
-    alignItems: "center",
-    marginTop: Spacing.lg,
-    gap: Spacing.md,
-  },
-  verifyButton: {
-    backgroundColor: Colors.secondary,
-    width: 250,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: Constants.borderRadius,
-    alignItems: "center",
-  },
-  verifyButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    fontSize: 14,
-    marginTop: 4,
+  addIcon: {
+    color: Colors.accent,
+    paddingRight: 20
   },
 });
