@@ -25,7 +25,7 @@ import { getListings } from "@/lib/listing";
 import { useLoading } from "@/utils/LoadingContext";
 import { createBooking } from "@/lib/booking";
 import { useUser } from "@clerk/clerk-expo";
-import AllListingsNav from "@/components/allListingsNav";
+import AllListingsNav from "@/components/AllListingsNav";
 
 const allListings = () => {
   const [listings, setListings] = useState<Listing[]>([]);
