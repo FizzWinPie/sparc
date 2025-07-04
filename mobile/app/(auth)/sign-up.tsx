@@ -46,6 +46,22 @@ export default function SignUpScreen() {
 
       if (createdSessionId && setSessionActive) {
         await setSessionActive({ session: createdSessionId });
+        console.log("SSO flow completed successfully");
+
+        // Add user to MongoDB
+        if (user) {
+          const email = user.primaryEmailAddress?.emailAddress;
+          const clerkId = user.id;
+          const name = user.firstName || "";
+          const phoneNumber = user.phoneNumbers?.[0]?.phoneNumber || "";
+          
+          if (email && clerkId) {
+            await addNewUser(email, clerkId, name, phoneNumber);
+            console.log("email: ", email, "\nClerkId: ", clerkId);
+          } else {
+            console.error("Email or ClerkId is undefined");
+          }
+        }
 
         // const clerkId = user?.id;
         // if (!clerkId) {
@@ -65,6 +81,8 @@ export default function SignUpScreen() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const [verification, setVerification] = useState({
     state: "default",
@@ -121,7 +139,7 @@ export default function SignUpScreen() {
       });
       if (completeSignUp.status === "complete") {
         if (completeSignUp.createdUserId) {
-          await addNewUser(email, completeSignUp.createdUserId);
+          await addNewUser(email, completeSignUp.createdUserId, name, phoneNumber);
         } else {
           throw new Error("User ID is missing after sign up.");
         }

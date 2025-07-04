@@ -1,4 +1,4 @@
-export const addNewUser = async (email: string, clerkId: string) => {
+export const addNewUser = async (email: string, clerkId: string, name?: string, phoneNumber?: string) => {
   try {
     if (!email || !clerkId) {
       return Response.json(
@@ -17,7 +17,7 @@ export const addNewUser = async (email: string, clerkId: string) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, clerkId }),
+        body: JSON.stringify({ email, clerkId, name, phoneNumber }),
       }
     );
     return await res.json();
