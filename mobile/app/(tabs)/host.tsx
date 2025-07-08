@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,19 +13,34 @@ import Font from "../../constants/Font";
 import Spacing from "../../constants/Spacing";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileBar from "@/components/ProfileBar";
-import WalletCardBalance from "@/components/WalletCardBalance";
-import WalletCardTransactions from "@/components/WalletCardTransactions";
-import RequestCard from "@/components/RequestCard";
+import WalletCardBalance from "@/components/wallet/WalletCardBalance";
+import WalletCardTransactions from "@/components/wallet/WalletCardTransactions";
+import RequestCard from "@/components/host/RequestCard";
 import CarouselComponent from "@/components/CarouselComponent";
 import { Ionicons } from "@expo/vector-icons";
-import { createListing } from "@/lib/listing";
 import { useUser } from "@clerk/clerk-expo";
 import ListingModal from "@/components/modals/ListingModal";
+import useCreateListing from "@/utils/hooks/useCreateListing";
+import { ListingFormData } from "@/types";
+import PluggedCard from "@/components/host/PluggedCard";
+
+type Transaction = {
+  _id: string;
+  receiver: string;
+  payer: string;
+  amount: number;
+};
+
+type Props = {
+  transactions: Transaction[];
+  balance: number;
+};
 
 export default function Host() {
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const { user } = useUser();
-  const [selectedTab, setSelectedTab] = useState<"requests" | "plugged">("requests");
+  const [selectedTab, setSelectedTab] = useState<"requests" | "plugged">(
+    "requests"
+  );
 
   const requests = dummyData.bookings.map((b) => ({
     id: b.id,
@@ -44,42 +59,42 @@ export default function Host() {
     price: b.total_cost.toString(),
   }));
 
-  const handleCreateListing = async (listingData: {
-    address: string;
-    availabilitySchedule: string;
-    chargerType: string;
-    connectorType: string;
-    powerOutput: string;
-    pricePerHour: string;
-    minPrice: string;
-    instructions: string;
-    images: string;
-  }) => {
-    if (!user) return;
-    
-    try {
-      const newListing = await createListing({
-        host_id: user.id,
-        charger_type: listingData.chargerType,
-        power_output_kw: listingData.powerOutput,
-        connector_type: listingData.connectorType,
-        address: listingData.address,
-        latitude: 40.7831,
-        longitude: -73.9712,
-        availability_schedule: listingData.availabilitySchedule,
-        price_per_hour: listingData.pricePerHour,
-        min_price: listingData.minPrice,
-        images: listingData.images,
-        instructions: listingData.instructions,
-        is_active: true,
-      });
-      console.log("Created listing:", newListing);
-      setEditModalVisible(false);
-    } catch (error) {
-      console.error("Listing creation failed", error);
-      throw error;
-    }
+  const { createNewListing } = useCreateListing();
+
+  const handleCreateListing = async (listingData: ListingFormData) => {
+    const listing = await createNewListing(listingData);
+    console.log("Created listing:", listing);
+    setEditModalVisible(false);
   };
+  
+  const { user } = useUser();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [balance, setBalance] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user?.id) return;
+
+      try {
+        const res = await fetch(
+          `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/transaction/${user.id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        setTransactions(data.transactions);
+        setBalance(data.balance);
+      } catch (error) {
+        console.error("Failed to fetch transactions", error);
+      }
+    };
+
+    fetchTransactions();
+  }, [user?.id]);
 
   return (
     <SafeAreaView style={styles.page}>
@@ -92,12 +107,10 @@ export default function Host() {
         {/* Wallet Cards */}
         <View style={styles.walletContainer}>
           <WalletCardBalance
-            wallet={1240.97}
-            transactions={dummyData.payment_invoice}
+            balance={balance}
           />
           <WalletCardTransactions
-            wallet={1601.89}
-            transactions={dummyData.payment_invoice}
+            transactions={transactions}
           />
         </View>
 
@@ -147,7 +160,13 @@ export default function Host() {
               ));
             }
           } else {
-            return <EmptyState message="No plugged-in sessions" />;
+            if (requests.length === 0) {
+              return <EmptyState message="No plugged-in sessions" />;
+            } else {
+              return requests.map((r) => (
+                <PluggedCard key={r.id} plugged={r} />
+              ));
+            }
           }
         })()}
 
@@ -186,42 +205,42 @@ const EmptyState = ({ message }: { message: string }) => (
 );
 
 const styles = StyleSheet.create({
-  page: { 
-    flex: 1, 
-    backgroundColor: Colors.primary, 
-    padding: Spacing.lg 
+  page: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+    padding: Spacing.lg,
   },
   scrollViewContent: {
-    paddingBottom: 50
+    paddingBottom: 50,
   },
   walletContainer: {
     flex: 1,
     flexDirection: "row",
     gap: 12,
-    marginTop: Spacing.lg
+    marginTop: Spacing.lg,
   },
   tabContainer: {
     flexDirection: "row",
     gap: 16,
-    marginVertical: Spacing.lg
+    marginVertical: Spacing.lg,
   },
   tabText: {
     fontWeight: "300",
-    color: "gray"
+    color: "gray",
   },
   tabTextSelected: {
     fontWeight: "bold",
-    color: Colors.secondary
+    color: Colors.secondary,
   },
   dot: {
     width: 6,
     height: 6,
     borderRadius: 6,
-    marginTop: 4
+    marginTop: 4,
   },
   dotSelected: {
     backgroundColor: Colors.accent,
-    alignSelf: "center"
+    alignSelf: "center",
   },
   emptyBox: {
     height: 180,
@@ -230,32 +249,32 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.sm,
     justifyContent: "center",
     alignItems: "center",
-    borderStyle: "dotted"
+    borderStyle: "dotted",
   },
   emptyImage: {
     width: 120,
     height: 80,
-    resizeMode: "contain"
+    resizeMode: "contain",
   },
   emptyText: {
     marginTop: Spacing.xs,
     color: Colors.basic.blue,
-    fontSize: 12
+    fontSize: 12,
   },
   stationsHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: Spacing.sm,
-    marginTop: Spacing.xl
+    marginTop: Spacing.xl,
   },
   stationsTitle: {
     color: Colors.secondary,
     fontSize: Font.md,
-    fontWeight: "700"
+    fontWeight: "700",
   },
   addIcon: {
     color: Colors.accent,
-    paddingRight: 20
+    paddingRight: 20,
   },
 });

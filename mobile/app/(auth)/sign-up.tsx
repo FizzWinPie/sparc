@@ -53,7 +53,19 @@ export default function SignUpScreen() {
         //   return;
         // }
         // await addNewUser(email, clerkId);
-
+        if (user) {
+          const email = user.primaryEmailAddress?.emailAddress;
+          const clerkId = user.id;
+          // const name = user.firstName || "";
+          // const phoneNumber = user.phoneNumbers?.[0]?.phoneNumber || "";
+          
+          if (email && clerkId) {
+            await addNewUser(email, clerkId);
+            console.log("email: ", email, "\nClerkId: ", clerkId);
+          } else {
+            console.error("Email or ClerkId is undefined");
+          }
+        }
         router.replace("/(tabs)/home");
       }
     } catch (err) {

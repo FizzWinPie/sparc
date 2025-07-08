@@ -7,17 +7,11 @@ import Constants from "@/constants/Constants";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
-type Transaction = {
-  id: string;
-  amount: number;
-};
-
 type Props = {
-  wallet: number;
-  transactions: Transaction[];
+  balance: number;
 };
 
-export default function WalletCardBalance({ wallet, transactions }: Props) {
+export default function WalletCardBalance({ balance }: Props) {
   return (
     <View
       style={{
@@ -64,7 +58,7 @@ export default function WalletCardBalance({ wallet, transactions }: Props) {
             fontWeight: "bold",
           }}
         >
-          $ {wallet}
+          {balance >= 0 ? "+" : "-"}${Math.abs(balance).toFixed(2)}
         </Text>
       </View>
 
