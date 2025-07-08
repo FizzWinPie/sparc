@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Spacing from "@/constants/Spacing";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";

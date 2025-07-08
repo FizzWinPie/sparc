@@ -1,8 +1,7 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Wallet from "@/components/Wallet";
-import ProfileBar from "@/components/ProfileBar";
+import Wallet from "@/components/wallet/ProfileWallet";
 import { SignOutButton } from "@/components/SignOutButton";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,9 +12,23 @@ import ProfileUser from "@/components/ProfileUser";
 const Profile = () => {
   return (
     <SafeAreaView style={{ backgroundColor: "white" }}>
-      <View style={{flexDirection: "row", justifyContent: "space-between", paddingHorizontal: Spacing.lg, marginVertical: Spacing.sm}}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          paddingHorizontal: Spacing.lg,
+          marginVertical: Spacing.sm,
+        }}
+      >
         <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" style={{fontFamily: "bold", fontSize: Spacing.md, color: Colors.secondary}}/>
+          <Ionicons
+            name="arrow-back"
+            style={{
+              fontFamily: "bold",
+              fontSize: Spacing.md,
+              color: Colors.secondary,
+            }}
+          />
         </TouchableOpacity>
         <SignOutButton />
       </View>

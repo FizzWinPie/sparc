@@ -4,29 +4,15 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import ListingsMap from "@/components/ListingsMap";
 import ProfileBar from "@/components/ProfileBar";
 import { BlurView } from "expo-blur";
 import Spacing from "@/constants/Spacing";
 import SearchBar from "@/components/SearchBar";
-import { Listing } from "@/types";
-import { getListings } from "@/lib/listing";
+import useListings from "@/utils/hooks/useListings";
 
 const fullMap = () => {
-  const [listings, setListings] = useState<Listing[]>([]);
-
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const data = await getListings();
-        setListings(data);
-      } catch (error) {
-        console.error("Error fetching listings:", error);
-      }
-    };
-    fetchListings();
-  }, []);
+  const { listings } = useListings();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
