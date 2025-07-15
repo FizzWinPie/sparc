@@ -16,7 +16,11 @@ import Constants from "@/constants/Constants";
 import Font from "@/constants/Font";
 import { deleteUser, updateUser } from "@/lib/user";
 import { router } from "expo-router";
+import ProfileAvatar from '@/components/ProfileAvatar';
 
+const { user } = useUser();
+const clerkId = user?.id;
+const [avatarUrl, setAvatarUrl] = useState(user?.imageUrl ?? '');
 const ProfileUser = () => {
   const { user } = useUser();
   const hasPassword = user?.passwordEnabled;
@@ -117,7 +121,14 @@ const ProfileUser = () => {
         // backgroundColor: Colors.blueVariations.aliceBlue
       }}
     >
-      <Ionicons name="person-circle" color={Colors.secondary} size={100} />
+      <ProfileAvatar
+        size={160}
+        startUrl={user?.imageUrl ?? ''}
+        onChange={async (url) => {
+          setAvatarUrl(url);                            
+          if (clerkId) await updateUser(email, clerkId, url as unknown as string);
+        }}
+      />
       <Text
         style={{ fontFamily: "bold", fontSize: Spacing.md, marginBottom: 4 }}
       >
