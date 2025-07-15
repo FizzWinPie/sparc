@@ -6,16 +6,18 @@ import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
 import { router, useNavigation } from "expo-router";
 import Colors from "@/constants/Colors";
+import { useUser } from "@clerk/clerk-expo";
 
 const ProfileBar = () => {
   const navigation = useNavigation();
+  const {user} = useUser();
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.userSection} onPress={() => router.push("./profile")}>
         <Ionicons name="person-circle" style={styles.userIcon} color={Colors.secondary}/>
         <Text style={styles.welcomeText}>
-          Welcome, {dummyData.users[0].name}!
+          Welcome {user?.firstName ?? ""}
         </Text>
       </TouchableOpacity>
 

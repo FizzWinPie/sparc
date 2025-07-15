@@ -32,7 +32,7 @@ const MyCarCard = ({ bookings }: Props) => {
     >
       <View style={styles.leftSection}>
         <Text style={styles.idText}>
-          ID {selectedBooking._id.slice(-5)}{" "}
+          ID {selectedBooking._id.slice(-5)}{"   "}
           <Text style={styles.onlineText}>ONLINE</Text>
         </Text>
         <Image
@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
   idText: {
     color: "white",
     fontFamily: "bold",
+    textTransform: "uppercase",
   },
   onlineText: {
     color: Colors.accent,
