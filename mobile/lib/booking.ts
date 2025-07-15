@@ -1,5 +1,6 @@
 export const getBookings = async() => {
   try {
+    console.log(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/bookings`);
     const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/bookings`, {
       method: "GET",
       headers: {
