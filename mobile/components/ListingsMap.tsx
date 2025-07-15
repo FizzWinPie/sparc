@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
@@ -13,6 +13,8 @@ import { createBooking } from "@/lib/booking";
 import { useStripePayment } from "@/utils/hooks/useStripePayment";
 import useBookings from "@/utils/hooks/useBookings";
 import { useLoading } from "@/utils/LoadingContext";
+import MapViewDirections from "react-native-maps-directions";
+import * as Location from "expo-location";
 
 interface Props {
   listings: Listing[];
@@ -32,6 +34,12 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
   const { user } = useUser();
   const { setLoading } = useLoading();
   const { bookings } = useBookings(user?.id);
+  const [isBooked, setIsBooked] = useState(false);
+
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   const { initializePaymentSheet, openPaymentSheet } = useStripePayment(
     user?.fullName ?? "N/A"
@@ -74,8 +82,28 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
     });
 
     console.log("Booking result:", res);
+    setIsBooked(true);
+    console.log(
+      isBooked,
+      userLocation,
+      selectedListing.latitude,
+      selectedListing.longitude
+    );
     setLoading(false);
   };
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
+
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+  }, []);
 
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -90,6 +118,20 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
           showsPointsOfInterest={false}
           customMapStyle={noLabelsMapStyle}
         >
+          {selectedListing && userLocation && isBooked && (
+            <MapViewDirections
+              origin={userLocation}
+              destination={{
+                latitude: selectedListing.latitude,
+                longitude: selectedListing.longitude,
+              }}
+              apikey="AIzaSyAcUgXhSi72pPbSNvC10X4MWz_LcrdIZE8"
+              strokeWidth={3}
+              strokeColor="blue"
+              mode="DRIVING"
+            />
+          )}
+
           {listings.map((item) => (
             <Marker
               key={item._id}
