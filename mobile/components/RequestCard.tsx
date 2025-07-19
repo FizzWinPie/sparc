@@ -17,9 +17,11 @@ type Request = {
 
 type Props = {
   request: Request;
+  onAccept?: () => void;
+  onDecline?: () => void;
 };
 
-const RequestCard: React.FC<Props> = ({ request: r }) => {
+const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
   return (
     <View
       style={{
@@ -143,6 +145,7 @@ const RequestCard: React.FC<Props> = ({ request: r }) => {
                 alignItems: "center",
                 backgroundColor: Colors.accent,
               }}
+              onPress={onAccept}
             >
               <Text
                 style={{
@@ -165,6 +168,7 @@ const RequestCard: React.FC<Props> = ({ request: r }) => {
                 borderColor: "gray",
                 borderWidth: 1,
               }}
+              onPress={onDecline}
             >
               <Text
                 style={{

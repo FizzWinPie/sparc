@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  Pressable,
 } from "react-native";
 import dummyData from "../../constants/dummyData/dummy";
 import Colors from "../../constants/Colors";
@@ -23,6 +24,8 @@ import { Ionicons } from "@expo/vector-icons";
 import ReactNativeModal from "react-native-modal";
 import { createListing } from "@/lib/listing";
 import { useUser } from "@clerk/clerk-expo";
+import PluggedInCard from "@/components/PluggedInCard";
+import { updateBooking, getBookingsByHost } from "@/lib/booking";
 
 export default function Host() {
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -36,6 +39,15 @@ export default function Host() {
   const [minPrice, setMinPrice] = useState("");
   const [instructions, setInstructions] = useState("");
   const [images, setImages] = useState("");
+
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lon: number } | null>(null);
+
+  const [acceptedRequests, setAcceptedRequests] = useState<any[]>([]);
+  const [declinedRequests, setDeclinedRequests] = useState<string[]>([]);
+  const [acceptedBookings, setAcceptedBookings] = useState<any[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
 
   const { user } = useUser();
 
@@ -52,8 +64,8 @@ export default function Host() {
         power_output_kw: powerOutput,
         connector_type: connectorType,
         address: address,
-        latitude: 40.7831, // fix
-        longitude: -73.9712,
+        latitude: selectedCoords?.lat,//40.7831, // fix
+        longitude: selectedCoords?.lon, //-73.9712,
         availability_schedule: availabilitySchedule,
         price_per_hour: pricePerHour,
         min_price: minPrice,
@@ -68,6 +80,7 @@ export default function Host() {
     }
   };
 
+  /*
   // Static needs to be fixed to be updated using the data
   const requests = dummyData.bookings.map((b) => ({
     id: b.id,
@@ -85,6 +98,116 @@ export default function Host() {
     })}`,
     price: b.total_cost.toString(),
   }));
+  */
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      if (!user) return;
+
+      try {
+        const bookings = await getBookingsByHost(user.id);
+        console.log("Bookings from getBookingsByHost:", bookings);
+        console.log("userID", user.id)
+        const pending = bookings.filter((b: any) => b.status === "pending");
+
+        const formatted = pending.map((b: any) => ({
+          id: b._id,
+          name: b.ev_owner_name ?? "Unknown",
+          place: b.charger_listings_address ?? "-",
+          date: b.start_time.split("T")[0],
+          time: `${new Date(b.start_time).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })} - ${new Date(b.end_time).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}`,
+          price: b.total_cost.toString(),
+        }));
+
+        setPendingRequests(formatted);
+      } catch (error) {
+        console.error("Failed to fetch requests", error);
+      }
+    };
+
+    fetchRequests();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchAcceptedBookings = async () => {
+      try {
+        if (!user) return;
+        const bookings = await getBookingsByHost(user.id);
+        const accepted = bookings.filter((b: any) => b.status === "accepted");
+        setAcceptedBookings(accepted);
+      } catch (error) {
+        console.error("Error fetching accepted bookings:", error);
+      }
+    };
+
+    fetchAcceptedBookings();
+  }, [user]);
+
+  const fetchSuggestions = async (query: string) => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&countrycodes=us&q=${encodeURIComponent(
+          query
+        )}`,
+        {
+          headers: {
+            "User-Agent": "plugPorch/1.0",
+          },
+        }
+      );
+      const data = await response.json();
+      setSuggestions(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setSuggestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectSuggestion = (item: any) => {
+    setAddress(item.display_name);
+    setSelectedCoords({ lat: parseFloat(item.lat), lon: parseFloat(item.lon) });
+    setSuggestions([]);
+    console.log("Selected coordinates:", item.lat, item.lon);
+  };
+
+  const handleAcceptRequest = async (requestId: string) => {
+    const requestToAccept = pendingRequests.find((r) => r.id === requestId);
+    if (!requestToAccept) return;
+    try {
+      await updateBooking(requestId, { status: "accepted" });
+      setAcceptedRequests((prev) => [...prev, requestToAccept]);
+      setAcceptedBookings((prev) => [...prev, requestToAccept]);
+    } catch (error) {
+      console.error("Failed to accept request", error);
+    }
+  };
+
+  const handleDeclineRequest = async (requestId: string) => {
+    try {
+      await updateBooking(requestId, { status: "declined" });
+      setDeclinedRequests((prev) => [...prev, requestId]);
+    } catch (error) {
+      console.error("Failed to decline request", error);
+    }
+  };
+
+  const filteredRequests = pendingRequests.filter(
+    (r) => !declinedRequests.includes(r.id) && !acceptedRequests.find((a) => a.id === r.id)
+  );
 
   return (
     <SafeAreaView style={styles.page}>
@@ -148,7 +271,7 @@ export default function Host() {
 
         {(() => {
           if (selectedTab === "requests") {
-            if (requests.length === 0) {
+            if (filteredRequests.length === 0) {
               return (
                 <View style={[styles.emptyBox, { height: 120 }]}>
                   <Image
@@ -161,23 +284,35 @@ export default function Host() {
                 </View>
               );
             } else {
-              return requests.map((r) => (
-                <RequestCard key={r.id} request={r} />
+              return filteredRequests.map((r) => (
+                <RequestCard
+                  key={r.id}
+                  request={r}
+                  onAccept={() => handleAcceptRequest(r.id)}
+                  onDecline={() => handleDeclineRequest(r.id)}
+                />
               ));
             }
           } else {
-            return (
-              <View style={[styles.emptyBox, { height: 120 }]}>
-                <Image
-                  source={require("../../assets/images/noRequest-icon.png")}
-                  style={{ width: 50, height: 50, resizeMode: "contain" }}
-                />
-                <Text style={[styles.emptyTxt, { fontSize: 12 }]}>
-                  No plugged-in sessions
-                </Text>
-              </View>
-            );
+            if (acceptedBookings.length === 0) {
+              return (
+                <View style={[styles.emptyBox, { height: 120 }]}>
+                  <Image
+                    source={require("../../assets/images/noRequest-icon.png")}
+                    style={{ width: 50, height: 50, resizeMode: "contain" }}
+                  />
+                  <Text style={[styles.emptyTxt, { fontSize: 12 }]}>
+                    No plugged-in sessions
+                  </Text>
+                </View>
+              );
+            } else {
+              return acceptedBookings.map((b) => (
+                <PluggedInCard key={b.id} booking={b} />
+              ));
+            }
           }
+
         })()}
 
         {/* Stations */}
@@ -241,12 +376,31 @@ export default function Host() {
                   />
                   <TextInput
                     value={address}
-                    onChangeText={setAddress}
+                    onChangeText={(text) => {
+                      setAddress(text);
+                    }}
                     placeholder="Address"
                     placeholderTextColor="#888"
                     style={styles.input}
                   />
+                  <TouchableOpacity onPress={() => fetchSuggestions(address)}>
+                    <Ionicons name="search-outline" size= {Font.lg} color="#888" style={{paddingLeft: 8}} />
+                  </TouchableOpacity>
                 </View>
+
+                {suggestions.length > 0 && (
+                  <View style={styles.suggestionList}>
+                    {suggestions.map((item) => (
+                      <Pressable
+                        key={item.place_id}
+                        onPress={() => handleSelectSuggestion(item)}
+                        style={styles.suggestionItem}
+                      >
+                        <Text>{item.display_name}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                )}
 
                 {/* Availability Schedule */}
                 <View style={styles.inputRow}>
@@ -604,5 +758,16 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginTop: 4,
+  },
+  suggestionList: {
+      backgroundColor: "#fff",
+      borderRadius: Constants.borderRadius,
+      marginTop: 4,
+      maxHeight: 200,
+    },
+  suggestionItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
   },
 });

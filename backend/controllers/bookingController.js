@@ -150,3 +150,14 @@ export const updateBooking = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+
+export const getBookingsByHost = async (req, res) => {
+  try {
+    const hostId = req.params.hostId;
+    const bookings = await Booking.find({ host_id: hostId });
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching bookings", error });
+  }
+};
