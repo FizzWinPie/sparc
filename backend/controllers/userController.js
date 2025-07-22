@@ -12,7 +12,7 @@ export const createUser = async (req, res) => {
   }
 
   try {
-    const user = new User({ email, clerkId, firstName });
+    const user = new User({ _id: clerkId, email, clerkId, firstName });
     const savedUser = await user.save();
     res.status(201).json(savedUser);
   } catch (error) {
