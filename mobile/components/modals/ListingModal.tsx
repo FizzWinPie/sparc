@@ -13,6 +13,7 @@ import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
 import Constants from "@/constants/Constants";
+import ImageUploader from "../../components/ImageUploader";
 
 interface ListingModalProps {
   isVisible: boolean;
@@ -233,21 +234,10 @@ const ListingModal: React.FC<ListingModalProps> = ({
             </View>
 
             {/* Image URL */}
-            <View style={styles.inputRow}>
-              <Ionicons
-                name="image-outline"
-                size={20}
-                color={Colors.accent}
-                style={styles.inputIcon}
-              />
-              <TextInput
-                value={images}
-                onChangeText={setImages}
-                placeholder="Image URL"
-                placeholderTextColor="#888"
-                style={styles.input}
-              />
-            </View>
+            <ImageUploader
+              label="Upload Charger Photo"
+              onUrl={setImages}         
+            />
           </View>
 
           {!!errorMessage && (

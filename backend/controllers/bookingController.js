@@ -1,5 +1,6 @@
 import Booking from "../models/Booking.js";
 import Listing from "../models/Listing.js";
+import Notification from "../models/Notification.js"; 
 
 export const getBookings = async (req, res) => {
   try {
@@ -112,6 +113,12 @@ export const createBooking = async (req, res) => {
       images,
     });
     const savedBooking = await newBooking.save();
+
+    await Notification.create({
+      hostId: host_id,
+      bookingId: savedBooking._id,
+      message: `New booking request from ${ev_owner_id}`
+    });
 
     return res.status(201).json(savedBooking);
   } catch (error) {
