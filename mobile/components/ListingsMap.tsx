@@ -15,6 +15,8 @@ import useBookings from "@/utils/hooks/useBookings";
 import { useLoading } from "@/utils/LoadingContext";
 import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
+import AppleButton from "./AppleMapsButton";
+import GoogleButton from "./GoogleButton";
 
 interface Props {
   listings: Listing[];
@@ -81,8 +83,9 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
       images: selectedListing.images,
     });
 
-    console.log("Booking result:", res);
     setIsBooked(true);
+    console.log("Booking result:", res);
+    console.log("--------")
     console.log(
       isBooked,
       userLocation,
@@ -103,7 +106,7 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
         longitude: location.coords.longitude,
       });
     })();
-  }, []);
+  }, [isBooked, userLocation, selectedListing]);
 
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -130,6 +133,27 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
               strokeColor="blue"
               mode="DRIVING"
             />
+          )}
+
+          {isBooked && userLocation && selectedListing && (
+            <>
+              <GoogleButton
+                origin={userLocation}
+                destination={{
+                  latitude: selectedListing.latitude,
+                  longitude: selectedListing.longitude,
+                }}
+                isBooked={true}
+              />
+              <AppleButton
+                origin={{ latitude: 42.34, longitude: -71.08 }}
+                destination={{
+                  latitude: selectedListing.latitude,
+                  longitude: selectedListing.longitude,
+                }}
+                isBooked={true}
+              />
+            </>
           )}
 
           {listings.map((item) => (
