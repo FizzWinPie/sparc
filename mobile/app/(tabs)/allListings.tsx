@@ -5,51 +5,51 @@ import {
   FlatList,
   Image,
   SafeAreaView,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
 } from "react-native";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
-import { Ionicons, Entypo } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Listing } from "@/types";
 import BottomSheet from "@gorhom/bottom-sheet";
 import ListingBottomSheet from "@/components/bottomSheet/ListingBottomSheet";
 import ProfileBar from "@/components/ProfileBar";
 import SearchBar from "@/components/SearchBar";
-import { getListings } from "@/lib/listing";
 import { useLoading } from "@/utils/LoadingContext";
 import { createBooking } from "@/lib/booking";
 import { useUser } from "@clerk/clerk-expo";
+import AllListingsNav from "@/components/AllListingsNav";
+//import useListings from "@/utils/hooks/useListings";
+import { useFocusEffect } from "@react-navigation/native";
+
+import ListingCard from "@/components/ListingCard";
+import { useListings } from "@/utils/ListingContext";
 
 const allListings = () => {
-  const [listings, setListings] = useState<Listing[]>([]);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["45%", "70%"], []);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const { setLoading } = useLoading();
-  const {user} = useUser();
+  const { user } = useUser();
 
   const bookingStartTime = new Date().toISOString();
   const bookingEndTime = new Date(Date.now() + 60 * 60 * 1000).toISOString();
   const calculatedCost = selectedListing?.price_per_hour || 10;
   const selectedBatteryLevel = "50%";
 
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const data = await getListings();
-        setListings(data);
-      } catch (error) {
-        console.error("Error fetching listings:", error);
-      }
-    };
-    fetchListings();
-  }, []);
+  //const { listings } = useListings();
+  const { listings, refreshListings } = useListings();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshListings();
+    }, [refreshListings])
+  );
 
   const handleChooseListing = () => {
     bottomSheetRef.current?.close();
@@ -90,85 +90,18 @@ const allListings = () => {
     );
   };
 
-  const extractAddress = (address: string) => {
-    const addr = address.split(",")[0];
-    const noNumber = addr.replace(/^\d+\s*/, "");
-    return noNumber;
-  };
-
   const handleCardPress = (listing: Listing) => {
     setSelectedListing(listing);
     bottomSheetRef.current?.snapToIndex(0);
   };
 
   const renderItem = ({ item }: { item: Listing }) => (
-    <View style={styles.shadowWrapper}>
-      <TouchableOpacity
-        style={styles.box}
-        onPress={() => handleCardPress(item)}
-      >
-        {/* <View style={{ alignItems: "center" }}>
-          <Ionicons
-            name="star"
-            size={15}
-            color={Constants.colors.accent}
-            style={{ position: "absolute", top: -8, zIndex: 1, backgroundColor: Colors.primary, borderRadius: 12 }}
-            
-          /> */}
-        <Image source={{ uri: item.images }} style={styles.image} />
-        {/* </View> */}
-        <View style={styles.middleContent}>
-          <Text
-            style={{
-              fontFamily: "bold",
-              fontSize: Font.md,
-              padding: Spacing.sm,
-            }}
-          >
-            {extractAddress(item.address)}
-          </Text>
-          <View style={styles.bottomRow}>
-            <View style={styles.bottomLeft}>
-              <Ionicons name="location-sharp" size={14} color={Colors.accent} />
-              <Text style={{ fontSize: Font.sm }}>3 miles away</Text>
-            </View>
-            <View style={styles.bottomRight}>
-              {/* <FontAwesome5
-                name="plug"
-                size={14}
-                color={Colors.blueVariations.steelBlue}
-              /> */}
-              <Image
-                source={require("../../assets/images/level2a.png")}
-                style={{ width: 16, height: 16 }}
-              />
-              <Text style={{ fontSize: Font.sm, color: Colors.secondary }}>
-                Type 2
-              </Text>
-            </View>
-          </View>
-        </View>
-        <Text
-          style={{
-            fontFamily: "bold",
-            fontSize: Font.md,
-            padding: Spacing.md,
-            position: "absolute",
-            top: Spacing.sm,
-            right: Spacing.sm,
-          }}
-        >
-          ${item.price_per_hour}{" "}
-          <Text style={{ fontFamily: "light", fontSize: Font.sm }}>/kWh</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
+    <ListingCard listing={item} onPress={handleCardPress} />
   );
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.basic.white }}>
-        {/* <Text style={{fontFamily: "bold",fontSize: Font.lg, textAlign: 'center',}}>All Listing</Text> */}
         <View style={{ paddingHorizontal: Spacing.lg, paddingTop: Spacing.lg }}>
           <ProfileBar />
         </View>
@@ -177,72 +110,7 @@ const allListings = () => {
             <SearchBar />
           </View>
 
-          {/* <View style={styles.searchcontainer}>
-          <View style={styles.searchBar}>
-            <Ionicons
-              name="search"
-              size={Font.lg}
-              color="gray"
-              style={styles.iconLeft}
-            />
-            <TextInput
-              placeholder="Search for a charger near you"
-              style={styles.searchInput}
-              placeholderTextColor="gray"
-            />
-            <TouchableOpacity>
-              <Ionicons
-                name="filter"
-                size={Font.lg}
-                color="gray"
-                style={styles.iconRight}
-              />
-            </TouchableOpacity>
-          </View>
-        </View> */}
-
-          <View style={styles.navcontainer}>
-            <View style={styles.navItem}>
-              <Entypo name="map" size={Font.lg} color={Colors.basic.white} />
-              <Text
-                style={{
-                  fontSize: Font.sm,
-                  color: Colors.basic.white,
-                  padding: Spacing.xs,
-                }}
-              >
-                Map
-              </Text>
-            </View>
-            <View style={styles.navItem}>
-              <Ionicons name="list" size={Font.lg} color={Colors.basic.white} />
-              <Text
-                style={{
-                  fontSize: Font.sm,
-                  color: Colors.basic.white,
-                  padding: Spacing.xs,
-                }}
-              >
-                List
-              </Text>
-            </View>
-            <View style={styles.navItem}>
-              <Ionicons
-                name="heart"
-                size={Font.lg}
-                color={Colors.basic.white}
-              />
-              <Text
-                style={{
-                  fontSize: Font.sm,
-                  color: Colors.basic.white,
-                  padding: Spacing.xs,
-                }}
-              >
-                Favorites
-              </Text>
-            </View>
-          </View>
+          <AllListingsNav />
 
           <View style={styles.listcontainer}>
             <FlatList

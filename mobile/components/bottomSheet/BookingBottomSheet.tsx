@@ -29,7 +29,7 @@ const BookingBottomSheet = ({
             <View style={styles.bookingInfo}>
               <View style={styles.bookingDetails}>
                 <Text style={styles.bookingId}>
-                  {selectedBooking.charger_listings_address.split(",")[0]}
+                  {selectedBooking.charger_listings_address.split(",").slice(0, 2)}
                 </Text>
                 <View style={styles.locationContainer}>
                   <Ionicons

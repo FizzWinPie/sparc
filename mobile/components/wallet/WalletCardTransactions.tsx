@@ -7,26 +7,26 @@ import Constants from "@/constants/Constants";
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import { router } from "expo-router";
+import { useUser } from "@clerk/clerk-expo";
 
 type Transaction = {
-  id: string;
+  _id: string;
+  receiver: string;
+  payer: string;
   amount: number;
 };
 
 type Props = {
-  wallet: number;
   transactions: Transaction[];
 };
 
-export default function WalletCardTransactions({
-  wallet,
-  transactions,
-}: Props) {
+
+export default function WalletCardTransactions({ transactions }: Props) {
+  const {user} = useUser();
   return (
     <View
       style={{
         flex: 1,
-        // margin: Spacing.sm,
         marginTop: Spacing.lg,
         borderRadius: Constants.borderRadius,
         backgroundColor: "white",
@@ -47,7 +47,6 @@ export default function WalletCardTransactions({
           borderRadius: Constants.borderRadius,
           paddingHorizontal: Spacing.md,
           paddingVertical: Spacing.sm,
-          justifyContent: "space-between"
         }}
       >
         <Text
@@ -61,49 +60,44 @@ export default function WalletCardTransactions({
           Recent Transactions
         </Text>
 
-        <ScrollView style={{ gap: 2 }}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ color: "#eee", fontSize: Font.sm }}>ID42456</Text>
-            <Text
-              style={{
-                color: "white",
-                fontSize: Font.sm,
-                fontWeight: "bold",
-              }}
-            >
-              -$15.94
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ color: "#eee", fontSize: Font.sm }}>ID12476</Text>
-            <Text
-              style={{
-                color: Constants.colors.accent,
-                fontSize: Font.sm,
-                fontWeight: "bold",
-              }}
-            >
-              +$12.37
-            </Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={{ gap: 4 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {transactions.length === 0 ? (
+            <Text style={{ color: "#ccc", fontSize: Font.sm }}>No transactions</Text>
+          ) : (
+            transactions.map((txn) => {
+              const isReceiver = txn.receiver === user?.id;
+              return (
+                <View
+                  key={txn._id}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={{ color: "#eee", fontSize: Font.sm }}>
+                    ID{txn._id.slice(-5).toUpperCase()}
+                  </Text>
+                  <Text
+                    style={{
+                      color: isReceiver ? Constants.colors.accent : "white",
+                      fontSize: Font.sm,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {isReceiver ? "+" : "-"}${Math.abs(txn.amount).toFixed(2)}
+                  </Text>
+                </View>
+              );
+            })
+          )}
         </ScrollView>
-        
       </View>
+
       <TouchableOpacity
         style={{
-          // flex: 1,
           flexDirection: "row",
           gap: 6,
           justifyContent: "center",
@@ -115,7 +109,7 @@ export default function WalletCardTransactions({
         onPress={() => router.push("/(tabs)/profile")}
       >
         <Ionicons name="arrow-forward-outline" size={15} />
-        <Text style={{ fontSize: Font.sm, fontWeight: "regular" }}>
+        <Text style={{ fontSize: Font.sm, fontWeight: "400" }}>
           View All
         </Text>
       </TouchableOpacity>

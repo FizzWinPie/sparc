@@ -1,5 +1,6 @@
 import Booking from "../models/Booking.js";
 import Listing from "../models/Listing.js";
+import User from '../models/User.js';
 
 export const getBookings = async (req, res) => {
   try {
@@ -156,7 +157,18 @@ export const getBookingsByHost = async (req, res) => {
   try {
     const hostId = req.params.hostId;
     const bookings = await Booking.find({ host_id: hostId });
-    res.status(200).json(bookings);
+
+    const enrichedBookings = await Promise.all(
+      bookings.map(async (booking) => {
+        const user = await User.findOne({ clerkId: booking.ev_owner_id });
+        return {
+          ...booking.toObject(),
+          ev_owner_name: user?.firstName ?? "Unknown",
+        };
+      })
+    );
+
+    res.status(200).json(enrichedBookings);
   } catch (error) {
     res.status(500).json({ message: "Error fetching bookings", error });
   }

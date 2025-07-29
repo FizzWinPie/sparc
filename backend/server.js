@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/UserRoutes.js";
 import listingRoutes from "./routes/ListingsRoutes.js";
 import bookingRoutes from "./routes/BookingsRoute.js";
+import paymentRoutes from "./routes/PaymentRoute.js";
 
 dotenv.config();
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors());
 app.use("/api", userRoutes);
 app.use("/api", listingRoutes);
 app.use("/api", bookingRoutes);
+app.use("/api", paymentRoutes);
 
 const PORT = process.env.PORT || 8000;
 

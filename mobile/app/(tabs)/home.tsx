@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -11,23 +10,12 @@ import ListingsMap from "@/components/ListingsMap";
 import HomeBottomScreen from "@/components/HomeBottomScreen";
 import SearchBar from "@/components/SearchBar";
 import Spacing from "@/constants/Spacing";
-import { Listing } from "@/types";
-import { getListings } from "@/lib/listing";
+import { useListings } from "@/utils/ListingContext";
+//import useListings from "@/utils/hooks/useListings";
 
 const Home = () => {
-  const [listings, setListings] = useState<Listing[]>([]);
-
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const data = await getListings();
-        setListings(data);
-      } catch (error) {
-        console.error("Error fetching listings:", error);
-      }
-    };
-    fetchListings();
-  }, []);
+  //const { listings } = useListings();
+  const { listings, refreshListings}  = useListings();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -53,6 +41,7 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   map: {
     height: "50%",

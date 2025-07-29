@@ -15,10 +15,21 @@ const MyCarCard = ({ bookings }: Props) => {
 
   if (!selectedBooking) {
     return (
-      <View>
-        <Text>No booking available</Text>
-      </View>
+        <View style={styles.emptyBox}>
+          <Image
+            source={require("../assets/images/onboard/bookings.png")}
+            style={styles.emptyImage}
+          />
+          <Text style={styles.emptyText}>No Active sessions. Charge now!</Text>
+        </View>
     );
+  }
+
+  const addressParts = selectedBooking.charger_listings_address.split(",").slice(0, 2).map(s => s.trim());
+  const formattedAddress = addressParts.join(" ");
+  function truncateText(text: string, maxLength: number) {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + "...";
   }
 
   return (
@@ -28,7 +39,8 @@ const MyCarCard = ({ bookings }: Props) => {
     >
       <View style={styles.leftSection}>
         <Text style={styles.idText}>
-          ID {selectedBooking._id.slice(-5)} <Text style={styles.onlineText}>ONLINE</Text>
+          ID {selectedBooking._id.slice(-5)}{"   "}
+          <Text style={styles.onlineText}>ONLINE</Text>
         </Text>
         <Image
           source={require("../assets/images/ev_profile.png")}
@@ -47,7 +59,7 @@ const MyCarCard = ({ bookings }: Props) => {
               color={Colors.accent}
             />
             <Text style={styles.locationText}>
-              {selectedBooking.charger_listings_address.split(",")[0]}
+              {truncateText(formattedAddress, 13)}
             </Text>
           </View>
           <View style={styles.batteryRow}>
@@ -87,6 +99,7 @@ const styles = StyleSheet.create({
   idText: {
     color: "white",
     fontFamily: "bold",
+    textTransform: "uppercase",
   },
   onlineText: {
     color: Colors.accent,
@@ -140,6 +153,27 @@ const styles = StyleSheet.create({
     fontFamily: "bold",
     color: Colors.accent,
     fontSize: Font.md,
+  },
+  emptyBox: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+    height: 140,
+    borderWidth: 2,
+    borderColor: Colors.blueVariations.aliceBlue,
+    borderRadius: Spacing.sm,
+    justifyContent: "center",
+    alignItems: "center",
+    borderStyle: "dotted",
+  },
+  emptyImage: {
+    width: 200,
+    height: 100,
+    resizeMode: "contain",
+  },
+  emptyText: {
+    marginTop: Spacing.xs,
+    color: Colors.basic.blue,
+    fontSize: 12,
   },
 });
 

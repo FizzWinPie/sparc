@@ -13,7 +13,6 @@ import Constants from "@/constants/Constants";
 import Spacing from "@/constants/Spacing";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import ListingBottomSheet from "./bottomSheet/ListingBottomSheet";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Listing } from "@/types";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -23,7 +22,7 @@ import ReactNativeModal from "react-native-modal";
 import Font from "@/constants/Font";
 import { ScrollView } from "react-native-gesture-handler";
 
-function CarouselComponent() {
+function CarouselComponent({ refreshTrigger }: { refreshTrigger: number }) {
   const progress = useSharedValue<number>(0);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -37,8 +36,6 @@ function CarouselComponent() {
   const [instructions, setInstructions] = useState("");
   const [images, setImages] = useState("");
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["85%"], []);
   const [selectedHostListing, setSelectedHostListing] =
     useState<Listing | null>(null);
 
@@ -46,7 +43,6 @@ function CarouselComponent() {
   const [hostListingData, sethostListingData] = useState([]);
 
   const handleCardPress = (hostListing: Listing) => {
-    // bottomSheetRef.current?.snapToIndex(0);
     setSelectedHostListing(hostListing);
     setEditModalVisible(true);
     setAddress(hostListing.address);
@@ -64,47 +60,51 @@ function CarouselComponent() {
     console.log("update");
   };
 
-const handleDelete = async () => {
-  if (!selectedHostListing?._id) return;
+  const handleDelete = async () => {
+    if (!selectedHostListing?._id) return;
 
-  Alert.alert(
-    "Confirm Deletion",
-    "Are you sure you want to delete this listing? This action cannot be undone.",
-    [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deleteListing(selectedHostListing._id);
-            setEditModalVisible(false);
-          } catch (err) {
-            console.error("Listing deletion failed", err);
-            setErrorMessage("Failed to delete listing");
-          }
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this listing? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
         },
-      },
-    ]
-  );
-};
-
-useEffect(() => {
-  if (!user) return;
-
-  const fetchListingByHost = async () => {
-    try {
-      const data = await getListingsByHostId(user.id);
-      sethostListingData(data);
-    } catch (error) {
-      console.error("Error getting bookings:", error);
-    }
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteListing(selectedHostListing._id);
+              setEditModalVisible(false);
+              if (!user) return;
+              const updatedListings = await getListingsByHostId(user.id);
+              sethostListingData(updatedListings);
+            } catch (err) {
+              console.error("Listing deletion failed", err);
+              setErrorMessage("Failed to delete listing");
+            }
+          },
+        },
+      ]
+    );
   };
-  fetchListingByHost();
-}, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchListingByHost = async () => {
+      try {
+        const data = await getListingsByHostId(user.id);
+        sethostListingData(data);
+      } catch (error) {
+        console.error("Error getting bookings:", error);
+      }
+    };
+    fetchListingByHost();
+  }, [refreshTrigger]);
+
 
   const renderItem = ({ item }: { item: Listing }) => (
     <View>
@@ -119,7 +119,7 @@ useEffect(() => {
         <View style={styles.cardOverlay}>
           <View style={styles.cardRow}>
             <View style={styles.cardInfo}>
-              <Text style={styles.cardTitle}>{item.address.split(",")[0]}</Text>
+              <Text style={styles.cardTitle}>{item.address.split(",").slice(0, 2)}</Text>
               <Text style={styles.cardBattery}>
                 {item.availability_schedule}
               </Text>
@@ -146,25 +146,32 @@ useEffect(() => {
 
   return (
     <View id="carousel-component">
-      <Carousel
-        autoPlayInterval={2000}
-        data={hostListingData}
-        height={258}
-        loop={hostListingData.length > 1}
-        pagingEnabled={hostListingData.length > 1}
-        snapEnabled={hostListingData.length > 1}
-        width={393}
-        style={{ width: 393 }}
-        // mode="vertical-stack"
-        // mode="horizontal-stack"
-        modeConfig={{
-          stackInterval: 10,
-          opacityInterval: 0.9,
-        }}
-        onProgressChange={progress}
-        renderItem={renderItem}
-      />
-
+      {hostListingData.length === 0 ? (
+  <View style={styles.emptyBox}>
+    <Image
+      source={require("../assets/images/onboard/house2.png")}
+      style={styles.emptyImage}
+    />
+    <Text style={styles.emptyText}>No listings found. Add a new one to get started!</Text>
+  </View>
+      ) : (
+        <Carousel
+          autoPlayInterval={2000}
+          data={hostListingData}
+          height={258}
+          loop={hostListingData.length > 1}
+          pagingEnabled={hostListingData.length > 1}
+          snapEnabled={hostListingData.length > 1}
+          width={393}
+          style={{ width: 393 }}
+          modeConfig={{
+            stackInterval: 10,
+            opacityInterval: 0.9,
+          }}
+          onProgressChange={progress}
+          renderItem={renderItem}
+        />
+      )}
       <ReactNativeModal
         isVisible={editModalVisible}
         onBackdropPress={() => setEditModalVisible(false)}
@@ -358,18 +365,6 @@ useEffect(() => {
           </ScrollView>
         </View>
       </ReactNativeModal>
-
-      {/* <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-      >
-        <ListingBottomSheet
-          selectedListing={selectedHostListing}
-          onChooseListing={() => bottomSheetRef.current?.close()}
-        />
-      </BottomSheet> */}
     </View>
   );
 }
@@ -504,6 +499,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
   },
+    emptyBox: {
+      height: 200,
+      borderWidth: 2,
+      borderColor: Colors.blueVariations.aliceBlue,
+      borderRadius: Spacing.sm,
+      justifyContent: "center",
+      alignItems: "center",
+      borderStyle: "dotted"
+    },
+    emptyImage: {
+      width: 180,
+      height: 140,
+      resizeMode: "contain"
+    },
+    emptyText: {
+      marginTop: Spacing.xs,
+      color: Colors.basic.blue,
+      fontSize: 12
+    },
 });
 
 export default CarouselComponent;

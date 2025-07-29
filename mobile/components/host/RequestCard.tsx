@@ -134,7 +134,7 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
                 gap: 6,
               }}
             >
-              {r.place.split(",")[0]}
+              {r.place.split(",")[1]}
             </Text>
           </View>
           <View>
