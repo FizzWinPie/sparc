@@ -46,6 +46,7 @@ export default function SignUpScreen() {
 
       if (createdSessionId && setSessionActive) {
         await setSessionActive({ session: createdSessionId });
+        //TO DO: try to fix. timeout, promise. rxjs
 
         // const clerkId = user?.id;
         // if (!clerkId) {

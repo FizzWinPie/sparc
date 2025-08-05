@@ -29,7 +29,7 @@ const ListingBottomSheet = ({
             <View style={styles.listingInfo}>
               <View style={styles.listingDetails}>
                 <Text style={styles.listingId}>
-                  {selectedListing.address.split(",")[0]}
+                  {selectedListing.address.split(",").slice(0, 2)}
                 </Text>
                 <View style={styles.locationContainer}>
                   <Ionicons

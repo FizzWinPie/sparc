@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import dummyData from "../../constants/dummyData/dummy";
 import Colors from "../../constants/Colors";
 import Font from "../../constants/Font";
 import Spacing from "../../constants/Spacing";
@@ -23,6 +22,9 @@ import ListingModal from "@/components/modals/ListingModal";
 import useCreateListing from "@/utils/hooks/useCreateListing";
 import { ListingFormData } from "@/types";
 import PluggedCard from "@/components/host/PluggedCard";
+import { getBookingsByHost, updateBooking } from "@/lib/booking";
+import { useListings } from "@/utils/ListingContext";
+//import useListings from "@/utils/hooks/useListings";
 
 type Transaction = {
   _id: string;
@@ -38,38 +40,135 @@ type Props = {
 
 export default function Host() {
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [refreshListingsVersion, setRefreshListingsVersion] = useState(0);
   const [selectedTab, setSelectedTab] = useState<"requests" | "plugged">(
     "requests"
   );
-
-  const requests = dummyData.bookings.map((b) => ({
-    id: b.id,
-    name: dummyData.users.find((u) => u.id === b.ev_owner_id)?.name ?? "-",
-    place:
-      dummyData.charger_listings.find((c) => c.id === b.charger_listings_id)
-        ?.address ?? "-",
-    date: b.start_time.split("T")[0],
-    time: `${new Date(b.start_time).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    })} -${new Date(b.end_time).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    })}`,
-    price: b.total_cost.toString(),
-  }));
+  const [acceptedRequests, setAcceptedRequests] = useState<any[]>([]);
+  const [declinedRequests, setDeclinedRequests] = useState<string[]>([]);
+  const [acceptedBookings, setAcceptedBookings] = useState<any[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
 
   const { createNewListing } = useCreateListing();
+  const { refreshListings } = useListings();
 
   const handleCreateListing = async (listingData: ListingFormData) => {
     const listing = await createNewListing(listingData);
     console.log("Created listing:", listing);
     setEditModalVisible(false);
+    await refreshListings();
+    setRefreshListingsVersion((prev) => prev + 1);
   };
   
   const { user } = useUser();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user?.id) return;
+
+      try {
+        const res = await fetch(
+          `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/transaction/${user.id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        setTransactions(data.transactions);
+        setBalance(data.balance);
+      } catch (error) {
+        console.error("Failed to fetch transactions", error);
+      }
+    };
+
+    fetchTransactions();
+  }, [user?.id]);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      if (!user) return;
+      try {
+        const bookings = await getBookingsByHost(user.id);
+        const pending = bookings.filter((b: any) => b.status === "pending");
+        const formatted = pending.map((b: any) => ({
+          id: b._id,
+          name: b.ev_owner_name ?? "Unknown",
+          place: b.charger_listings_address ?? "-",
+          date: b.start_time.split("T")[0],
+          time: `${new Date(b.start_time).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })} - ${new Date(b.end_time).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}`,
+          price: b.total_cost.toString(),
+        }));
+        setPendingRequests(formatted);
+      } catch (error) {
+        console.error("Failed to fetch requests", error);
+      }
+    };
+    fetchRequests();
+  }, [user]);
+
+useEffect(() => {
+  const fetchAcceptedBookings = async () => {
+    try {
+      if (!user) return;
+      const bookings = await getBookingsByHost(user.id);
+      const accepted = bookings.filter((b: any) => b.status === "accepted");
+      const formatted = accepted.map((b: any) => ({
+        id: b._id,
+        name: b.ev_owner_name ?? "Unknown",
+        place: b.charger_listings_address ?? "-",
+        date: b.start_time?.split("T")[0] ?? "-",
+        time: `${new Date(b.start_time).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })} - ${new Date(b.end_time).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`,
+        price: b.total_cost?.toString() ?? "0",
+      }));
+      setAcceptedBookings(formatted);
+    } catch (error) {
+      console.error("Error fetching accepted bookings:", error);
+    }
+  };
+  fetchAcceptedBookings();
+}, [user]);
+
+    const handleAcceptRequest = async (requestId: string) => {
+    const requestToAccept = pendingRequests.find((r) => r.id === requestId);
+    if (!requestToAccept) return;
+    try {
+      await updateBooking(requestId, { status: "accepted" });
+      setAcceptedRequests((prev) => [...prev, requestToAccept]);
+      setAcceptedBookings((prev) => [...prev, requestToAccept]);
+    } catch (error) {
+      console.error("Failed to accept request", error);
+    }
+  };
+
+  const handleDeclineRequest = async (requestId: string) => {
+    try {
+      await updateBooking(requestId, { status: "declined" });
+      setDeclinedRequests((prev) => [...prev, requestId]);
+    } catch (error) {
+      console.error("Failed to decline request", error);
+    }
+  };
+
+  const filteredRequests = pendingRequests.filter(
+    (r) => !declinedRequests.includes(r.id) && !acceptedRequests.find((a) => a.id === r.id)
+  );
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -114,8 +213,10 @@ export default function Host() {
           />
         </View>
 
-        {/* Requests and Plugged In Bar */}
-        <View style={styles.tabContainer}>
+        {/* Requests and PluggedIn Bar */}
+        <View
+          style={{ flexDirection: "row", gap: 16, marginVertical: Spacing.lg }}
+        >
           <TouchableOpacity onPress={() => setSelectedTab("plugged")}>
             <Text
               style={[
@@ -152,22 +253,48 @@ export default function Host() {
 
         {(() => {
           if (selectedTab === "requests") {
-            if (requests.length === 0) {
-              return <EmptyState message="No active requests" />;
+            if (filteredRequests.length === 0) {
+              return (
+                <View style={[styles.emptyBox, { height: 120 }]}>
+                  <Image
+                    source={require("../../assets/images/noRequest-icon.png")}
+                    style={{ width: 50, height: 50, resizeMode: "contain" }}
+                  />
+                  <Text style={[{ fontSize: Font.sm, marginTop: Spacing.xs, color: Colors.basic.blue}]}>
+                    No active requests
+                  </Text>
+                </View>
+              );
             } else {
-              return requests.map((r) => (
-                <RequestCard key={r.id} request={r} />
+              return filteredRequests.map((r) => (
+                <RequestCard
+                  key={r.id}
+                  request={r}
+                  onAccept={() => handleAcceptRequest(r.id)}
+                  onDecline={() => handleDeclineRequest(r.id)}
+                />
               ));
             }
           } else {
-            if (requests.length === 0) {
-              return <EmptyState message="No plugged-in sessions" />;
+            if (acceptedBookings.length === 0) {
+              return (
+                <View style={[styles.emptyBox, { height: 120 }]}>
+                  <Image
+                    source={require("../../assets/images/noRequest-icon.png")}
+                    style={{ width: 50, height: 50, resizeMode: "contain" }}
+                  />
+                  <Text style={[{ fontSize: Font.sm, marginTop: Spacing.xs, color: Colors.basic.blue}]}>
+                    No plugged-in sessions
+                  </Text>
+                </View>
+              );
             } else {
-              return requests.map((r) => (
+              return acceptedBookings.map((r) => (
                 <PluggedCard key={r.id} plugged={r} />
               ));
             }
           }
+
         })()}
 
         {/* Charging Stations */}
@@ -182,7 +309,7 @@ export default function Host() {
           </TouchableOpacity>
         </View>
 
-        <CarouselComponent />
+        <CarouselComponent refreshTrigger={refreshListingsVersion}/>
 
         <ListingModal
           isVisible={editModalVisible}

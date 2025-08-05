@@ -6,6 +6,9 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import ReactNativeModal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,6 +16,7 @@ import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
 import Constants from "@/constants/Constants";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 interface ListingModalProps {
   isVisible: boolean;
@@ -27,6 +31,8 @@ interface ListingModalProps {
     minPrice: string;
     instructions: string;
     images: string;
+    latitude?: number;
+    longitude?: number;
   }) => Promise<void>;
 }
 
@@ -46,6 +52,45 @@ const ListingModal: React.FC<ListingModalProps> = ({
   const [instructions, setInstructions] = useState("");
   const [images, setImages] = useState("");
 
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lon: number } | null>(null);
+
+  const fetchSuggestions = async (query: string) => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&countrycodes=us&q=${encodeURIComponent(
+          query
+        )}`,
+        {
+          headers: {
+            "User-Agent": "plugPorch/1.0",
+          },
+        }
+      );
+      const data = await response.json();
+      setSuggestions(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setSuggestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectSuggestion = (item: any) => {
+    setAddress(item.display_name);
+    setSelectedCoords({ lat: parseFloat(item.lat), lon: parseFloat(item.lon) });
+    setSuggestions([]);
+    console.log("Selected coordinates:", item.lat, item.lon);
+  };
+
   const handleCreateListing = async () => {
     try {
       await onCreateListing({
@@ -58,6 +103,8 @@ const ListingModal: React.FC<ListingModalProps> = ({
         minPrice,
         instructions,
         images,
+        latitude: selectedCoords?.lat,
+        longitude: selectedCoords?.lon,
       });
       // Clear form on success
       setAddress("");
@@ -82,9 +129,13 @@ const ListingModal: React.FC<ListingModalProps> = ({
   return (
     <ReactNativeModal isVisible={isVisible} onBackdropPress={onClose}>
       <View style={styles.modalContainer}>
-        <ScrollView
-          contentContainerStyle={{ paddingBottom: 10 }}
+        <KeyboardAwareScrollView
+          enableOnAndroid
+          extraHeight={100}
+          keyboardOpeningTime={0}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           <View style={styles.modalIconContainer}>
             <Ionicons name="create-outline" size={20} color={Colors.accent} />
@@ -103,12 +154,31 @@ const ListingModal: React.FC<ListingModalProps> = ({
               />
               <TextInput
                 value={address}
-                onChangeText={setAddress}
+                onChangeText={(text) => {
+                  setAddress(text);
+                }}
                 placeholder="Address"
                 placeholderTextColor="#888"
                 style={styles.input}
               />
+              <TouchableOpacity onPress={() => fetchSuggestions(address)}>
+                <Ionicons name="search-outline" size= {Font.lg} color="#888" style={{paddingLeft: 8}} />
+              </TouchableOpacity>
             </View>
+
+            {suggestions.length > 0 && (
+              <View style={styles.suggestionList}>
+                {suggestions.map((item) => (
+                  <Pressable
+                    key={item.place_id}
+                    onPress={() => handleSelectSuggestion(item)}
+                    style={styles.suggestionItem}
+                  >
+                    <Text>{item.display_name}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
 
             {/* Availability Schedule */}
             <View style={styles.inputRow}>
@@ -262,7 +332,7 @@ const ListingModal: React.FC<ListingModalProps> = ({
               <Text style={styles.verifyButtonText}>Create Listing</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
     </ReactNativeModal>
   );
@@ -345,6 +415,17 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginTop: 4,
+  },
+    suggestionList: {
+      backgroundColor: "#fff",
+      borderRadius: Constants.borderRadius,
+      marginTop: 4,
+      maxHeight: 200,
+    },
+  suggestionItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
   },
 });
 

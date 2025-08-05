@@ -8,4 +8,6 @@ export interface ListingFormData {
   minPrice: string;
   instructions: string;
   images: string;
+  latitude?: number;
+  longitude?: number;
 };

@@ -1,3 +1,5 @@
+import { Booking } from "@/types/Booking";
+
 export const getBookings = async() => {
   try {
     const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/bookings`, {
@@ -44,5 +46,44 @@ export const createBooking = async (bookingData: any) => {
   } catch (error) {
     console.error("Failed to create Booking:", error);
     throw error;
+  }
+};
+
+export const updateBooking = async (bookingId: string, updates: Partial<Booking>) => {
+  try {
+    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/bookings/${bookingId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updates),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to update booking ${bookingId}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to update Booking:", error);
+    throw error;
+  }
+};
+
+export const getBookingsByHost = async (hostId: string) => {
+  try {
+    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/bookings/host/${hostId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/bookings/host/${hostId}`);
+
+    if (!res.ok) throw new Error("Failed to fetch bookings for host");
+    return await res.json();
+  } catch (err) {
+    console.error("Error fetching bookings for host:", err);
+    throw err;
   }
 };

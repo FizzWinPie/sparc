@@ -22,7 +22,7 @@ import ReactNativeModal from "react-native-modal";
 import Font from "@/constants/Font";
 import { ScrollView } from "react-native-gesture-handler";
 
-function CarouselComponent() {
+function CarouselComponent({ refreshTrigger }: { refreshTrigger: number }) {
   const progress = useSharedValue<number>(0);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -121,6 +121,9 @@ function CarouselComponent() {
             try {
               await deleteListing(selectedHostListing._id);
               setEditModalVisible(false);
+              if (!user) return;
+              const updatedListings = await getListingsByHostId(user.id);
+              sethostListingData(updatedListings);
             } catch (err) {
               console.error("Listing deletion failed", err);
               setErrorMessage("Failed to delete listing");
@@ -143,7 +146,7 @@ function CarouselComponent() {
       }
     };
     fetchListingByHost();
-  }, []);
+  }, [refreshTrigger]);
 
   const renderItem = ({ item }: { item: Listing }) => (
     <View>
@@ -158,7 +161,7 @@ function CarouselComponent() {
         <View style={styles.cardOverlay}>
           <View style={styles.cardRow}>
             <View style={styles.cardInfo}>
-              <Text style={styles.cardTitle}>{item.address.split(",")[0]}</Text>
+              <Text style={styles.cardTitle}>{item.address.split(",").slice(0, 2)}</Text>
               <Text style={styles.cardBattery}>
                 {item.availability_schedule}
               </Text>
