@@ -14,22 +14,18 @@ interface AppleButtonProps {
     latitude: number;
     longitude: number;
   };
-  isBooked: boolean;
 }
 
-const AppleButton = ({ origin, destination, isBooked }: AppleButtonProps) => {
+const AppleButton = ({ origin, destination }: AppleButtonProps) => {
   const openAppleMaps = () => {
     if (!origin || !destination) return;
     
     const originStr = `${origin.latitude.toFixed(6)},${origin.longitude.toFixed(6)}`;
     const destinationStr = `${destination.latitude.toFixed(6)},${destination.longitude.toFixed(6)}`;
     
-    const url = `http://maps.apple.com/?daddr=${originStr},${destinationStr}&dirflg=d`;
-    console.log()
+    const url = `http://maps.apple.com/?saddr=${originStr}&daddr=${destinationStr}&dirflg=d`;
     Linking.openURL(url).catch(err => console.error("Failed to open Apple Maps:", err));
   };
-
-  if (!isBooked) return null;
 
   return (
     <GestureHandlerRootView style={styles.container}>

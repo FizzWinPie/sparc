@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Alert } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import Colors from "@/constants/Colors";
@@ -62,8 +62,16 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
 
     bottomSheetRef.current?.close();
 
-    const success = await openPaymentSheet();
-    if (!success) return;
+    try {
+      const success = await openPaymentSheet();
+      if (!success) {
+        Alert.alert("Payment failed", "Please try again");
+        return;
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      Alert.alert("Error", "Failed to complete booking");
+    }
 
     setLoading(true);
 
@@ -84,14 +92,6 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
     });
 
     setIsBooked(true);
-    console.log("Booking result:", res);
-    console.log("--------")
-    console.log(
-      isBooked,
-      userLocation,
-      selectedListing.latitude,
-      selectedListing.longitude
-    );
     setLoading(false);
   };
 
@@ -106,7 +106,7 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
         longitude: location.coords.longitude,
       });
     })();
-  }, [isBooked, userLocation, selectedListing]);
+  }, [userLocation, selectedListing]);
 
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -121,37 +121,35 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
           showsPointsOfInterest={false}
           customMapStyle={noLabelsMapStyle}
         >
-          {selectedListing && userLocation && isBooked && (
+          {selectedListing && userLocation && (
             <MapViewDirections
               origin={userLocation}
               destination={{
                 latitude: selectedListing.latitude,
                 longitude: selectedListing.longitude,
               }}
-              apikey="AIzaSyAcUgXhSi72pPbSNvC10X4MWz_LcrdIZE8"
+              apikey={process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY!}
               strokeWidth={3}
               strokeColor="blue"
               mode="DRIVING"
             />
           )}
 
-          {isBooked && userLocation && selectedListing && (
+          {userLocation && selectedListing && (
             <>
               <GoogleButton
-                origin={userLocation}
+                origin={userLocation || { latitude: 42.34, longitude: -71.08 }}
                 destination={{
                   latitude: selectedListing.latitude,
                   longitude: selectedListing.longitude,
                 }}
-                isBooked={true}
               />
               <AppleButton
-                origin={{ latitude: 42.34, longitude: -71.08 }}
+                origin={userLocation || { latitude: 42.34, longitude: -71.08 }}
                 destination={{
                   latitude: selectedListing.latitude,
                   longitude: selectedListing.longitude,
                 }}
-                isBooked={true}
               />
             </>
           )}

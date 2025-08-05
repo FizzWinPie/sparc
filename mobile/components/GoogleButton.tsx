@@ -14,10 +14,9 @@ interface GoogleButtonProps {
     latitude: number;
     longitude: number;
   };
-  isBooked: boolean;
 }
 
-const GoogleButton = ({ origin, destination, isBooked }: GoogleButtonProps) => {
+const GoogleButton = ({ origin, destination }: GoogleButtonProps) => {
   const openGoogleMaps = () => {
     if (!origin || !destination) return;
     
@@ -27,8 +26,6 @@ const GoogleButton = ({ origin, destination, isBooked }: GoogleButtonProps) => {
     const url = `https://www.google.com/maps/dir/?api=1&origin=${originStr}&destination=${destinationStr}&travelmode=driving`;
     Linking.openURL(url).catch(err => console.error("Failed to open Google Maps:", err));
   };
-
-  if (!isBooked) return null;
 
   return (
     <GestureHandlerRootView style={styles.container}>
