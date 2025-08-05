@@ -170,6 +170,43 @@ useEffect(() => {
     (r) => !declinedRequests.includes(r.id) && !acceptedRequests.find((a) => a.id === r.id)
   );
 
+  const { createNewListing } = useCreateListing();
+
+  const handleCreateListing = async (listingData: ListingFormData) => {
+    const listing = await createNewListing(listingData);
+    console.log("Created listing:", listing);
+    setEditModalVisible(false);
+  };
+  
+  const { user } = useUser();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [balance, setBalance] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user?.id) return;
+
+      try {
+        const res = await fetch(
+          `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/transaction/${user.id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        setTransactions(data.transactions);
+        setBalance(data.balance);
+      } catch (error) {
+        console.error("Failed to fetch transactions", error);
+      }
+    };
+
+    fetchTransactions();
+  }, [user?.id]);
+
   return (
     <SafeAreaView style={styles.page}>
       <ScrollView
@@ -194,34 +231,32 @@ useEffect(() => {
         >
           <TouchableOpacity onPress={() => setSelectedTab("plugged")}>
             <Text
-              style={{
-                fontWeight: selectedTab === "plugged" ? "bold" : "300",
-                color: selectedTab === "plugged" ? Colors.secondary : "gray",
-              }}
+              style={[
+                styles.tabText,
+                selectedTab === "plugged" && styles.tabTextSelected,
+              ]}
             >
               Plugged In
             </Text>
             <View
               style={[
                 styles.dot,
-                { marginTop: 4 },
                 selectedTab === "plugged" && styles.dotSelected,
               ]}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setSelectedTab("requests")}>
             <Text
-              style={{
-                fontWeight: selectedTab === "requests" ? "bold" : "300",
-                color: selectedTab === "requests" ? Colors.secondary : "gray",
-              }}
+              style={[
+                styles.tabText,
+                selectedTab === "requests" && styles.tabTextSelected,
+              ]}
             >
               Charge requests
             </Text>
             <View
               style={[
                 styles.dot,
-                { marginTop: 4 },
                 selectedTab === "requests" && styles.dotSelected,
               ]}
             />

@@ -14,6 +14,7 @@ import useBookings from "@/utils/hooks/useBookings";
 import { useStripePayment } from "@/utils/hooks/useStripePayment";
 import { useListings } from "@/utils/ListingContext";
 
+
 const HomeBottomScreen = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["100%"], []);
@@ -21,6 +22,7 @@ const HomeBottomScreen = () => {
   const { user } = useUser();
   //const { listings } = useListings();
   const { listings, refreshListings } = useListings();
+
   const { bookings } = useBookings(user?.id);
   const [loading, setLoading] = useState(false);
   const { initializePaymentSheet, openPaymentSheet } = useStripePayment(user?.fullName ?? "N/A");
