@@ -170,18 +170,6 @@ useEffect(() => {
     (r) => !declinedRequests.includes(r.id) && !acceptedRequests.find((a) => a.id === r.id)
   );
 
-  const { createNewListing } = useCreateListing();
-
-  const handleCreateListing = async (listingData: ListingFormData) => {
-    const listing = await createNewListing(listingData);
-    console.log("Created listing:", listing);
-    setEditModalVisible(false);
-  };
-  
-  const { user } = useUser();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [balance, setBalance] = useState<number>(0);
-
   useEffect(() => {
     const fetchTransactions = async () => {
       if (!user?.id) return;
