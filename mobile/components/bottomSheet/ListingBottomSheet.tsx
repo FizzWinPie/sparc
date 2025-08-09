@@ -6,6 +6,10 @@ import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
 import { Listing } from "@/types";
+import useRatings from "@/utils/hooks/useRatings";
+import Stars from "../Stars"
+import { router } from "expo-router";
+
 
 interface ListingBottomSheetProps {
   selectedListing: Listing | null;
@@ -16,6 +20,8 @@ const ListingBottomSheet = ({
   selectedListing,
   onChooseListing,
 }: ListingBottomSheetProps) => {
+  const rating = useRatings(selectedListing?.host_id ?? "");
+
   return (
     <BottomSheetView style={styles.contentContainer}>
       {selectedListing ? (
@@ -28,9 +34,24 @@ const ListingBottomSheet = ({
             />
             <View style={styles.listingInfo}>
               <View style={styles.listingDetails}>
+
+                {/* Address */}
                 <Text style={styles.listingId}>
                   {selectedListing.address.split(",")[0]}
                 </Text>
+
+                {/* Stars */}
+                {/* <Stars rating = {rating} size={14} style = {styles.starsContainer} /> */}
+                <Stars rating={rating} size={14} style={styles.starsContainer} onPress={() => {
+                  console.log("Stars pressed");
+                  if (!selectedListing) return;
+                  router.push({
+                    pathname: "../reviews/[hostId]",
+                    params: { hostId: selectedListing.host_id },
+                  });
+                }}/>
+                
+                {/* Location */}
                 <View style={styles.locationContainer}>
                   <Ionicons
                     name="location-sharp"
@@ -142,8 +163,8 @@ const styles = StyleSheet.create({
   },
   listingDetails: {
     flex: 1,
-    justifyContent: "space-between",
-    gap: 10,
+    justifyContent: "flex-start",
+    gap: 4,
   },
   listingId: {
     fontFamily: "bold",
@@ -153,6 +174,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignContent: "center",
     gap: 2,
+    marginTop: 2,
   },
   locationText: {
     fontFamily: "light",
@@ -221,6 +243,9 @@ const styles = StyleSheet.create({
     fontFamily: "bold",
     fontSize: Font.md,
     alignSelf: "center",
+  },
+  starsContainer: {
+    marginTop: 1,
   },
 });
 

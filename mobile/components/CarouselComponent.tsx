@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Listing } from "@/types";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { deleteListing, getListingsByHostId } from "@/lib/listing";
+import { deleteListing, getListingsByHostId, updateListing } from "@/lib/listing";
 import { useUser } from "@clerk/clerk-expo";
 import ReactNativeModal from "react-native-modal";
 import Font from "@/constants/Font";
@@ -56,11 +56,56 @@ function CarouselComponent() {
     setImages(hostListing.images);
   };
 
-  const handleUpdate = () => {
-    console.log("update");
-  };
+//update listing function
+ const handleUpdate = async () => {
+  console.log("🚀 Update button pressed");
+  if (!selectedHostListing?._id || !user?.id) {
+    setErrorMessage("Invalid listing or user session.");
+    return;
+  }
 
+  // Validate user inputs
+  if (
+    !address ||
+    !availabilitySchedule ||
+    !chargerType ||
+    !connectorType ||
+    isNaN(parseFloat(powerOutput)) ||
+    isNaN(parseFloat(pricePerHour)) ||
+    isNaN(parseFloat(minPrice))
+  ) {
+    setErrorMessage("Please complete all required fields with valid numbers.");
+    return;
+  }
+
+  try {
+    const updatedData = {
+      host_id: user.id,
+      address,
+      availability_schedule: availabilitySchedule,
+      charger_type: chargerType,
+      connector_type: connectorType,
+      power_output_kw: parseFloat(powerOutput),
+      price_per_hour: parseFloat(pricePerHour),
+      min_price: parseFloat(minPrice),
+      instructions,
+      images,
+      is_active: true,
+    };
+
+    await updateListing(selectedHostListing._id, updatedData);
+    const refreshedListings = await getListingsByHostId(user.id);
+    sethostListingData(refreshedListings);
+    setEditModalVisible(false);
+    setErrorMessage("");
+  } catch (err: any) {
+    console.error("Update failed:", err);
+    setErrorMessage("Failed to update listing. Please try again.");
+  }
+};
+  
   const handleDelete = async () => {
+    console.log("Delete button pressed");
     if (!selectedHostListing?._id) return;
 
     Alert.alert(

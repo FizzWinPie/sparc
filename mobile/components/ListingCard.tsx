@@ -4,6 +4,8 @@ import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
 import { Listing } from "@/types";
+import useRatings from "@/utils/hooks/useRatings";
+import Stars from "./Stars";
 
 type Props = {
   listing: Listing;
@@ -11,14 +13,25 @@ type Props = {
 };
 
 const ListingCard = ({ listing, onPress }: Props) => {
+  const rating = useRatings(listing?.host_id ?? "");
+
   return (
     <View style={styles.shadowWrapper}>
       <TouchableOpacity style={styles.box} onPress={() => onPress(listing)}>
         <Image source={{ uri: listing.images }} style={styles.image} />
+        
         <View style={styles.middleContent}>
+          <View style = {styles.detailsContainer}>
+          
+          {/* Address */}
           <Text style={styles.addressText}>
             {listing.address.split(",")[0].replace(/^\d+\s*/, "")}
           </Text>
+
+          {/* Stars */}
+          <Stars rating = {rating} style = {styles.starsContainer} />
+          
+          {/* Location */}
           <View style={styles.bottomRow}>
             <View style={styles.bottomLeft}>
               <Ionicons name="location-sharp" size={14} color={Colors.accent} />
@@ -32,6 +45,7 @@ const ListingCard = ({ listing, onPress }: Props) => {
               <Text style={styles.metaText}>Type 2</Text>
             </View>
           </View>
+        </View>
         </View>
         <Text style={styles.priceText}>
           ${listing.price_per_hour}
@@ -87,7 +101,6 @@ const styles = StyleSheet.create({
   addressText: {
     fontFamily: "bold",
     fontSize: Font.md,
-    padding: Spacing.sm,
   },
   metaText: {
     fontSize: Font.sm,
@@ -104,6 +117,14 @@ const styles = StyleSheet.create({
   unitText: {
     fontFamily: "light",
     fontSize: Font.sm,
+  },
+  starsContainer: {
+    marginTop: 1,
+  },
+  detailsContainer: {
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    gap: 4,
   },
 });
 

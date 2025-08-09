@@ -6,6 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { Listing } from "@/types";
 import Constants from "@/constants/Constants";
+import useRatings from "@/utils/hooks/useRatings";
+import Stars from "./Stars";
 
 interface Props {
   listings: Listing[];
@@ -14,6 +16,7 @@ interface Props {
 
 const SmallCard = ({ listings, onPress }: Props) => {
   const selectedListing = listings.length > 0 ? listings[0] : null;
+  const rating = useRatings(selectedListing?.host_id ?? "");
 
   if (!selectedListing) {
     return (
@@ -37,9 +40,16 @@ const SmallCard = ({ listings, onPress }: Props) => {
       />
       <View style={styles.infoContainer}>
         <View style={styles.textContainer}>
+
+          {/* Address title */}
           <Text style={styles.title}>
             {selectedListing.address.split(",")[0]}
           </Text>
+          
+          {/* Stars */}
+          <Stars rating = {rating} style = {styles.starsContainer} />
+
+          {/* Location */}
           <View style={styles.locationContainer}>
             <Ionicons
               name="location-sharp"
@@ -93,8 +103,8 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    justifyContent: "space-between",
-    gap: 10,
+    justifyContent: "flex-start",
+    gap: 5,
   },
   title: {
     fontFamily: "regular",
@@ -110,10 +120,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 2,
     alignContent: "center",
+    marginTop: 3,
   },
   locationText: {
     fontFamily: "regular",
-    fontSize: Font.sm,
+    fontSize: Font.ssm,
     color: "white",
   },
   sheetTitle: {
@@ -130,6 +141,10 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     color: "white",
   },
+  starsContainer: {
+    marginTop: 1,
+  },
+
 });
 
 export default SmallCard;
