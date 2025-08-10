@@ -10,6 +10,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { LoadingProvider } from "@/utils/LoadingContext";
 import { StripeProvider } from '@stripe/stripe-react-native';
+import { ListingsProvider } from "@/utils/ListingContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -54,6 +55,7 @@ function RootLayoutNav() {
   return (
     <GestureHandlerRootView>
       <LoadingProvider>
+        <ListingsProvider>
         <ClerkProvider
           tokenCache={tokenCache}
           publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
@@ -80,6 +82,7 @@ function RootLayoutNav() {
             </StripeProvider>
           </ClerkLoaded>
         </ClerkProvider>
+        </ListingsProvider>
       </LoadingProvider>
     </GestureHandlerRootView>
   );

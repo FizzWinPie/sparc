@@ -16,13 +16,13 @@ import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Listing } from "@/types";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { deleteListing, getListingsByHostId } from "@/lib/listing";
+import { deleteListing, getListingsByHostId, updateListing} from "@/lib/listing";
 import { useUser } from "@clerk/clerk-expo";
 import ReactNativeModal from "react-native-modal";
 import Font from "@/constants/Font";
 import { ScrollView } from "react-native-gesture-handler";
 
-function CarouselComponent() {
+function CarouselComponent({ refreshTrigger }: { refreshTrigger: number }) {
   const progress = useSharedValue<number>(0);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -56,9 +56,52 @@ function CarouselComponent() {
     setImages(hostListing.images);
   };
 
-  const handleUpdate = () => {
-    console.log("update");
-  };
+//update listinng function
+ const handleUpdate = async () => {
+  if (!selectedHostListing?._id || !user?.id) {
+    setErrorMessage("Invalid listing or user session.");
+    return;
+  }
+
+  // Validate user inputs
+  if (
+    !address ||
+    !availabilitySchedule ||
+    !chargerType ||
+    !connectorType ||
+    isNaN(parseFloat(powerOutput)) ||
+    isNaN(parseFloat(pricePerHour)) ||
+    isNaN(parseFloat(minPrice))
+  ) {
+    setErrorMessage("Please complete all required fields with valid numbers.");
+    return;
+  }
+
+  try {
+    const updatedData = {
+      host_id: user.id,
+      address,
+      availability_schedule: availabilitySchedule,
+      charger_type: chargerType,
+      connector_type: connectorType,
+      power_output_kw: parseFloat(powerOutput),
+      price_per_hour: parseFloat(pricePerHour),
+      min_price: parseFloat(minPrice),
+      instructions,
+      images,
+      is_active: true,
+    };
+
+    await updateListing(selectedHostListing._id, updatedData);
+    const refreshedListings = await getListingsByHostId(user.id);
+    sethostListingData(refreshedListings);
+    setEditModalVisible(false);
+    setErrorMessage("");
+  } catch (err: any) {
+    console.error("Update failed:", err);
+    setErrorMessage("Failed to update listing. Please try again.");
+  }
+};
 
   const handleDelete = async () => {
     if (!selectedHostListing?._id) return;
@@ -78,6 +121,9 @@ function CarouselComponent() {
             try {
               await deleteListing(selectedHostListing._id);
               setEditModalVisible(false);
+              if (!user) return;
+              const updatedListings = await getListingsByHostId(user.id);
+              sethostListingData(updatedListings);
             } catch (err) {
               console.error("Listing deletion failed", err);
               setErrorMessage("Failed to delete listing");
@@ -100,7 +146,7 @@ function CarouselComponent() {
       }
     };
     fetchListingByHost();
-  }, []);
+  }, [refreshTrigger]);
 
   const renderItem = ({ item }: { item: Listing }) => (
     <View>
@@ -115,7 +161,7 @@ function CarouselComponent() {
         <View style={styles.cardOverlay}>
           <View style={styles.cardRow}>
             <View style={styles.cardInfo}>
-              <Text style={styles.cardTitle}>{item.address.split(",")[0]}</Text>
+              <Text style={styles.cardTitle}>{item.address.split(",").slice(0, 2)}</Text>
               <Text style={styles.cardBattery}>
                 {item.availability_schedule}
               </Text>

@@ -65,7 +65,7 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
       start_time: bookingStartTime,
       end_time: bookingEndTime,
       total_cost: selectedListing.price_per_hour,
-      status: "approved",
+      status: "pending", //need to change
       payment_status: "paid",
       rating_by_driver: null,
       rating_by_host: null,

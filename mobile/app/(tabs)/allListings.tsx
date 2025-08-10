@@ -10,7 +10,7 @@ import {
   Keyboard,
   Alert,
 } from "react-native";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
@@ -24,8 +24,11 @@ import { useLoading } from "@/utils/LoadingContext";
 import { createBooking } from "@/lib/booking";
 import { useUser } from "@clerk/clerk-expo";
 import AllListingsNav from "@/components/AllListingsNav";
-import useListings from "@/utils/hooks/useListings";
+//import useListings from "@/utils/hooks/useListings";
+import { useFocusEffect } from "@react-navigation/native";
+
 import ListingCard from "@/components/ListingCard";
+import { useListings } from "@/utils/ListingContext";
 
 const allListings = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -39,7 +42,14 @@ const allListings = () => {
   const calculatedCost = selectedListing?.price_per_hour || 10;
   const selectedBatteryLevel = "50%";
 
-  const { listings } = useListings();
+  //const { listings } = useListings();
+  const { listings, refreshListings } = useListings();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshListings();
+    }, [refreshListings])
+  );
 
   const handleChooseListing = () => {
     bottomSheetRef.current?.close();

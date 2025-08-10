@@ -43,6 +43,7 @@
     "react-native-dotenv": "^3.4.11",
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-map-clustering": "^3.4.2",
     "react-native-maps": "1.20.1",
     "react-native-modal": "^14.0.0-rc.1",
