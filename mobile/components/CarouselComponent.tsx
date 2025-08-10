@@ -21,6 +21,7 @@ import { useUser } from "@clerk/clerk-expo";
 import ReactNativeModal from "react-native-modal";
 import Font from "@/constants/Font";
 import { ScrollView } from "react-native-gesture-handler";
+import ImageUploader from "./ImageUploader";
 
 function CarouselComponent({ refreshTrigger }: { refreshTrigger: number }) {
   const progress = useSharedValue<number>(0);
@@ -189,13 +190,15 @@ function CarouselComponent({ refreshTrigger }: { refreshTrigger: number }) {
   return (
     <View id="carousel-component">
       {hostListingData.length === 0 ? (
-  <View style={styles.emptyBox}>
-    <Image
-      source={require("../assets/images/onboard/house2.png")}
-      style={styles.emptyImage}
-    />
-    <Text style={styles.emptyText}>No listings found. Add a new one to get started!</Text>
-  </View>
+        <View style={styles.emptyBox}>
+          <Image
+            source={require("../assets/images/onboard/house2.png")}
+            style={styles.emptyImage}
+          />
+          <Text style={styles.emptyText}>
+            No listings found. Add a new one to get started!
+          </Text>
+        </View>
       ) : (
         <Carousel
           autoPlayInterval={2000}
@@ -372,21 +375,7 @@ function CarouselComponent({ refreshTrigger }: { refreshTrigger: number }) {
               </View>
 
               {/* Image URL */}
-              <View style={styles.inputRow}>
-                <Ionicons
-                  name="image-outline"
-                  size={20}
-                  color={Colors.accent}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  value={images}
-                  onChangeText={setImages}
-                  placeholder="Image URL"
-                  placeholderTextColor="#888"
-                  style={styles.input}
-                />
-              </View>
+              <ImageUploader label="Upload Photo" onUrl={setImages} />
             </View>
 
             {!!errorMessage && (
