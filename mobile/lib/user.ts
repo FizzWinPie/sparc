@@ -27,13 +27,10 @@ export const addNewUser = async (email: string, clerkId: string) => {
   }
 };
 
-type Extra = Record<string, unknown>;
-
 export const updateUser = async (
   email: string,
   clerkId: string,
   firstName: string,
-  extras: Extra = {}
 ) => {
   try {
     if (!email || !clerkId) {
@@ -53,7 +50,7 @@ export const updateUser = async (
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, clerkId, firstName, ...extras }),
+        body: JSON.stringify({ email, clerkId, firstName }),
       }
     );
     return await res.json();
