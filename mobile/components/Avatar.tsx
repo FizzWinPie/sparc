@@ -1,56 +1,59 @@
-import React, { useState } from 'react';
-import { TouchableOpacity, Image, ActivityIndicator, StyleSheet } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity, ActivityIndicator, Image } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useLoading } from "@/utils/LoadingContext";
+import { useUser } from "@clerk/clerk-expo";
+import { useState } from "react";
 
-const CLOUD_URL     = 'https://api.cloudinary.com/v1_1/drrcgoosq/upload';
-const UPLOAD_PRESET = 'Sparc2025';
+export default function ProfileAvatar() {
+  const { user } = useUser();
+  const { setLoading } = useLoading();
+  const [uploading, setUploading] = useState(false);
+  const profilePic = (user?.publicMetadata?.avatarUrl as string) || user?.imageUrl || '';
 
-interface Props {
-  size?: number;          
-  startUrl?: string;      
-  onChange: (url: string) => Promise<void> | void; 
-}
+  const handleInput = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    setUploading(true);
+    
+    try {
+      const picture = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.75,
+        base64: true,
+      });
 
-export default function ProfileAvatar({ size = 140, startUrl, onChange }: Props) {
-  const [url, setUrl]   = useState(startUrl);
-  const [busy, setBusy] = useState(false);
+      if (picture.canceled || !picture.assets[0]) {
+        return;
+      }
 
-  const pick = async () => {
-    const pic = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.75,
-    });
-    if (pic.canceled) return;
-
-    setBusy(true);
-    const fd = new FormData();
-    fd.append('file', { uri: pic.assets[0].uri, name: 'avatar.jpg', type: 'image/jpeg' } as any);
-    fd.append('upload_preset', UPLOAD_PRESET);
-
-    const res  = await fetch(CLOUD_URL, { method: 'POST', body: fd });
-    const json = await res.json();
-    setBusy(false);
-
-    setUrl(json.secure_url);
-    await onChange(json.secure_url);   // let parent store URL
+      if (picture.assets[0].base64) {
+        const base64Data = `data:${picture.assets[0].mimeType};base64,${picture.assets[0].base64}`;
+        await user.setProfileImage({ file: base64Data });
+      }
+    } catch (error) {
+      console.error("Error updating profile image:", error);
+    } finally {
+      setLoading(false);
+      setUploading(false);
+    }
   };
 
   return (
-    <TouchableOpacity onPress={pick} disabled={busy}>
-      {busy ? (
+    <TouchableOpacity onPress={handleInput} disabled={uploading}>
+      {uploading ? (
         <ActivityIndicator size="large" />
-      ) : url ? (
-        <Image source={{ uri: url }} style={[styles.img, { width: size, height: size }]} />
+      ) : profilePic ? (
+        <Image 
+          source={{ uri: profilePic }} 
+          style={{ width: 160, height: 160, borderRadius: 999 }} 
+        />
       ) : (
-        <Ionicons name="person-circle" size={size} color="#0a2d48" />
+        <Ionicons name="person-circle" size={160} color="#0a2d48" />
       )}
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  img: { borderRadius: 999 },
-});

@@ -37,7 +37,6 @@ const ProfileBar = () => {
         />
         <Ionicons 
           name="notifications-outline" style={styles.icon} 
-          onPress={() => router.push('/notifications')}
         />
       </View>
     </View>
