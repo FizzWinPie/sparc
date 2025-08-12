@@ -12,27 +12,23 @@ import { LoadingProvider } from "@/utils/LoadingContext";
 import { StripeProvider } from '@stripe/stripe-react-native';
 
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    light: require("../assets/fonts/Inter-ExtraLight.ttf"),
+    light: require("../assets/fonts/Inter-ExtraLight.ttf"),  
     regular: require("../assets/fonts/Inter-Regular.ttf"),
     bold: require("../assets/fonts/Inter-SemiBold.ttf"),
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -61,8 +57,8 @@ function RootLayoutNav() {
           <ClerkLoaded>
             <StripeProvider
               publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
-              merchantIdentifier="merchant.identifier" // required for Apple Pay
-              urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
+              merchantIdentifier="merchant.identifier" 
+              urlScheme="your-url-scheme" 
             >
               <SafeAreaProvider>
                 <Stack>
