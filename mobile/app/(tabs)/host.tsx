@@ -54,7 +54,6 @@ export default function Host() {
 
   const handleCreateListing = async (listingData: ListingFormData) => {
     const listing = await createNewListing(listingData);
-    console.log("Created listing:", listing);
     setEditModalVisible(false);
     await refreshListings();
     setRefreshListingsVersion((prev) => prev + 1);

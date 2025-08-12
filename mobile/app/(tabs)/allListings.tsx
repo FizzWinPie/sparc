@@ -73,7 +73,7 @@ const allListings = () => {
       start_time: bookingStartTime,
       end_time: bookingEndTime,
       total_cost: selectedListing.price_per_hour,
-      status: "approved",
+      status: "pending",
       payment_status: "paid",
       rating_by_driver: null,
       rating_by_host: null,

@@ -78,7 +78,6 @@ export const getBookingsByHost = async (hostId: string) => {
         "Content-Type": "application/json",
       },
     });
-    console.log(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/bookings/host/${hostId}`);
 
     if (!res.ok) throw new Error("Failed to fetch bookings for host");
     return await res.json();

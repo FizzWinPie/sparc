@@ -89,7 +89,6 @@ const ListingModal: React.FC<ListingModalProps> = ({
     setAddress(item.display_name);
     setSelectedCoords({ lat: parseFloat(item.lat), lon: parseFloat(item.lon) });
     setSuggestions([]);
-    console.log("Selected coordinates:", item.lat, item.lon);
   };
 
   const handleCreateListing = async () => {
