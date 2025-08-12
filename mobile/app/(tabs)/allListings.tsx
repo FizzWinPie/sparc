@@ -26,6 +26,8 @@ import { useUser } from "@clerk/clerk-expo";
 import AllListingsNav from "@/components/AllListingsNav";
 import useListings from "@/utils/hooks/useListings";
 import ListingCard from "@/components/ListingCard";
+import { useStripePayment } from "@/utils/hooks/useStripePayment";
+import { createTransaction } from "@/lib/transaction";
 
 const allListings = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -33,6 +35,9 @@ const allListings = () => {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const { setLoading } = useLoading();
   const { user } = useUser();
+  const { initializePaymentSheet, openPaymentSheet } = useStripePayment(
+    user?.fullName ?? "N/A"
+  );
 
   const bookingStartTime = new Date().toISOString();
   const bookingEndTime = new Date(Date.now() + 60 * 60 * 1000).toISOString();
@@ -41,48 +46,44 @@ const allListings = () => {
 
   const { listings } = useListings();
 
-  const handleChooseListing = () => {
+  const handleChooseListing = async () => {
+    if (!selectedListing || !user) return;
+
     bottomSheetRef.current?.close();
-    Alert.alert(
-      "Confirm Booking",
-      "Are you sure you want to book this listing?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Confirm",
-          style: "default",
-          onPress: async () => {
-            if (!selectedListing || !user) return;
-            setLoading(true);
-            const res = await createBooking({
-              charger_listings_id: selectedListing._id,
-              charger_listings_address: selectedListing.address,
-              host_id: selectedListing.host_id,
-              ev_owner_id: user.id,
-              start_time: bookingStartTime,
-              end_time: bookingEndTime,
-              total_cost: calculatedCost,
-              status: "pending",
-              payment_status: "unpaid",
-              rating_by_driver: null,
-              rating_by_host: null,
-              battery_level: selectedBatteryLevel,
-              images: selectedListing.images,
-            });
-            console.log(res);
-            setLoading(false);
-          },
-        },
-      ]
+
+    const success = await openPaymentSheet();
+    if (!success) return;
+
+    setLoading(true);
+    const bookingResult = await createBooking({
+      charger_listings_id: selectedListing._id,
+      charger_listings_address: selectedListing.address,
+      host_id: selectedListing.host_id,
+      ev_owner_id: user.id,
+      start_time: bookingStartTime,
+      end_time: bookingEndTime,
+      total_cost: selectedListing.price_per_hour,
+      status: "approved",
+      payment_status: "paid",
+      rating_by_driver: null,
+      rating_by_host: null,
+      battery_level: selectedBatteryLevel,
+      images: selectedListing.images,
+    });
+
+    const transactionResult = await createTransaction(
+      user.id,
+      selectedListing.host_id,
+      bookingResult._id,
+      selectedListing.price_per_hour
     );
+    setLoading(false);
   };
 
-  const handleCardPress = (listing: Listing) => {
+  const handleCardPress = async (listing: Listing) => {
     setSelectedListing(listing);
     bottomSheetRef.current?.snapToIndex(0);
+    await initializePaymentSheet(listing.price_per_hour * 100);
   };
 
   const renderItem = ({ item }: { item: Listing }) => (
