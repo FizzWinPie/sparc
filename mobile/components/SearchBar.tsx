@@ -53,7 +53,6 @@ const SearchBar = () => {
   const handleSelect = (item: any) => {
     setAddressInput(item.display_name);
     setSuggestions([]);
-    console.log(item);
   };
 
   const handleClearInput = () => {

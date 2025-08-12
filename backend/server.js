@@ -7,9 +7,17 @@ import listingRoutes from "./routes/ListingsRoutes.js";
 import bookingRoutes from "./routes/BookingsRoute.js";
 import paymentRoutes from "./routes/PaymentRoute.js";
 import reviewRoutes from "./routes/ReviewRoute.js";
+import messageRoutes from "./routes/MessageRoute.js";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import Conversation from "./models/Conversation.js";
+import Message from "./models/Message.js";
 
 dotenv.config();
+const PORT = process.env.PORT || 8000;
 const app = express();
+const server = createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
 app.use(express.json());
 app.use(cors());
@@ -17,14 +25,99 @@ app.use("/api", userRoutes);
 app.use("/api", listingRoutes);
 app.use("/api", bookingRoutes);
 app.use("/api", paymentRoutes);
+app.use("/api", messageRoutes);
 app.use("/api", reviewRoutes);
 
-const PORT = process.env.PORT || 8000;
+app.post("/api/conversations", async (req, res) => {
+  const { user1, user2 } = req.body;
+
+  let convo = await Conversation.findOne({
+    participants: { $all: [user1, user2] },
+  });
+
+  if (!convo) {
+    convo = await Conversation.create({ participants: [user1, user2] });
+  }
+
+  res.json(convo);
+});
+
+// io.on("connection", (socket) => {
+//   console.log("Socket connected:", socket.id);
+
+//   socket.emit("connected", { socketId: socket.id });
+
+//   socket.on("chat", (message) => {
+//     console.log("Received message:", message);
+//   });
+
+//   socket.on("disconnect", () => {
+//     console.log("Socket disconnected:", socket.id);
+//   });
+// });
+
+// REST API to fetch conversations for a user
+app.get("/conversations/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  const conversations = await Conversation.find({
+    participants: userId,
+  })
+    .populate("lastMessage")
+    .sort({ updatedAt: -1 });
+  res.json(conversations);
+});
+
+// REST API to fetch messages for a conversation (pagination supported)
+app.get("/conversations/:conversationId/messages", async (req, res) => {
+  const { conversationId } = req.params;
+  const limit = parseInt(req.query.limit) || 50;
+  const skip = parseInt(req.query.skip) || 0;
+
+  const messages = await Message.find({ conversation: conversationId })
+    .sort({ createdAt: 1 }) // oldest first
+    .skip(skip)
+    .limit(limit);
+
+  res.json(messages);
+});
+
+// Socket.IO chat logic
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  socket.on("joinRoom", (conversationId) => {
+    socket.join(conversationId);
+    console.log(`Socket ${socket.id} joined room ${conversationId}`);
+  });
+
+  socket.on("sendMessage", async ({ conversationId, sender, text }) => {
+    try {
+      // Save message
+      const message = await Message.create({
+        conversation: conversationId,
+        sender,
+        text,
+      });
+
+      // Update conversation
+      await Conversation.findByIdAndUpdate(conversationId, {
+        lastMessage: message._id,
+        updatedAt: new Date(),
+      });
+
+      // Broadcast new message to room
+      io.to(conversationId).emit("newMessage", message);
+    } catch (err) {
+      console.error(err);
+      socket.emit("error", "Could not send message");
+    }
+  });
+});
 
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("MongoDB connected");
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((err) => console.error("DB error:", err));

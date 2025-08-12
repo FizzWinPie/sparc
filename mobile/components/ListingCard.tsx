@@ -4,6 +4,8 @@ import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
 import { Listing } from "@/types";
+import { useEffect, useState } from "react";
+import * as Location from "expo-location";
 
 type Props = {
   listing: Listing;
@@ -11,6 +13,36 @@ type Props = {
 };
 
 const ListingCard = ({ listing, onPress }: Props) => {
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
+
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+  }, []);
+
+  const getDistanceInMiles = () => {
+    if (!userLocation) return null;
+
+    const deltaLat = listing.latitude - userLocation.latitude;
+    const deltaLon = listing.longitude - userLocation.longitude;
+
+    const milesPerDegree = 69;
+    const distance = Math.sqrt(deltaLat ** 2 + deltaLon ** 2) * milesPerDegree;
+
+    return distance.toFixed(1);
+  };
+
   const addressParts = listing.address.split(",").slice(0, 2).map(s => s.trim());
   const formattedAddress = addressParts.join(" ");
   function truncateText(text: string, maxLength: number) {
@@ -29,7 +61,11 @@ const ListingCard = ({ listing, onPress }: Props) => {
           <View style={styles.bottomRow}>
             <View style={styles.bottomLeft}>
               <Ionicons name="location-sharp" size={14} color={Colors.accent} />
-              <Text style={styles.metaText}>3 miles away</Text>
+              <Text style={styles.metaText}>
+                {getDistanceInMiles()
+                  ? `${getDistanceInMiles()} miles away`
+                  : "N/A"}
+              </Text>
             </View>
             <View style={styles.bottomRight}>
               <Image

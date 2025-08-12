@@ -1,11 +1,12 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { Listing } from "@/types";
 import Constants from "@/constants/Constants";
+import * as Location from "expo-location";
 
 interface Props {
   listings: Listing[];
@@ -13,7 +14,34 @@ interface Props {
 }
 
 const SmallCard = ({ listings, onPress }: Props) => {
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
+
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+  }, []);
+
   const selectedListing = listings.length > 0 ? listings[0] : null;
+
+  const getDistanceInMiles = () => {
+    if (!userLocation || !selectedListing) return null;
+
+    const deltaLat = selectedListing.latitude - userLocation.latitude;
+    const deltaLon = selectedListing.longitude - userLocation.longitude;
+
+    const milesPerDegree = 69;
+    const distance = Math.sqrt(deltaLat ** 2 + deltaLon ** 2) * milesPerDegree;
+
+    return distance.toFixed(1);
+  };
 
   if (!selectedListing) {
     return (
@@ -54,7 +82,11 @@ const SmallCard = ({ listings, onPress }: Props) => {
               size={Font.md}
               color={Colors.accent}
             />
-            <Text style={styles.locationText}>3 miles</Text>
+            <Text style={styles.locationText}>
+              {getDistanceInMiles()
+                ? `${getDistanceInMiles()} miles away`
+                : "N/A"}
+            </Text>
           </View>
         </View>
       </View>

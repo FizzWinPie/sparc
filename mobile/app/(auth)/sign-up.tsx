@@ -46,14 +46,6 @@ export default function SignUpScreen() {
 
       if (createdSessionId && setSessionActive) {
         await setSessionActive({ session: createdSessionId });
-        //TO DO: try to fix. timeout, promise. rxjs
-
-        // const clerkId = user?.id;
-        // if (!clerkId) {
-        //   console.log("no clerkId yet");
-        //   return;
-        // }
-        // await addNewUser(email, clerkId);
         if (user) {
           const email = user.primaryEmailAddress?.emailAddress;
           const clerkId = user.id;
@@ -62,7 +54,6 @@ export default function SignUpScreen() {
           
           if (email && clerkId) {
             await addNewUser(email, clerkId);
-            console.log("email: ", email, "\nClerkId: ", clerkId);
           } else {
             console.error("Email or ClerkId is undefined");
           }

@@ -47,7 +47,7 @@ const MyCarCard = ({ bookings }: Props) => {
           style={styles.image}
           resizeMode="contain"
         />
-        <Text style={styles.modelText}>Tesla Model X</Text>
+        <Text style={styles.modelText}>Booking Details</Text>
       </View>
 
       <View style={styles.rightSection}>
@@ -64,9 +64,9 @@ const MyCarCard = ({ bookings }: Props) => {
           </View>
           <View style={styles.batteryRow}>
             <Ionicons name="flash-outline" size={42} color={Colors.accent} />
-            <Text style={styles.batteryText}>
+            {/* <Text style={styles.batteryText}>
               {selectedBooking.battery_level ?? "72%"}
-            </Text>
+            </Text> */}
           </View>
           <TouchableOpacity style={styles.stopButton}>
             <Text style={styles.stopText}>STOP</Text>

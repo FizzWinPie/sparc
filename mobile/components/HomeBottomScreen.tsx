@@ -12,8 +12,8 @@ import { useUser } from "@clerk/clerk-expo";
 //import useListings from "@/utils/hooks/useListings";
 import useBookings from "@/utils/hooks/useBookings";
 import { useStripePayment } from "@/utils/hooks/useStripePayment";
+import { createTransaction } from "@/lib/transaction";
 import { useListings } from "@/utils/ListingContext";
-
 
 const HomeBottomScreen = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -25,7 +25,9 @@ const HomeBottomScreen = () => {
 
   const { bookings } = useBookings(user?.id);
   const [loading, setLoading] = useState(false);
-  const { initializePaymentSheet, openPaymentSheet } = useStripePayment(user?.fullName ?? "N/A");
+  const { initializePaymentSheet, openPaymentSheet } = useStripePayment(
+    user?.fullName ?? "N/A"
+  );
 
   const handleCardPress = async (listing: Listing) => {
     setSelectedListing(listing);
@@ -46,7 +48,7 @@ const HomeBottomScreen = () => {
     if (!success) return;
 
     setLoading(true);
-    const res = await createBooking({
+    const bookingResult = await createBooking({
       charger_listings_id: selectedListing._id,
       charger_listings_address: selectedListing.address,
       host_id: selectedListing.host_id,
@@ -61,7 +63,13 @@ const HomeBottomScreen = () => {
       battery_level: selectedBatteryLevel,
       images: selectedListing.images,
     });
-    console.log("Booking result:", res);
+
+    const transactionResult = await createTransaction(
+      user.id,
+      selectedListing.host_id,
+      bookingResult._id,
+      selectedListing.price_per_hour
+    );
     setLoading(false);
   };
 

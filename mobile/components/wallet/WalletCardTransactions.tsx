@@ -67,7 +67,7 @@ export default function WalletCardTransactions({ transactions }: Props) {
           {transactions.length === 0 ? (
             <Text style={{ color: "#ccc", fontSize: Font.sm }}>No transactions</Text>
           ) : (
-            transactions.map((txn) => {
+            transactions.slice().reverse().map((txn) => {
               const isReceiver = txn.receiver === user?.id;
               return (
                 <View
