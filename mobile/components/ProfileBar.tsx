@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import dummyData from "@/constants/dummyData/dummy";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,11 +11,20 @@ import { useUser } from "@clerk/clerk-expo";
 const ProfileBar = () => {
   const navigation = useNavigation();
   const {user} = useUser();
+  const profilePic = (user?.publicMetadata?.avatarUrl as string) || user?.imageUrl || '';
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.userSection} onPress={() => router.push("./profile")}>
-        <Ionicons name="person-circle" style={styles.userIcon} color={Colors.secondary}/>
+       {profilePic ? (
+        <Image source={{ uri: profilePic }} style={styles.avatar} />
+        ) : (
+          <Ionicons
+            name="person-circle"
+            style={styles.userIcon}
+            color={Colors.secondary}
+          />
+        )}
         <Text style={styles.welcomeText}>
           Welcome {user?.firstName ?? ""}
         </Text>
@@ -26,7 +35,9 @@ const ProfileBar = () => {
           name="chatbubble-ellipses-outline"
           style={styles.icon}
         />
-        <Ionicons name="notifications-outline" style={styles.icon} />
+        <Ionicons 
+          name="notifications-outline" style={styles.icon} 
+        />
       </View>
     </View>
   );
@@ -59,6 +70,11 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: Font.lg,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
 });
 

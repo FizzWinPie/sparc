@@ -9,17 +9,20 @@ import { Listing } from "@/types";
 import ListingBottomSheet from "./bottomSheet/ListingBottomSheet";
 import { createBooking } from "@/lib/booking";
 import { useUser } from "@clerk/clerk-expo";
-import useListings from "@/utils/hooks/useListings";
+//import useListings from "@/utils/hooks/useListings";
 import useBookings from "@/utils/hooks/useBookings";
 import { useStripePayment } from "@/utils/hooks/useStripePayment";
 import { createTransaction } from "@/lib/transaction";
+import { useListings } from "@/utils/ListingContext";
 
 const HomeBottomScreen = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["100%"], []);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const { user } = useUser();
-  const { listings } = useListings();
+  //const { listings } = useListings();
+  const { listings, refreshListings } = useListings();
+
   const { bookings } = useBookings(user?.id);
   const [loading, setLoading] = useState(false);
   const { initializePaymentSheet, openPaymentSheet } = useStripePayment(
@@ -53,7 +56,7 @@ const HomeBottomScreen = () => {
       start_time: bookingStartTime,
       end_time: bookingEndTime,
       total_cost: selectedListing.price_per_hour,
-      status: "approved",
+      status: "pending", //need to change
       payment_status: "paid",
       rating_by_driver: null,
       rating_by_host: null,

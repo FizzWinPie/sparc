@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Spacing from "@/constants/Spacing";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -16,11 +16,14 @@ import Constants from "@/constants/Constants";
 import Font from "@/constants/Font";
 import { deleteUser, updateUser } from "@/lib/user";
 import { router } from "expo-router";
+import Avatar from '@/components/Avatar';
+
 
 const ProfileUser = () => {
   const { user } = useUser();
   const hasPassword = user?.passwordEnabled;
   const clerkId = user?.id;
+  const [avatarUrl, setAvatarUrl] = useState(user?.imageUrl ?? '')
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [email, setEmail] = useState(
@@ -117,7 +120,18 @@ const ProfileUser = () => {
         // backgroundColor: Colors.blueVariations.aliceBlue
       }}
     >
-      <Ionicons name="person-circle" color={Colors.secondary} size={100} />
+      <Avatar
+        size={160}
+        startUrl={avatarUrl}
+        onChange={async (url) => {
+          setAvatarUrl(url);                            
+          if (clerkId) {
+            await updateUser(email, clerkId, firstName, { avatarUrl: url });
+            await user?.reload();
+          }
+          await (user as any).update({ publicMetadata: { avatarUrl: url } });
+        }}
+      />
       <Text
         style={{ fontFamily: "bold", fontSize: Spacing.md, marginBottom: 4 }}
       >

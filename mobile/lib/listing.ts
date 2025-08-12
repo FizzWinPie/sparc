@@ -84,3 +84,28 @@ export const deleteListing = async (listingId: string) => {
     throw error;
   }
 };
+
+export const updateListing = async (listingId: string, updatedData: any) => {
+  try {
+    const res = await fetch(
+      `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/listings/${listingId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      }
+    );
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Failed to update listing");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to update listing:", error);
+    throw error;
+  }
+};

@@ -56,6 +56,13 @@ const SmallCard = ({ listings, onPress }: Props) => {
     );
   }
 
+  const addressParts = selectedListing.address.split(",").slice(0, 2).map(s => s.trim());
+  const formattedAddress = addressParts.join(" ");
+  function truncateText(text: string, maxLength: number) {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + "...";
+  }
+
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image
@@ -66,7 +73,8 @@ const SmallCard = ({ listings, onPress }: Props) => {
       <View style={styles.infoContainer}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>
-            {selectedListing.address.split(",")[0]}
+            {/*{selectedListing.address.split(",")[0]}*/}
+            {truncateText(formattedAddress, 13)}
           </Text>
           <View style={styles.locationContainer}>
             <Ionicons

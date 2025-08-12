@@ -30,7 +30,7 @@ export const addNewUser = async (email: string, clerkId: string) => {
 export const updateUser = async (
   email: string,
   clerkId: string,
-  firstName: string
+  firstName: string,
 ) => {
   try {
     if (!email || !clerkId) {

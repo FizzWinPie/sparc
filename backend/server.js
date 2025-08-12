@@ -6,6 +6,7 @@ import userRoutes from "./routes/UserRoutes.js";
 import listingRoutes from "./routes/ListingsRoutes.js";
 import bookingRoutes from "./routes/BookingsRoute.js";
 import paymentRoutes from "./routes/PaymentRoute.js";
+import reviewRoutes from "./routes/ReviewRoute.js";
 import messageRoutes from "./routes/MessageRoute.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -25,6 +26,7 @@ app.use("/api", listingRoutes);
 app.use("/api", bookingRoutes);
 app.use("/api", paymentRoutes);
 app.use("/api", messageRoutes);
+app.use("/api", reviewRoutes);
 
 app.post("/api/conversations", async (req, res) => {
   const { user1, user2 } = req.body;

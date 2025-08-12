@@ -25,6 +25,13 @@ const MyCarCard = ({ bookings }: Props) => {
     );
   }
 
+  const addressParts = selectedBooking.charger_listings_address.split(",").slice(0, 2).map(s => s.trim());
+  const formattedAddress = addressParts.join(" ");
+  function truncateText(text: string, maxLength: number) {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + "...";
+  }
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -52,7 +59,7 @@ const MyCarCard = ({ bookings }: Props) => {
               color={Colors.accent}
             />
             <Text style={styles.locationText}>
-              {selectedBooking.charger_listings_address.split(",")[0]}
+              {truncateText(formattedAddress, 13)}
             </Text>
           </View>
           <View style={styles.batteryRow}>

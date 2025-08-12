@@ -9,10 +9,21 @@ import ProfileBar from "@/components/ProfileBar";
 import { BlurView } from "expo-blur";
 import Spacing from "@/constants/Spacing";
 import SearchBar from "@/components/SearchBar";
-import useListings from "@/utils/hooks/useListings";
+import { useListings } from "@/utils/ListingContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+
+//import useListings from "@/utils/hooks/useListings";
 
 const fullMap = () => {
-  const { listings } = useListings();
+  //const { listings } = useListings();
+  const { listings, refreshListings } = useListings();
+
+  useFocusEffect(
+      useCallback(() => {
+        refreshListings();
+      }, [refreshListings])
+  );
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

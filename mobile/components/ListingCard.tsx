@@ -43,13 +43,20 @@ const ListingCard = ({ listing, onPress }: Props) => {
     return distance.toFixed(1);
   };
 
+  const addressParts = listing.address.split(",").slice(0, 2).map(s => s.trim());
+  const formattedAddress = addressParts.join(" ");
+  function truncateText(text: string, maxLength: number) {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + "...";
+  }
+
   return (
     <View style={styles.shadowWrapper}>
       <TouchableOpacity style={styles.box} onPress={() => onPress(listing)}>
         <Image source={{ uri: listing.images }} style={styles.image} />
         <View style={styles.middleContent}>
           <Text style={styles.addressText}>
-            {listing.address.split(",")[0].replace(/^\d+\s*/, "")}
+            {truncateText(formattedAddress, 15)}
           </Text>
           <View style={styles.bottomRow}>
             <View style={styles.bottomLeft}>
