@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
@@ -6,6 +6,7 @@ import Colors from "@/constants/Colors";
 import Font from "@/constants/Font";
 import Spacing from "@/constants/Spacing";
 import { Listing } from "@/types";
+import * as Location from "expo-location";
 
 interface ListingBottomSheetProps {
   selectedListing: Listing | null;
@@ -16,6 +17,36 @@ const ListingBottomSheet = ({
   selectedListing,
   onChooseListing,
 }: ListingBottomSheetProps) => {
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
+
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+  }, []);
+
+  const getDistanceInMiles = () => {
+    if (!userLocation || !selectedListing) return null;
+
+    const deltaLat = selectedListing.latitude - userLocation.latitude;
+    const deltaLon = selectedListing.longitude - userLocation.longitude;
+
+    const milesPerDegree = 69;
+    const distance = Math.sqrt(deltaLat ** 2 + deltaLon ** 2) * milesPerDegree;
+
+    return distance.toFixed(1);
+  };
+
   return (
     <BottomSheetView style={styles.contentContainer}>
       {selectedListing ? (
@@ -23,7 +54,11 @@ const ListingBottomSheet = ({
           <Text style={styles.sheetTitle}>Select Listing</Text>
           <View style={styles.listingHeader}>
             <Image
-              source={require("../../assets/images/logo/splash-icon.png")}
+              source={
+                selectedListing?.images?.[0]
+                  ? { uri: selectedListing.images }
+                  : require("../../assets/images/logo/splash-icon.png")
+              }
               style={styles.listingImage}
             />
             <View style={styles.listingInfo}>
@@ -37,7 +72,11 @@ const ListingBottomSheet = ({
                     size={Font.md}
                     color={Colors.accent}
                   />
-                  <Text style={styles.locationText}>3 miles away</Text>
+                  <Text style={styles.locationText}>
+                    {getDistanceInMiles()
+                      ? `${getDistanceInMiles()} miles away`
+                      : "N/A"}
+                  </Text>
                 </View>
               </View>
 
