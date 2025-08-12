@@ -11,14 +11,11 @@ import HomeBottomScreen from "@/components/HomeBottomScreen";
 import SearchBar from "@/components/SearchBar";
 import Spacing from "@/constants/Spacing";
 import useListings from "@/utils/hooks/useListings";
-import Message from "@/components/Message";
 import { useUser } from "@clerk/clerk-expo";
-import GoogleButton from "@/components/GoogleButton";
-import AppleButton from "@/components/AppleMapsButton";
 
 const Home = () => {
   const { listings } = useListings();
-  const {user} = useUser();
+  const { user } = useUser();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -34,7 +31,6 @@ const Home = () => {
           <ListingsMap listings={listings} snapPoints={["60%"]} />
         </View>
         <View style={styles.bottomScreen}>
-          {/* <Message conversationId={"687fe7c31c42c3b567b480d2"} userId={user?.id ?? ""} /> */}
           <HomeBottomScreen />
         </View>
       </View>

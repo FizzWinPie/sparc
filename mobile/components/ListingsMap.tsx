@@ -17,6 +17,7 @@ import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
 import AppleButton from "./AppleMapsButton";
 import GoogleButton from "./GoogleButton";
+import { createTransaction } from "@/lib/transaction";
 
 interface Props {
   listings: Listing[];
@@ -75,7 +76,7 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
 
     setLoading(true);
 
-    const res = await createBooking({
+    const bookingResult = await createBooking({
       charger_listings_id: selectedListing._id,
       charger_listings_address: selectedListing.address,
       host_id: selectedListing.host_id,
@@ -92,6 +93,14 @@ const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {
     });
 
     setIsBooked(true);
+
+    const transactionResult = await createTransaction(
+      user.id,
+      selectedListing.host_id,
+      bookingResult._id,
+      selectedListing.price_per_hour
+    );
+
     setLoading(false);
   };
 
