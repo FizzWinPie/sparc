@@ -25,6 +25,7 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
   return (
     <View
       style={{
+        marginBottom: Spacing.sm,
         shadowColor: "black",
         shadowOffset: { width: 2, height: 2 },
         shadowOpacity: 0.2,
@@ -37,11 +38,11 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
         style={{
           flexDirection: "row",
           borderWidth: 1,
-          borderColor: Colors.blueVariations.aliceBlue,
+          borderColor: Colors.secondary,
           borderRadius: Constants.borderRadius,
           padding: Spacing.md,
           minHeight: 180,
-          backgroundColor: Colors.primary,
+          backgroundColor: Colors.secondary,
           opacity: 0.97,
         }}
       >
@@ -55,13 +56,14 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
           >
             <Ionicons
               name="person-circle"
-              size={35}
-              color={Constants.colors.accent}
+              size={40}
+              color={Colors.basic.white}
+              style={{ marginRight: 5 }}
             />
             <Text
               style={{
                 fontWeight: "bold",
-                color: Colors.secondary,
+                color: Colors.basic.white,
               }}
             >
               {r.name}
@@ -76,10 +78,10 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
                 gap: 4,
               }}
             >
-              <Ionicons name="calendar" size={20} color={Colors.accent} />
+              <Ionicons name="calendar" size={20} color={Colors.basic.white} />
               <Text
                 style={{
-                  color: Colors.secondary,
+                  color: Colors.basic.white,
                   fontSize: Font.sm,
                 }}
               >
@@ -94,10 +96,10 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
                 gap: 4,
               }}
             >
-              <Ionicons name="time-outline" size={20} color={Colors.accent} />
+              <Ionicons name="time-outline" size={20} color={Colors.basic.white} />
               <Text
                 style={{
-                  color: Colors.secondary,
+                  color: Colors.basic.white,
                   fontSize: Font.sm,
                 }}
               >
@@ -109,7 +111,7 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
           <Text
             style={{
               fontWeight: "bold",
-              color: "black",
+              color: Colors.basic.white,
               fontSize: Constants.fontSize.lg,
             }}
           >
@@ -126,13 +128,16 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
               marginBottom: Spacing.sm,
             }}
           >
-            <Ionicons name="location" size={16} color={Colors.accent} />
+            <Ionicons name="location" size={18} color={Colors.blueVariations.vistaBlue} />
             <Text
               style={{
-                color: Colors.secondary,
+                color: Colors.basic.white,
                 fontSize: Font.sm,
                 gap: 6,
+                maxWidth: 160,
               }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
             >
               {r.place.split(",")[1]}
             </Text>
@@ -143,7 +148,7 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
                 borderRadius: Spacing.lg,
                 paddingVertical: Spacing.sm,
                 alignItems: "center",
-                backgroundColor: Colors.accent,
+                backgroundColor: Colors.blueVariations.steelBlue,
               }}
               onPress={onAccept}
             >
@@ -174,7 +179,7 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
                 style={{
                   fontSize: Font.sm,
                   fontWeight: "bold",
-                  color: "gray",
+                  color: "#404040",
                 }}
               >
                 Decline Booking
@@ -196,13 +201,13 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
                 <Ionicons
                   name="chatbubble-ellipses-outline"
                   size={18}
-                  color={Constants.colors.accent}
+                  color={Colors.blueVariations.polynesianBlue}
                 />
                 <Text
                   style={{
                     fontSize: Font.sm,
                     fontWeight: "bold",
-                    color: Constants.colors.accent,
+                    color: Colors.blueVariations.polynesianBlue,
                   }}
                 >
                   Send Message

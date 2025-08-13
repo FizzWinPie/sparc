@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Text,
   TextInput,
@@ -32,8 +32,35 @@ export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [code, setCode] = useState("");
-  const { user } = useUser();
+
   const { setLoading } = useLoading();
+  const { user } = useUser();
+
+  const hasSyncedUser = useRef(false);
+
+  useEffect(() => {
+    const syncUser = async () => {
+      if (
+        user?.id &&
+        user?.primaryEmailAddress?.emailAddress &&
+        !hasSyncedUser.current
+      ) {
+        hasSyncedUser.current = true;
+
+        const email = user.primaryEmailAddress.emailAddress;
+        const clerkId = user.id;
+
+        try {
+          await addNewUser(email, clerkId);
+          console.log("SSO user synced:", email, clerkId);
+        } catch (error) {
+          console.error("Error syncing SSO user:", error);
+        }
+      }
+    };
+
+    syncUser();
+  }, [user]);
 
   const onSelectAuth = async (strategy: Strategy) => {
     try {

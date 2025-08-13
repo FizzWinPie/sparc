@@ -267,7 +267,12 @@ useEffect(() => {
               );
             } else {
               return acceptedBookings.map((r) => (
-                <PluggedCard key={r.id} plugged={r} />
+                <PluggedCard 
+                  key={r.id}
+                  plugged={r}
+                  onCancel={(id) =>
+                    setAcceptedBookings((prev) => prev.filter((b) => b.id !== id))
+                } />
               ));
             }
           }
@@ -343,7 +348,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   dotSelected: {
-    backgroundColor: Colors.accent,
+    backgroundColor: Colors.blueVariations.polynesianBlue,
     alignSelf: "center",
   },
   emptyBox: {

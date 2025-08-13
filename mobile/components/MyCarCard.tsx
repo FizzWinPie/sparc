@@ -5,13 +5,17 @@ import Font from "@/constants/Font";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { Booking } from "@/types";
+import { cancelBooking } from "@/lib/booking";
 
 interface Props {
   bookings: Booking[];
+  onCancel: (bookingId: string) => void;
 }
 
-const MyCarCard = ({ bookings }: Props) => {
+const MyCarCard = ({ bookings, onCancel }: Props) => {
   const selectedBooking = bookings.length > 0 ? bookings[0] : null;
+  const [showMessage, setShowMessage] = useState(false);
+  const [message, setMessage] = useState("");
 
   if (!selectedBooking) {
     return (
@@ -40,14 +44,14 @@ const MyCarCard = ({ bookings }: Props) => {
       <View style={styles.leftSection}>
         <Text style={styles.idText}>
           ID {selectedBooking._id.slice(-5)}{"   "}
-          <Text style={styles.onlineText}>ONLINE</Text>
         </Text>
         <Image
           source={require("../assets/images/ev_profile.png")}
           style={styles.image}
           resizeMode="contain"
         />
-        <Text style={styles.modelText}>Tesla Model X</Text>
+        {/*<Text style={styles.modelText}>Tesla Model X</Text>*/}
+        <Text style={styles.onlineText}>ONLINE</Text>
       </View>
 
       <View style={styles.rightSection}>
@@ -65,10 +69,21 @@ const MyCarCard = ({ bookings }: Props) => {
           <View style={styles.batteryRow}>
             <Ionicons name="flash-outline" size={42} color={Colors.accent} />
             <Text style={styles.batteryText}>
-              {selectedBooking.battery_level ?? "72%"}
+              {selectedBooking.battery_level ?? "100%"}
             </Text>
           </View>
-          <TouchableOpacity style={styles.stopButton}>
+          <TouchableOpacity 
+            style={styles.stopButton}
+            onPress={async () => {
+              try {
+                await cancelBooking(selectedBooking._id);
+                onCancel(selectedBooking._id);
+                alert("Booking cancelled successfully.");
+              } catch (error) {
+                alert("Failed to cancel booking.");
+              }
+              }}
+          >
             <Text style={styles.stopText}>STOP</Text>
           </TouchableOpacity>
         </View>
@@ -103,6 +118,8 @@ const styles = StyleSheet.create({
   },
   onlineText: {
     color: Colors.accent,
+    fontFamily: "bold",
+    fontSize: Font.md,
   },
   image: {
     width: 140,

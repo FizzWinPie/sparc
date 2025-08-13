@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert, Platform, ToastAndroid } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
 import Constants from "@/constants/Constants";
+import { cancelBooking } from "@/lib/booking";
 
 type Plugged = {
   id: string;
@@ -17,9 +18,46 @@ type Plugged = {
 
 type Props = {
   plugged: Plugged;
+  onCancel: (id: string) => void;
 };
 
-const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
+const PluggedCard: React.FC<Props> = ({ plugged: r, onCancel }) => {
+
+  const showToast = (message: string) => {
+    if (Platform.OS === "android") {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    } else {
+      // For iOS or other platforms, fallback to alert or implement a custom toast component
+      Alert.alert("", message);
+    }
+  };
+
+  const handleCancel = () => {
+    Alert.alert(
+      "Cancel Booking",
+      "Are you sure you want to cancel this booking?",
+      [
+        {
+          text: "No",
+          style: "cancel",
+        },
+        {
+          text: "Yes, Cancel",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await cancelBooking(r.id);
+              onCancel(r.id);
+              showToast("Booking cancelled successfully.");
+            } catch (error) {
+              showToast("Failed to cancel booking.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View
       style={{
@@ -35,11 +73,11 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
         style={{
           flexDirection: "row",
           borderWidth: 1,
-          borderColor: Colors.blueVariations.aliceBlue,
+          borderColor: Colors.secondary,
           borderRadius: Constants.borderRadius,
           padding: Spacing.md,
           minHeight: 180,
-          backgroundColor: Colors.primary,
+          backgroundColor: Colors.secondary,
           opacity: 0.97,
         }}
       >
@@ -53,20 +91,21 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
           >
             <Ionicons
               name="person-circle"
-              size={35}
-              color={Constants.colors.accent}
+              size={40}
+              color={Colors.basic.white}
+              style={{ marginRight: 5 }}
             />
             <Text
               style={{
                 fontWeight: "bold",
-                color: Colors.secondary,
+                color: Colors.basic.white,
               }}
             >
               {r.name}
             </Text>
           </View>
 
-          <View style={{gap: 12}}>
+          <View style={{ gap: 12 }}>
             <View
               style={{
                 flexDirection: "row",
@@ -74,10 +113,10 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
                 gap: 4,
               }}
             >
-              <Ionicons name="calendar" size={20} color={Colors.accent} />
+              <Ionicons name="calendar" size={20} color={Colors.basic.white} />
               <Text
                 style={{
-                  color: Colors.secondary,
+                  color: Colors.basic.white,
                   fontSize: Font.sm,
                 }}
               >
@@ -92,10 +131,10 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
                 gap: 4,
               }}
             >
-              <Ionicons name="time-outline" size={20} color={Colors.accent} />
+              <Ionicons name="time-outline" size={20} color={Colors.basic.white} />
               <Text
                 style={{
-                  color: Colors.secondary,
+                  color: Colors.basic.white,
                   fontSize: Font.sm,
                 }}
               >
@@ -107,7 +146,7 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
           <Text
             style={{
               fontWeight: "bold",
-              color: "black",
+              color: Colors.basic.white,
               fontSize: Constants.fontSize.lg,
             }}
           >
@@ -124,19 +163,23 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
               marginBottom: Spacing.sm,
             }}
           >
-            <Ionicons name="location" size={16} color={Colors.accent} />
+            <Ionicons name="location" size={16} color={Colors.blueVariations.vistaBlue} />
             <Text
               style={{
-                color: Colors.secondary,
+                color: Colors.basic.white,
                 fontSize: Font.sm,
                 gap: 6,
+                maxWidth: 160,
               }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
             >
               {r.place.split(",")[1]}
             </Text>
           </View>
           <View>
             <TouchableOpacity
+              onPress={handleCancel}
               style={{
                 borderRadius: Spacing.lg,
                 paddingVertical: Spacing.sm,
@@ -150,7 +193,7 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
                 style={{
                   fontSize: Font.sm,
                   fontWeight: "bold",
-                  color: "gray",
+                  color: "#404040",
                 }}
               >
                 Cancel Session
@@ -172,13 +215,13 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
                 <Ionicons
                   name="chatbubble-ellipses-outline"
                   size={18}
-                  color={Constants.colors.accent}
+                  color={Colors.blueVariations.polynesianBlue}
                 />
                 <Text
                   style={{
                     fontSize: Font.sm,
                     fontWeight: "bold",
-                    color: Constants.colors.accent,
+                    color: Colors.blueVariations.polynesianBlue,
                   }}
                 >
                   Send Message

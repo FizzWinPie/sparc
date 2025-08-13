@@ -87,3 +87,23 @@ export const getBookingsByHost = async (hostId: string) => {
     throw err;
   }
 };
+
+export const cancelBooking = async (bookingId: string) => {
+  try {
+    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/bookings/${bookingId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to cancel booking");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Cancel booking error:", error);
+    throw error;
+  }
+};

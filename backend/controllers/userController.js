@@ -74,3 +74,24 @@ export const getUserByEmail = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getUserByClerkId = async (req, res) => {
+  const { clerkId } = req.query;
+
+  if (!clerkId) {
+    return res.status(400).json({ error: 'Missing clerkId' });
+  }
+
+  try {
+    const user = await User.findOne({ clerkId });
+
+    if (!user) {
+      return res.status(200).json({ user: null });
+    }
+
+    return res.status(200).json({ user });
+  } catch (error) {
+    console.error('Error fetching user by clerkId:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

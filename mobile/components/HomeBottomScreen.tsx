@@ -1,11 +1,11 @@
 import { View, Text, StyleSheet } from "react-native";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MyCarCard from "./MyCarCard";
 import Font from "@/constants/Font";
 import SmallCard from "./SmallCard";
 import Spacing from "@/constants/Spacing";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { Listing } from "@/types";
+import { Booking, Listing } from "@/types";
 import ListingBottomSheet from "./bottomSheet/ListingBottomSheet";
 import { createBooking } from "@/lib/booking";
 import { useUser } from "@clerk/clerk-expo";
@@ -24,6 +24,7 @@ const HomeBottomScreen = () => {
   const { bookings } = useBookings(user?.id);
   const [loading, setLoading] = useState(false);
   const { initializePaymentSheet, openPaymentSheet } = useStripePayment(user?.fullName ?? "N/A");
+  const [activeBookings, setActiveBookings] = useState<Booking[]>([]);
 
   const handleCardPress = async (listing: Listing) => {
     setSelectedListing(listing);
@@ -63,6 +64,12 @@ const HomeBottomScreen = () => {
     setLoading(false);
   };
 
+  useEffect(() => {
+    if (bookings && bookings.length > 0) {
+      setActiveBookings(bookings);
+    }
+  }, [bookings]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Recommended for you</Text>
@@ -81,7 +88,11 @@ const HomeBottomScreen = () => {
         Your bookings
       </Text>
       <View style={styles.cardsRow}>
-        <MyCarCard bookings={[bookings[0]]} />
+        <MyCarCard 
+          bookings= {activeBookings.length > 0 ? [activeBookings[0]] : []}
+          onCancel={(id) => {
+            setActiveBookings((prev) => prev.filter((b) => b._id !== id));
+          }} />
       </View>
 
       <BottomSheet
