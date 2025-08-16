@@ -81,22 +81,8 @@ export const createBooking = async (req, res) => {
         .json({ message: "Cannot book listing that doesn't exist" });
     }
 
-    // const overlappingBooking = await Booking.findOne({
-    //   charger_listings_id,
-    //   $or: [
-    //     {
-    //       start_time: { $lt: new Date(end_time) },
-    //       end_time: { $gt: new Date(start_time) },
-    //     },
-    //   ],
-    // });
-
-    // if (overlappingBooking) {
-    //   return res
-    //     .status(409)
-    //     .json({ message: "Time slot already booked for this listing" });
-    // }
-
+    // TODO future: ensure no booking overlaps - time management
+    
     const newBooking = new Booking({
       charger_listings_id,
       charger_listings_address,

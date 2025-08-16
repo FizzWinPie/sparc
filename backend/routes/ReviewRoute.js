@@ -5,6 +5,6 @@ import {
 
 const router = express.Router();
 
-router.post('/reviews', createReview);  // POST /api/reviews
+router.post('/reviews', createReview);
 
 export default router;

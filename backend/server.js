@@ -7,7 +7,6 @@ import listingRoutes from "./routes/ListingsRoutes.js";
 import bookingRoutes from "./routes/BookingsRoute.js";
 import paymentRoutes from "./routes/PaymentRoute.js";
 import reviewRoutes from "./routes/ReviewRoute.js";
-import messageRoutes from "./routes/MessageRoute.js";
 import conversationRoutes from "./routes/ConversationRoute.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -27,22 +26,7 @@ app.use("/api", listingRoutes);
 app.use("/api", bookingRoutes);
 app.use("/api", paymentRoutes);
 app.use("/api", reviewRoutes);
-app.use("/api", messageRoutes);
 app.use("/api", conversationRoutes);
-
-// io.on("connection", (socket) => {
-//   console.log("Socket connected:", socket.id);
-
-//   socket.emit("connected", { socketId: socket.id });
-
-//   socket.on("chat", (message) => {
-//     console.log("Received message:", message);
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("Socket disconnected:", socket.id);
-//   });
-// });
 
 // Socket.IO chat logic
 io.on("connection", (socket) => {
