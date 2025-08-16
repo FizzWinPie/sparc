@@ -6,7 +6,7 @@ const Index = () => {
   const { isSignedIn } = useAuth();
 
   if (isSignedIn) {
-    return <Redirect href={"/(tabs)/profile"} />;
+    return <Redirect href={"/(tabs)/home"} />;
   }
 
   return <Redirect href="/(auth)/welcome" />;

@@ -1,6 +1,12 @@
-import { Text, TouchableOpacity, View, Image } from "react-native";
-import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
+import React, { useEffect, useCallback, useState } from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Spacing from "@/constants/Spacing";
@@ -8,6 +14,7 @@ import Colors from "@/constants/Colors";
 import { useUser } from "@clerk/clerk-expo";
 import LottieView from "lottie-react-native";
 import { useLoading } from "@/utils/LoadingContext";
+import { useFocusEffect } from "@react-navigation/native";
 
 type LastMessage = {
   text?: string;
@@ -27,31 +34,35 @@ export default function channels() {
   const [data, setData] = useState<Conversation[]>([]);
   const { setLoading } = useLoading();
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      if (!userId) return;
-      setLoading(true)
-      try {
-        const res = await fetch(
-          `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/conversations/${userId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await res.json();
-        // console.log(data);
-        setData(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to fetch conversations", error);
-      }
-    };
+  const fetchConversations = useCallback(async () => {
+    if (!userId) return;
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/conversations/${userId}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      const result = await res.json();
+      setData(Array.isArray(result) ? result : result.conversations ?? []);
+    } catch (error) {
+      console.error("Failed to fetch conversations", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, setLoading]);
 
+  useEffect(() => {
     fetchConversations();
-  }, [userId]);
+  }, [fetchConversations]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchConversations();
+    }, [fetchConversations])
+  );
 
   const openConversation = (
     conversationId: string,
@@ -103,9 +114,9 @@ export default function channels() {
       </View>
 
       {data.length > 0 ? (
-        data.map((item, index) => (
+        data.map((item) => (
           <TouchableOpacity
-            key={index}
+            key={item._id}
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -158,7 +169,7 @@ export default function channels() {
               {new Date(item.updatedAt).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
-              }) || "10:30 AM"}
+              })}
             </Text>
           </TouchableOpacity>
         ))

@@ -62,7 +62,6 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
       }
 
       const conversation = await res.json();
-      console.log("Conversation created", conversation);
       openConversation(conversation._id, r.imageUrl, r.place.split(",")[0]);
     } catch (error) {
       console.error("Failed to create conversation", error);

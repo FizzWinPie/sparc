@@ -94,7 +94,6 @@ export default function SignUpScreen() {
         state: "pending",
       });
     } catch (err: any) {
-      console.log(JSON.stringify(err, null, 2));
       Alert.alert("Error", err.errors[0].longMessage);
     } finally {
       setLoading(false);
@@ -110,7 +109,6 @@ export default function SignUpScreen() {
         "Check your email for the new verification code."
       );
     } catch (err: any) {
-      console.log("Resend error:", err);
       Alert.alert("Error", err.errors?.[0]?.message || "Failed to resend code");
     }
   };

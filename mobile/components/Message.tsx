@@ -32,7 +32,6 @@ type MessageType = {
 const Message = ({ conversationId }: MessageProps) => {
   const { user } = useUser();
   const userId = user?.id;
-  console.log(userId)
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [text, setText] = useState("");
   const flatListRef = useRef<FlatList>(null);
