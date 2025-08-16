@@ -6,6 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import Spacing from "@/constants/Spacing";
 import Colors from "@/constants/Colors";
 import { useUser } from "@clerk/clerk-expo";
+import LottieView from "lottie-react-native";
+import { useLoading } from "@/utils/LoadingContext";
 
 type LastMessage = {
   text?: string;
@@ -23,10 +25,12 @@ export default function channels() {
   const { user } = useUser();
   const userId = user?.id;
   const [data, setData] = useState<Conversation[]>([]);
+  const { setLoading } = useLoading();
 
   useEffect(() => {
     const fetchConversations = async () => {
       if (!userId) return;
+      setLoading(true)
       try {
         const res = await fetch(
           `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/conversations/${userId}`,
@@ -40,6 +44,7 @@ export default function channels() {
         const data = await res.json();
         // console.log(data);
         setData(data);
+        setLoading(false);
       } catch (error) {
         console.error("Failed to fetch conversations", error);
       }
@@ -159,9 +164,20 @@ export default function channels() {
         ))
       ) : (
         <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          style={{
+            flex: 1,
+            justifyContent: "flex-start",
+            alignItems: "center",
+          }}
         >
-          <Text style={{ color: Colors.secondary }}>
+          <LottieView
+            source={require("../../assets/animation/noMessaging.json")}
+            autoPlay
+            loop
+            style={{ width: 400, height: 400, marginRight: 50 }}
+          />
+
+          <Text style={{ marginTop: Spacing.xxl, color: Colors.secondary }}>
             No conversations found
           </Text>
         </View>

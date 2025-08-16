@@ -98,7 +98,7 @@ const Message = ({ conversationId }: MessageProps) => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, marginBottom: 80 }}
+      style={{ flex: 1, marginBottom: 55 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={90}
     >
@@ -118,9 +118,7 @@ const Message = ({ conversationId }: MessageProps) => {
               <View
                 style={{
                   backgroundColor:
-                    item.sender === userId
-                      ? Colors.accent
-                      : Colors.blueVariations.vistaBlue,
+                    item.sender === userId ? Colors.accent : "#D1D1D6",
                   padding: 12,
                   borderRadius: 12,
                   borderBottomRightRadius: item.sender === userId ? 0 : 12,
@@ -129,7 +127,7 @@ const Message = ({ conversationId }: MessageProps) => {
               >
                 <Text
                   style={{
-                    color: "white",
+                    color: item.sender === userId ? "white" : "black",
                     fontSize: 16,
                   }}
                 >
@@ -138,16 +136,16 @@ const Message = ({ conversationId }: MessageProps) => {
                 {item.createdAt && (
                   <Text
                     style={{
-                      color: "rgba(255,255,255,0.6)",
+                      color: item.sender === userId ? "rgba(255,255,255,0.6)" : "rgba(38, 32, 32, 0.6)",
                       fontSize: 10,
                       alignSelf: "flex-end",
                       marginTop: 4,
                     }}
                   >
-                    {new Date(item.createdAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                {new Date(item.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
                   </Text>
                 )}
               </View>
@@ -165,25 +163,25 @@ const Message = ({ conversationId }: MessageProps) => {
             paddingTop: 8,
             paddingBottom: Platform.OS === "ios" ? 20 : 8,
             borderTopWidth: 1,
-            borderTopColor: "#e1e1e1", // Light gray border
-            backgroundColor: "white", // White background for the bar
+            borderTopColor: "#e1e1e1",
+            backgroundColor: "white",
           }}
         >
           <TextInput
             value={text}
             onChangeText={setText}
             placeholder="Type a message..."
-            placeholderTextColor="#9e9e9e" // Medium gray placeholder
+            placeholderTextColor="#9e9e9e"
             style={{
               flex: 1,
               borderWidth: 1,
-              borderColor: "#e1e1e1", // Light gray border
+              borderColor: "#e1e1e1",
               padding: 12,
               marginRight: 8,
-              borderRadius: 24,
-              backgroundColor: "white", // White input background
-              color: "#1a1a1a", // Dark text color
-              minHeight: 48,
+              borderRadius: 25,
+              backgroundColor: "white",
+              color: "#1a1a1a",
+              minHeight: 30,
               maxHeight: 120,
             }}
             multiline
@@ -192,8 +190,8 @@ const Message = ({ conversationId }: MessageProps) => {
             onPress={sendMessage}
             style={{
               backgroundColor: Colors.accent,
-              width: 48,
-              height: 48,
+              width: 46,
+              height: 46,
               borderRadius: 50,
               justifyContent: "center",
               alignItems: "center",

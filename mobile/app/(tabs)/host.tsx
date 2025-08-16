@@ -99,6 +99,7 @@ export default function Host() {
           name: b.ev_owner_name ?? "Unknown",
           place: b.charger_listings_address ?? "-",
           date: b.start_time.split("T")[0],
+          imageUrl: b.images,
           time: `${new Date(b.start_time).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -127,6 +128,7 @@ useEffect(() => {
         name: b.ev_owner_name ?? "Unknown",
         place: b.charger_listings_address ?? "-",
         date: b.start_time?.split("T")[0] ?? "-",
+        imageUrl: b.images,
         time: `${new Date(b.start_time).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -256,8 +258,8 @@ useEffect(() => {
               return (
                 <View style={[styles.emptyBox, { height: 120 }]}>
                   <Image
-                    source={require("../../assets/images/noRequest-icon.png")}
-                    style={{ width: 50, height: 50, resizeMode: "contain" }}
+                    source={require("../../assets/images/onboard/charging_request.png")}
+                    style={{ width: 70, height: 50, resizeMode: "contain" }}
                   />
                   <Text style={[{ fontSize: Font.sm, marginTop: Spacing.xs, color: Colors.basic.blue}]}>
                     No active requests
