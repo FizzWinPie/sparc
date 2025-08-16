@@ -97,6 +97,7 @@ export default function Host() {
         const formatted = pending.map((b: any) => ({
           id: b._id,
           name: b.ev_owner_name ?? "Unknown",
+          ev_owner_id: b.ev_owner_id,
           place: b.charger_listings_address ?? "-",
           date: b.start_time.split("T")[0],
           imageUrl: b.images,
@@ -126,6 +127,7 @@ useEffect(() => {
       const formatted = accepted.map((b: any) => ({
         id: b._id,
         name: b.ev_owner_name ?? "Unknown",
+        ev_owner_id: b.ev_owner_id,
         place: b.charger_listings_address ?? "-",
         date: b.start_time?.split("T")[0] ?? "-",
         imageUrl: b.images,

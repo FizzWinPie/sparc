@@ -11,6 +11,7 @@ import { router } from "expo-router";
 type Plugged = {
   id: string;
   name: string;
+  ev_owner_id: string;
   date: string;
   time: string;
   price: string;
@@ -50,7 +51,7 @@ const PluggedCard: React.FC<Props> = ({ plugged: r }) => {
           },
           body: JSON.stringify({
             user1: user?.id,
-            user2: r.name,
+            user2: r.ev_owner_id,
             imageUrl: r.imageUrl,
             listingName: r.place.split(",")[0],
           }),
