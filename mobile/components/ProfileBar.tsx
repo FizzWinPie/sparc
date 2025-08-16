@@ -123,12 +123,7 @@ const styles = StyleSheet.create({
   iconSection: { flexDirection: "row", alignItems: "center", gap: 6 },
   iconWrap: { position: "relative", padding: 4 },
   icon: { fontSize: Font.lg },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#eee",
-  },
+  avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: "#eee" },
   badge: {
     position: "absolute",
     top: 0,

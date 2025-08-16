@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useUser } from "@clerk/clerk-expo";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import {
   fetchNotifications,
   markNotificationRead,
@@ -34,11 +36,12 @@ const COLORS = {
   text: "#111827",
   muted: "#6B7280",
   unreadTint: "#F1F7FF",
-  info: "#3B82F6",   
+  info: "#3B82F6",
   border: "#E5E7EB",
 };
 
 export default function Notifications() {
+  const insets = useSafeAreaInsets();
   const { user, isLoaded } = useUser();
   const [data, setData] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,21 +70,21 @@ export default function Notifications() {
   const onPressItem = async (id: string) => {
     try {
       await markNotificationRead(id);
-      setData(prev => prev.map(n => (n._id === id ? { ...n, read: true } : n)));
+      setData((prev) => prev.map((n) => (n._id === id ? { ...n, read: true } : n)));
     } catch {}
   };
 
   const markAllRead = async () => {
-    const unreadIds = data.filter(n => !n.read).map(n => n._id);
+    const unreadIds = data.filter((n) => !n.read).map((n) => n._id);
     if (unreadIds.length === 0) return;
     try {
-      await Promise.all(unreadIds.map(id => markNotificationRead(id)));
-      setData(prev => prev.map(n => ({ ...n, read: true })));
+      await Promise.all(unreadIds.map((id) => markNotificationRead(id)));
+      setData((prev) => prev.map((n) => ({ ...n, read: true })));
     } catch {}
   };
 
   const displayed = useMemo(
-    () => (filter === "unread" ? data.filter(n => !n.read) : data),
+    () => (filter === "unread" ? data.filter((n) => !n.read) : data),
     [data, filter]
   );
 
@@ -91,19 +94,10 @@ export default function Notifications() {
     const iconColor = unread ? COLORS.info : COLORS.muted;
 
     return (
-      <TouchableOpacity
-        onPress={() => onPressItem(item._id)}
-        activeOpacity={0.85}
-        style={styles.cardWrap}
-      >
+      <TouchableOpacity onPress={() => onPressItem(item._id)} activeOpacity={0.85} style={styles.cardWrap}>
         <View style={[styles.card, unread && { backgroundColor: COLORS.unreadTint }]}>
           <View style={[styles.accent, { backgroundColor: accentColor }]} />
-          <Ionicons
-            name="notifications-outline"
-            size={22}
-            color={iconColor}
-            style={{ marginRight: 10 }}
-          />
+          <Ionicons name="notifications-outline" size={22} color={iconColor} style={{ marginRight: 10 }} />
           <View style={{ flex: 1 }}>
             <Text numberOfLines={2} style={[styles.title, unread && styles.titleUnread]}>
               {item.message}
@@ -144,10 +138,13 @@ export default function Notifications() {
   }
 
   return (
-    <View style={[styles.screen, { backgroundColor: COLORS.bg }]}>
-      {/* header controls */}
+    <View style={[styles.screen, { backgroundColor: COLORS.bg, paddingTop: insets.top }]}>
       <View style={styles.topBar}>
-        <View style={styles.segment}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} accessibilityLabel="Back">
+          <Ionicons name="chevron-back" size={22} color={COLORS.text} />
+        </TouchableOpacity>
+
+        <View style={[styles.segment, { flex: 1, marginHorizontal: 8 }]}>
           <TouchableOpacity
             onPress={() => setFilter("all")}
             style={[styles.segBtn, filter === "all" && styles.segBtnActive]}
@@ -172,7 +169,7 @@ export default function Notifications() {
         data={displayed}
         keyExtractor={(n) => n._id}
         renderItem={renderItem}
-        contentContainerStyle={{ padding: 12, paddingBottom: 32 }}
+        contentContainerStyle={{ padding: 12, paddingBottom: Math.max(insets.bottom, 32) }}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         refreshControl={
           <RefreshControl
@@ -206,8 +203,8 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
   },
+  backBtn: { padding: 6, marginRight: 4 },
 
   segment: {
     flexDirection: "row",

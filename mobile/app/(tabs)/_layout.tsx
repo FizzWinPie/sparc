@@ -72,8 +72,13 @@ const MainLayout = () => {
         name="profile"
         options={{
           href: null,
-          headerShown: false
+          headerShown: false,
         }}
+      />
+      {/* ↓ Add this: notifications lives in (tabs) but is hidden from tab bar */}
+      <Tabs.Screen
+        name="notifications"
+        options={{ href: null, title: "Notifications" }}
       />
     </Tabs>
   );
