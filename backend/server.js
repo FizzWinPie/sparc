@@ -7,7 +7,7 @@ import listingRoutes from "./routes/ListingsRoutes.js";
 import bookingRoutes from "./routes/BookingsRoute.js";
 import paymentRoutes from "./routes/PaymentRoute.js";
 import reviewRoutes from "./routes/ReviewRoute.js";
-import messageRoutes from "./routes/MessageRoute.js";
+import conversationRoutes from "./routes/ConversationRoute.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import Conversation from "./models/Conversation.js";
@@ -25,61 +25,8 @@ app.use("/api", userRoutes);
 app.use("/api", listingRoutes);
 app.use("/api", bookingRoutes);
 app.use("/api", paymentRoutes);
-app.use("/api", messageRoutes);
 app.use("/api", reviewRoutes);
-
-app.post("/api/conversations", async (req, res) => {
-  const { user1, user2 } = req.body;
-
-  let convo = await Conversation.findOne({
-    participants: { $all: [user1, user2] },
-  });
-
-  if (!convo) {
-    convo = await Conversation.create({ participants: [user1, user2] });
-  }
-
-  res.json(convo);
-});
-
-// io.on("connection", (socket) => {
-//   console.log("Socket connected:", socket.id);
-
-//   socket.emit("connected", { socketId: socket.id });
-
-//   socket.on("chat", (message) => {
-//     console.log("Received message:", message);
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("Socket disconnected:", socket.id);
-//   });
-// });
-
-// REST API to fetch conversations for a user
-app.get("/conversations/:userId", async (req, res) => {
-  const userId = req.params.userId;
-  const conversations = await Conversation.find({
-    participants: userId,
-  })
-    .populate("lastMessage")
-    .sort({ updatedAt: -1 });
-  res.json(conversations);
-});
-
-// REST API to fetch messages for a conversation (pagination supported)
-app.get("/conversations/:conversationId/messages", async (req, res) => {
-  const { conversationId } = req.params;
-  const limit = parseInt(req.query.limit) || 50;
-  const skip = parseInt(req.query.skip) || 0;
-
-  const messages = await Message.find({ conversation: conversationId })
-    .sort({ createdAt: 1 }) // oldest first
-    .skip(skip)
-    .limit(limit);
-
-  res.json(messages);
-});
+app.use("/api", conversationRoutes);
 
 // Socket.IO chat logic
 io.on("connection", (socket) => {

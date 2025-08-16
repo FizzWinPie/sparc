@@ -72,7 +72,21 @@ const MainLayout = () => {
         name="profile"
         options={{
           href: null,
-          headerShown: false
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="channels"
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          href: null,
+          headerShown: false,
         }}
       />
     </Tabs>

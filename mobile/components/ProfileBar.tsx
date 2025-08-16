@@ -15,9 +15,12 @@ const ProfileBar = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.userSection} onPress={() => router.push("./profile")}>
-       {profilePic ? (
-        <Image source={{ uri: profilePic }} style={styles.avatar} />
+      <TouchableOpacity
+        style={styles.userSection}
+        onPress={() => router.push("./profile")}
+      >
+        {profilePic ? (
+          <Image source={{ uri: profilePic }} style={styles.avatar} />
         ) : (
           <Ionicons
             name="person-circle"
@@ -25,19 +28,14 @@ const ProfileBar = () => {
             color={Colors.secondary}
           />
         )}
-        <Text style={styles.welcomeText}>
-          Welcome {user?.firstName ?? ""}
-        </Text>
+        <Text style={styles.welcomeText}>Welcome {user?.firstName ?? ""}</Text>
       </TouchableOpacity>
 
       <View style={styles.iconSection}>
-        <Ionicons
-          name="chatbubble-ellipses-outline"
-          style={styles.icon}
-        />
-        <Ionicons 
-          name="notifications-outline" style={styles.icon} 
-        />
+        <TouchableOpacity onPress={() => router.push("./channels")}>
+          <Ionicons name="chatbubble-ellipses-outline" style={styles.icon} />
+        </TouchableOpacity>
+        <Ionicons name="notifications-outline" style={styles.icon} />
       </View>
     </View>
   );

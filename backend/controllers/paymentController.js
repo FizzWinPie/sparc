@@ -49,7 +49,9 @@ export const createTransaction = async (req, res) => {
 
     const payment = new Payment({ receiver, payer, bookingId, amount });
     const savedPayment = await payment.save();
-    // user update maybe
+    
+    // TODO future: Maybe update user
+    
     res.status(201).json(savedPayment);
   } catch (error) {
     console.error("Error creating a transaction:", error);

@@ -1,10 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import Spacing from "@/constants/Spacing";
 import Font from "@/constants/Font";
 import Constants from "@/constants/Constants";
+import { useUser } from "@clerk/clerk-expo";
+import { router } from "expo-router";
 
 type Request = {
   id: string;
@@ -13,6 +15,7 @@ type Request = {
   time: string;
   price: string;
   place: string;
+  imageUrl: string;
 };
 
 type Props = {
@@ -21,7 +24,52 @@ type Props = {
   onDecline?: () => void;
 };
 
-const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
+const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline }) => {
+  const { user } = useUser();
+  const openConversation = (
+    conversationId: string,
+    imageUrl: string,
+    listingName: string
+  ) => {
+    router.push({
+      pathname: "/chat",
+      params: {
+        conversationId,
+        imageUrl,
+        listingName,
+      },
+    });
+  };
+
+  const sendMessage = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/conversations`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user1: user?.id,
+            user2: r.name,
+            imageUrl: r.imageUrl,
+            listingName: r.place.split(",")[0],
+          }),
+        }
+      );
+      if (!res.ok) {
+        console.error("Failed to create conversation", await res.text());
+        return;
+      }
+
+      const conversation = await res.json();
+      openConversation(conversation._id, r.imageUrl, r.place.split(",")[0]);
+    } catch (error) {
+      console.error("Failed to create conversation", error);
+    }
+  };
+
   return (
     <View
       style={{
@@ -45,7 +93,9 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
           opacity: 0.97,
         }}
       >
-        <View style={{ flex: 1, width: "50%", justifyContent: "space-between" }}>
+        <View
+          style={{ flex: 1, width: "50%", justifyContent: "space-between" }}
+        >
           <View
             style={{
               flexDirection: "row",
@@ -53,10 +103,9 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
               justifyContent: "flex-start",
             }}
           >
-            <Ionicons
-              name="person-circle"
-              size={35}
-              color={Constants.colors.accent}
+            <Image
+              source={{ uri: r.imageUrl || "https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=" }}
+              style={{ width: 35, height: 35, borderRadius: 17.5, marginRight: 8 }}
             />
             <Text
               style={{
@@ -68,7 +117,7 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
             </Text>
           </View>
 
-          <View style={{gap: 12}}>
+          <View style={{ gap: 12 }}>
             <View
               style={{
                 flexDirection: "row",
@@ -190,6 +239,9 @@ const RequestCard: React.FC<Props> = ({ request: r, onAccept, onDecline}) => {
                 backgroundColor: "white",
                 borderColor: Constants.colors.accent,
                 borderWidth: 1,
+              }}
+              onPress={() => {
+                sendMessage();
               }}
             >
               <View style={{ flex: 1, flexDirection: "row", gap: 6 }}>

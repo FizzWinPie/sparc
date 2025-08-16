@@ -134,7 +134,7 @@ const Wallet = () => {
         <Text style={{ fontSize: Font.md, color: Colors.basic.black }}>
           Transactions
         </Text>
-        <Text style={{ fontSize: Font.xs, color: Colors.basic.blue }}>
+        <Text style={{ fontSize: 12, color: Colors.basic.blue }}>
           See All
         </Text>
       </View>
