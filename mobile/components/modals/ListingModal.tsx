@@ -2,13 +2,10 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   TextInput,
   StyleSheet,
   Pressable,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
 import ReactNativeModal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";

@@ -20,7 +20,7 @@ import Avatar from '@/components/Avatar';
 
 
 const ProfileUser = () => {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const hasPassword = user?.passwordEnabled;
   const clerkId = user?.id;
   const [avatarUrl, setAvatarUrl] = useState(user?.imageUrl ?? '')
@@ -42,17 +42,14 @@ const ProfileUser = () => {
       }
 
       if (email && email !== user.primaryEmailAddress?.emailAddress) {
-        const newEmail = await user.createEmailAddress({ email: email });
+        const newEmail = await user.createEmailAddress({ email });
         await newEmail.prepareVerification({ strategy: "email_code" });
         await user.update({ primaryEmailAddressId: newEmail.id });
       }
 
-      if (newPassword) {
-        await handlePasswordUpdate();
-      }
+      if (newPassword) await handlePasswordUpdate();
 
-      if (!clerkId) return;
-      await updateUser(email, clerkId, firstName);
+      if (clerkId) await updateUser(email, clerkId, firstName, { avatarUrl });
 
       setEditModalVisible(false);
     } catch (err: any) {
@@ -66,15 +63,9 @@ const ProfileUser = () => {
       if (!user) return;
 
       if (hasPassword) {
-        await user.updatePassword({
-          currentPassword,
-          newPassword,
-        });
+        await user.updatePassword({ currentPassword, newPassword });
       } else {
-        await user.updatePassword({
-          currentPassword: newPassword,
-          newPassword,
-        });
+        await user.updatePassword({ currentPassword: newPassword, newPassword });
       }
     } catch (err: any) {
       setErrorMessage(err?.errors?.[0]?.message || "Password update failed.");
@@ -89,10 +80,7 @@ const ProfileUser = () => {
       "Confirm Deletion",
       "Are you sure you want to delete your account? This action cannot be undone.",
       [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
+        { text: "Cancel", style: "cancel" },
         {
           text: "Delete",
           style: "destructive",
@@ -117,34 +105,16 @@ const ProfileUser = () => {
         paddingHorizontal: Spacing.lg,
         alignContent: "center",
         alignItems: "center",
-        // backgroundColor: Colors.blueVariations.aliceBlue
       }}
     >
-      <Avatar
-        size={160}
-        startUrl={avatarUrl}
-        onChange={async (url) => {
-          setAvatarUrl(url);                            
-          if (clerkId) {
-            await updateUser(email, clerkId, firstName, { avatarUrl: url });
-            await user?.reload();
-          }
-          await (user as any).update({ publicMetadata: { avatarUrl: url } });
-        }}
-      />
+      <Avatar />
       <Text
         style={{ fontFamily: "bold", fontSize: Spacing.md, marginBottom: 4 }}
       >
         {firstName || "User"}
       </Text>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 4,
-        }}
-      >
+
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
         <Text style={{ fontFamily: "light", fontSize: 12 }}>{email}</Text>
         <Ionicons
           name="create-outline"
@@ -168,14 +138,8 @@ const ProfileUser = () => {
           </Text>
 
           <View style={styles.inputFieldsContainer}>
-            {/* First Name */}
             <View style={styles.inputRow}>
-              <Ionicons
-                name="person-outline"
-                size={20}
-                color={Colors.accent}
-                style={styles.inputIcon}
-              />
+              <Ionicons name="person-outline" size={20} color={Colors.accent} style={styles.inputIcon} />
               <TextInput
                 value={firstName}
                 onChangeText={setFirstName}
@@ -185,14 +149,8 @@ const ProfileUser = () => {
               />
             </View>
 
-            {/* Email */}
             <View style={styles.inputRow}>
-              <Ionicons
-                name="mail-outline"
-                size={20}
-                color={Colors.accent}
-                style={styles.inputIcon}
-              />
+              <Ionicons name="mail-outline" size={20} color={Colors.accent} style={styles.inputIcon} />
               <TextInput
                 autoCapitalize="none"
                 value={email}
@@ -204,16 +162,10 @@ const ProfileUser = () => {
               />
             </View>
 
-            {/* Password */}
             {hasPassword && (
               <>
                 <View style={[styles.inputRow, { alignItems: "center" }]}>
-                  <Ionicons
-                    name="lock-open-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
+                  <Ionicons name="lock-open-outline" size={20} color={Colors.accent} style={styles.inputIcon} />
                   <TextInput
                     placeholder="Current Password"
                     secureTextEntry
@@ -224,12 +176,7 @@ const ProfileUser = () => {
                   />
                 </View>
                 <View style={[styles.inputRow, { alignItems: "center" }]}>
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={20}
-                    color={Colors.accent}
-                    style={styles.inputIcon}
-                  />
+                  <Ionicons name="lock-closed-outline" size={20} color={Colors.accent} style={styles.inputIcon} />
                   <TextInput
                     placeholder="New Password"
                     secureTextEntry
@@ -241,31 +188,12 @@ const ProfileUser = () => {
                 </View>
               </>
             )}
-            {/* Phone Number
-            <View style={styles.inputRow}>
-              <Ionicons
-                name="call-outline"
-                size={19}
-                color={Colors.accent}
-                style={styles.inputIcon}
-              />
-              <TextInput
-                autoCapitalize="none"
-                value={null}
-                onChangeText={setPhoneNumber}
-                placeholder="3542212234"
-                placeholderTextColor="#888"
-                style={styles.input}
-              />
-            </View> */}
           </View>
+
           {!!errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
           <View style={styles.modalButtonContainer}>
-            <TouchableOpacity
-              onPress={handleUpdate}
-              style={styles.verifyButton}
-            >
+            <TouchableOpacity onPress={handleUpdate} style={styles.verifyButton}>
               <Text style={styles.verifyButtonText}>Update</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleDeleteAccount}>
@@ -281,102 +209,6 @@ const ProfileUser = () => {
 export default ProfileUser;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    paddingHorizontal: Spacing.lg,
-  },
-  headerImage: {
-    height: 220,
-    width: 400,
-    marginBottom: Spacing.md,
-  },
-  formContainer: {
-    width: "100%",
-    paddingHorizontal: 50,
-  },
-  helloText: {
-    fontSize: Font.lg,
-    fontWeight: "bold",
-    marginBottom: Spacing.sm,
-  },
-  signUpText: {
-    fontSize: Font.md,
-    marginBottom: Spacing.lg,
-  },
-  inputFieldsContainer: {
-    alignSelf: "flex-start",
-    width: "100%",
-    gap: Spacing.md,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 30,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 12,
-  },
-  inputIcon: {
-    marginRight: Spacing.sm,
-    marginLeft: Spacing.xs,
-  },
-  input: {
-    flex: 1,
-    color: "#222",
-  },
-  buttonContainer: {
-    alignItems: "center",
-  },
-  continueButton: {
-    backgroundColor: Colors.secondary,
-    width: 250,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: Constants.borderRadius,
-    alignItems: "center",
-  },
-  continueButtonText: {
-    color: "white",
-    fontFamily: "bold",
-  },
-  signInLinkContainer: {
-    display: "flex",
-    flexDirection: "row",
-  },
-  orContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 45,
-  },
-  orLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#ccc",
-  },
-  orText: {
-    marginHorizontal: Spacing.sm,
-    color: "#888",
-    fontWeight: "400",
-  },
-  socialContainer: {
-    gap: 15,
-    alignSelf: "center",
-  },
-  socialButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  socialIcon: {
-    width: 20,
-    height: 20,
-  },
-  socialText: {
-    fontFamily: "regular",
-  },
   modalContainer: {
     backgroundColor: Colors.primary,
     padding: Spacing.lg,
@@ -410,20 +242,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Colors.secondary,
   },
-  modalEmail: {
-    color: Colors.accent,
-    fontFamily: "regular",
-  },
-  errorText: {
-    color: "red",
-    fontSize: 14,
-    marginTop: 4,
-  },
-  modalButtonContainer: {
+  inputFieldsContainer: { alignSelf: "flex-start", width: "100%", gap: Spacing.md },
+  inputRow: {
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: Spacing.lg,
-    gap: Spacing.md,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 30,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 12,
   },
+  inputIcon: { marginRight: Spacing.sm, marginLeft: Spacing.xs },
+  input: { flex: 1, color: "#222" },
+  errorText: { color: "red", fontSize: 14, marginTop: 4 },
+  modalButtonContainer: { alignItems: "center", marginTop: Spacing.lg, gap: Spacing.md },
   verifyButton: {
     backgroundColor: Colors.secondary,
     width: 250,
