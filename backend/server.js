@@ -12,6 +12,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import Conversation from "./models/Conversation.js";
 import Message from "./models/Message.js";
+import notificationRoutes from "./routes/NotificationRoute.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 8000;
@@ -27,6 +28,7 @@ app.use("/api", bookingRoutes);
 app.use("/api", paymentRoutes);
 app.use("/api", reviewRoutes);
 app.use("/api", conversationRoutes);
+app.use('/api', notificationRoutes);
 
 // Socket.IO chat logic
 io.on("connection", (socket) => {

@@ -37,6 +37,7 @@ export default function Page() {
         });
 
       if (createdSessionId && setSessionActive) {
+        //Broken: TODO, need 
         await setSessionActive({ session: createdSessionId });
         router.replace("/(tabs)/home");
       }
