@@ -11,11 +11,9 @@ import HomeBottomScreen from "@/components/HomeBottomScreen";
 import SearchBar from "@/components/SearchBar";
 import Spacing from "@/constants/Spacing";
 import { useListings } from "@/utils/ListingContext";
-//import useListings from "@/utils/hooks/useListings";
 import { useUser } from "@clerk/clerk-expo";
 
 const Home = () => {
-  //const { listings } = useListings();
   const { listings, refreshListings}  = useListings();
   const { user } = useUser();
 

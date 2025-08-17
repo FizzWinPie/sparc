@@ -31,3 +31,20 @@ export const fetchUnreadCount = async (userId: string): Promise<number> => {
   const data = await r.json();
   return Number(data?.count ?? 0);
 };
+
+export const createNotification = async (userId: string, message: string, read: boolean): Promise<number> => {
+  const r = await fetch(`${BASE}/api/notifications/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userId,
+      message,
+      read
+    })
+  });
+  if (!r.ok) throw new Error(`Failed to create a new notification`);
+  const data = await r.json();
+  return Number(data?.count ?? 0);
+};

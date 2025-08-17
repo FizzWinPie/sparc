@@ -98,11 +98,11 @@ export const createBooking = async (req, res) => {
     });
     const savedBooking = await newBooking.save();
 
-    await Notification.create({
-      userId: host_id,
-      message: `New booking request from ${ev_owner_id}`,
-      read: false,
-    });
+    // await Notification.create({
+    //   userId: host_id,
+    //   message: `New booking request from ${ev_owner_id}`,
+    //   read: false,
+    // });
 
     return res.status(201).json(savedBooking);
   } catch (error) {
@@ -132,30 +132,31 @@ export const updateBooking = async (req, res) => {
       { new: true, runValidators: true }
     ).lean();
 
-    if (
-      typeof updateFields.status === "string" &&
-      updateFields.status !== prevStatus
-    ) {
-      let message = null;
-      const s = updateFields.status.toLowerCase();
-      if (s === "accepted") message = "Your booking was accepted 🎉";
-      else if (s === "declined" || s === "rejected")
-        message = "Your booking was not accepted.";
-      else if (s === "cancelled" || s === "canceled")
-        message = "Your booking was cancelled.";
+    // // MISBEHAVE: Causes 2 notifications to be created
+    // if (
+    //   typeof updateFields.status === "string" &&
+    //   updateFields.status !== prevStatus
+    // ) {
+    //   let message = null;
+    //   const s = updateFields.status.toLowerCase();
+    //   if (s === "accepted") message = "Your booking was accepted 🎉";
+    //   else if (s === "declined" || s === "rejected")
+    //     message = "Your booking was not accepted.";
+    //   else if (s === "cancelled" || s === "canceled")
+    //     message = "Your booking was cancelled.";
 
-      if (message) {
-        try {
-          await Notification.create({
-            userId: updatedBooking.ev_owner_id,
-            message,
-            read: false,
-          });
-        } catch (e) {
-          console.error("Create guest notification error:", e);
-        }
-      }
-    }
+    //   if (message) {
+    //     try {
+    //       await Notification.create({
+    //         userId: updatedBooking.ev_owner_id,
+    //         message,
+    //         read: false,
+    //       });
+    //     } catch (e) {
+    //       console.error("Create guest notification error:", e);
+    //     }
+    //   }
+    // }
 
     return res.status(200).json(updatedBooking);
   } catch (error) {

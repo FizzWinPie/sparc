@@ -10,7 +10,7 @@ export default function ProfileAvatar() {
   const { setLoading } = useLoading();
   const [uploading, setUploading] = useState(false);
   const profilePic = (user?.publicMetadata?.avatarUrl as string) || user?.imageUrl || '';
-
+  
   const handleInput = async () => {
     if (!user) return;
     

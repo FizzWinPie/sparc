@@ -105,21 +105,9 @@ const ProfileUser = () => {
         paddingHorizontal: Spacing.lg,
         alignContent: "center",
         alignItems: "center",
-        // backgroundColor: Colors.blueVariations.aliceBlue
       }}
     >
-      <Avatar
-        size={160}
-        startUrl={avatarUrl}
-        onChange={async (url: any) => {
-          setAvatarUrl(url);                            
-          if (clerkId) {
-            await updateUser(email, clerkId, firstName, { avatarUrl: url });
-            await user?.reload();
-          }
-          await (user as any).update({ publicMetadata: { avatarUrl: url } });
-        }}
-      />
+      <Avatar />
       <Text
         style={{ fontFamily: "bold", fontSize: Spacing.md, marginBottom: 4 }}
       >

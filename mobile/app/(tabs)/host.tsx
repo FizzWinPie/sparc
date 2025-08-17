@@ -24,6 +24,7 @@ import { ListingFormData } from "@/types";
 import PluggedCard from "@/components/host/PluggedCard";
 import { getBookingsByHost, updateBooking } from "@/lib/booking";
 import { useListings } from "@/utils/ListingContext";
+import { createNotification } from "@/lib/notifications";
 //import useListings from "@/utils/hooks/useListings";
 
 type Transaction = {
@@ -148,22 +149,26 @@ useEffect(() => {
   fetchAcceptedBookings();
 }, [user]);
 
-    const handleAcceptRequest = async (requestId: string) => {
+  const handleAcceptRequest = async (requestId: string) => {
     const requestToAccept = pendingRequests.find((r) => r.id === requestId);
     if (!requestToAccept) return;
     try {
       await updateBooking(requestId, { status: "accepted" });
       setAcceptedRequests((prev) => [...prev, requestToAccept]);
       setAcceptedBookings((prev) => [...prev, requestToAccept]);
+      await createNotification(requestToAccept.ev_owner_id, `Your booking at ${requestToAccept.place.split(",")[0]} was accepted 🎉`, false);
     } catch (error) {
       console.error("Failed to accept request", error);
     }
   };
 
   const handleDeclineRequest = async (requestId: string) => {
+    const requestToDecline = pendingRequests.find((r) => r.id === requestId);
+    if (!requestToDecline) return;
     try {
       await updateBooking(requestId, { status: "declined" });
       setDeclinedRequests((prev) => [...prev, requestId]);
+      await createNotification(requestToDecline.ev_owner_id, `Your booking request at ${requestToDecline.place.split(",")[0]} was declined`, false);
     } catch (error) {
       console.error("Failed to decline request", error);
     }

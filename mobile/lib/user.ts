@@ -50,7 +50,7 @@ email: string, clerkId: string, firstName: string, p0: { avatarUrl: any; },
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, clerkId, firstName, ...extras }),
+        body: JSON.stringify({ email, clerkId, firstName }),
       }
     );
     return await res.json();
