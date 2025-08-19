@@ -275,7 +275,7 @@ const ListingModal: React.FC<ListingModalProps> = ({
               <TextInput
                 value={minPrice}
                 onChangeText={setMinPrice}
-                placeholder="Minimum Price"
+                placeholder="Minimum Price ($)"
                 placeholderTextColor="#888"
                 keyboardType="numeric"
                 style={styles.input}
@@ -301,7 +301,7 @@ const ListingModal: React.FC<ListingModalProps> = ({
 
             {/* Image URL */}
             <ImageUploader
-              label="Upload Charger Photo"
+              label="Upload Photo"
               onUrl={setImages}         
             />
           </View>

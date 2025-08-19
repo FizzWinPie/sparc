@@ -350,7 +350,7 @@ function CarouselComponent({ refreshTrigger }: { refreshTrigger: number }) {
                 <TextInput
                   value={minPrice}
                   onChangeText={setMinPrice}
-                  placeholder="Minimum Price"
+                  placeholder="Minimum Price ($)"
                   placeholderTextColor="#888"
                   keyboardType="numeric"
                   style={styles.input}

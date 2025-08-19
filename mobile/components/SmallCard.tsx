@@ -14,7 +14,10 @@ interface Props {
 }
 
 const SmallCard = ({ listings, onPress }: Props) => {
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -56,7 +59,10 @@ const SmallCard = ({ listings, onPress }: Props) => {
     );
   }
 
-  const addressParts = selectedListing.address.split(",").slice(0, 2).map(s => s.trim());
+  const addressParts = selectedListing.address
+    .split(",")
+    .slice(0, 2)
+    .map((s) => s.trim());
   const formattedAddress = addressParts.join(" ");
   function truncateText(text: string, maxLength: number) {
     if (text.length <= maxLength) return text;
@@ -74,7 +80,7 @@ const SmallCard = ({ listings, onPress }: Props) => {
         <View style={styles.textContainer}>
           <Text style={styles.title}>
             {/*{selectedListing.address.split(",")[0]}*/}
-            {truncateText(formattedAddress, 13)}
+            {truncateText(formattedAddress, 21)}
           </Text>
           <View style={styles.locationContainer}>
             <Ionicons
@@ -84,7 +90,7 @@ const SmallCard = ({ listings, onPress }: Props) => {
             />
             <Text style={styles.locationText}>
               {getDistanceInMiles()
-                ? `${getDistanceInMiles()} miles away`
+                ? `${getDistanceInMiles()} miles`
                 : "N/A"}
             </Text>
           </View>
@@ -120,7 +126,7 @@ const styles = StyleSheet.create({
   emptyImage: {
     width: 70,
     height: 70,
-    resizeMode: "contain"
+    resizeMode: "contain",
   },
   image: {
     width: 60,
@@ -153,7 +159,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontFamily: "regular",
-    fontSize: Font.sm,
+    fontSize: 12,
     color: "white",
   },
   sheetTitle: {

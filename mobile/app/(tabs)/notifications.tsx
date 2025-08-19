@@ -17,6 +17,7 @@ import {
   markNotificationRead,
   AppNotification,
 } from "@/lib/notifications";
+import LottieView from "lottie-react-native";
 
 const timeAgo = (iso: string) => {
   const d = new Date(iso);
@@ -138,9 +139,18 @@ export default function Notifications() {
   }
 
   return (
-    <View style={[styles.screen, { backgroundColor: COLORS.bg, paddingTop: insets.top }]}>
+    <View
+      style={[
+        styles.screen,
+        { backgroundColor: COLORS.bg, paddingTop: insets.top },
+      ]}
+    >
       <View style={styles.topBar}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} accessibilityLabel="Back">
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => router.back()}
+          accessibilityLabel="Back"
+        >
           <Ionicons name="chevron-back" size={22} color={COLORS.text} />
         </TouchableOpacity>
 
@@ -149,18 +159,33 @@ export default function Notifications() {
             onPress={() => setFilter("all")}
             style={[styles.segBtn, filter === "all" && styles.segBtnActive]}
           >
-            <Text style={[styles.segText, filter === "all" && styles.segTextActive]}>All</Text>
+            <Text
+              style={[styles.segText, filter === "all" && styles.segTextActive]}
+            >
+              All
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setFilter("unread")}
             style={[styles.segBtn, filter === "unread" && styles.segBtnActive]}
           >
-            <Text style={[styles.segText, filter === "unread" && styles.segTextActive]}>Unread</Text>
+            <Text
+              style={[
+                styles.segText,
+                filter === "unread" && styles.segTextActive,
+              ]}
+            >
+              Unread
+            </Text>
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity onPress={markAllRead} style={styles.linkBtn}>
-          <Ionicons name="checkmark-done-outline" size={18} color={COLORS.info} />
+          <Ionicons
+            name="checkmark-done-outline"
+            size={18}
+            color={COLORS.info}
+          />
           <Text style={styles.linkBtnText}>Mark all read</Text>
         </TouchableOpacity>
       </View>
@@ -169,7 +194,10 @@ export default function Notifications() {
         data={displayed}
         keyExtractor={(n) => n._id}
         renderItem={renderItem}
-        contentContainerStyle={{ padding: 12, paddingBottom: Math.max(insets.bottom, 32) }}
+        contentContainerStyle={{
+          padding: 12,
+          paddingBottom: Math.max(insets.bottom, 32),
+        }}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         refreshControl={
           <RefreshControl
@@ -182,7 +210,13 @@ export default function Notifications() {
         }
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
-            <Ionicons name="sparkles-outline" size={28} color={COLORS.muted} />
+            {/* <Ionicons name="sparkles-outline" size={28} color={COLORS.muted} /> */}
+            <LottieView
+              source={require("../../assets/animation/emptyNotifications.json")}
+              autoPlay
+              loop
+              style={{ width: 120, height: 120 }}
+            />
             <Text style={styles.emptyTitle}>You’re all caught up</Text>
             <Text style={styles.emptyText}>No notifications to show.</Text>
           </View>
