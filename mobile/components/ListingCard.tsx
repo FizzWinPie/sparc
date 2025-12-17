@@ -72,7 +72,7 @@ const ListingCard = ({ listing, onPress }: Props) => {
                 source={require("../assets/images/level2a.png")}
                 style={{ width: 16, height: 16 }}
               />
-              <Text style={styles.metaText}>Type 2</Text>
+              <Text style={styles.metaText}>{listing.connector_type}</Text>
             </View>
           </View>
         </View>
