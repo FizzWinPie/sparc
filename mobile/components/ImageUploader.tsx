@@ -1,6 +1,18 @@
 import React, { useState } from "react";
-import { View, Button, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  Button,
+  Image,
+  ActivityIndicator,
+  Text,
+  Touchable,
+  TouchableOpacity,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons";
+import Colors from "@/constants/Colors";
+import Font from "@/constants/Font";
+import Spacing from "@/constants/Spacing";
 
 const CLOUD_URL = "https://api.cloudinary.com/v1_1/drrcgoosq/upload";
 const UPLOAD_PRESET = "Sparc2025";
@@ -51,7 +63,35 @@ export default function ImageUploader({
       {busy ? (
         <ActivityIndicator />
       ) : (
-        <Button title={label} onPress={pickUpload} />
+        <TouchableOpacity
+          style={{
+            height: 80,
+            width: "100%",
+            borderWidth: 2,
+            borderColor: Colors.blueVariations.aliceBlue,
+            borderRadius: Spacing.sm,
+            justifyContent: "center",
+            alignItems: "center",
+            borderStyle: "dotted",
+          }}
+          onPress={pickUpload}
+        >
+          <Ionicons
+            name="cloud-upload-outline"
+            size={24}
+            color={Colors.accent}
+            style={{}}
+          />
+          <Text
+            style={{
+              color: Colors.accent,
+              fontWeight: "bold",
+              fontSize: Font.sm,
+            }}
+          >
+            {label}
+          </Text>
+        </TouchableOpacity>
       )}
     </View>
   );

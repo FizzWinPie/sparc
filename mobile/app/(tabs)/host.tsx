@@ -265,7 +265,7 @@ useEffect(() => {
               return (
                 <View style={[styles.emptyBox, { height: 120 }]}>
                   <Image
-                    source={require("../../assets/images/onboard/charging_request.png")}
+                    source={require("../../assets/images/onboard/driving.png")}
                     style={{ width: 70, height: 50, resizeMode: "contain" }}
                   />
                   <Text style={[{ fontSize: Font.sm, marginTop: Spacing.xs, color: Colors.basic.blue}]}>
@@ -288,8 +288,8 @@ useEffect(() => {
               return (
                 <View style={[styles.emptyBox, { height: 120 }]}>
                   <Image
-                    source={require("../../assets/images/noRequest-icon.png")}
-                    style={{ width: 50, height: 50, resizeMode: "contain" }}
+                    source={require("../../assets/images/onboard/charging_request.png")}
+                    style={{ width: 70, height: 50, resizeMode: "contain" }}
                   />
                   <Text style={[{ fontSize: Font.sm, marginTop: Spacing.xs, color: Colors.basic.blue}]}>
                     No plugged-in sessions

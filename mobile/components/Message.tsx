@@ -97,9 +97,9 @@ const Message = ({ conversationId }: MessageProps) => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, marginBottom: 55 }}
+      style={{ flex: 1, marginBottom: 50 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={90}
+      keyboardVerticalOffset={-20}
     >
       <View style={{ flex: 1, padding: 16 }}>
         <FlatList

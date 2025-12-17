@@ -69,7 +69,7 @@ const MyCarCard = ({ bookings }: Props) => {
             </Text> */}
           </View>
           <TouchableOpacity style={styles.stopButton}>
-            <Text style={styles.stopText}>STOP</Text>
+            <Text style={styles.stopText}>CANCEL SESSION</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   stopText: {
     fontFamily: "bold",
     color: Colors.accent,
-    fontSize: Font.md,
+    fontSize: 15,
   },
   emptyBox: {
     flex: 1,

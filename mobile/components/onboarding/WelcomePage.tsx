@@ -8,6 +8,7 @@ import dummyData from "@/constants/dummyData/dummy.js";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from "@/constants/Constants";
 import { Ionicons } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 
 const WelcomePage = () => {
   return (
@@ -25,8 +26,13 @@ const WelcomePage = () => {
             <Text style={styles.brandHighlight}>Porch</Text>
           </Text>
         </Text>
-        <Text style={{fontFamily: "light"}}>Let's get started!</Text>
-        <Ionicons name="chevron-down" color={Colors.accent} style={{fontFamily: "bold"}}/>
+        <Text style={{ fontFamily: "light" }}>Let's get started!</Text>
+        {/* <Ionicons name="chevron-down" color={Colors.accent} style={{fontFamily: "bold"}}/> */}
+        <LottieView
+          source={require("../../assets/animation/arrowDown.json")}
+          autoPlay
+          style={{ width: 35, height: 35 }}
+        />
       </View>
 
       <View style={styles.buttons}>

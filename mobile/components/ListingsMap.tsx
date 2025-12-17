@@ -25,10 +25,10 @@ interface Props {
 }
 
 const INITIAL_REGION = {
-  latitude: 40.7128,
+  latitude: 40.7428,
   longitude: -74.006,
-  latitudeDelta: 0.25,
-  longitudeDelta: 0.25,
+  latitudeDelta: 0.33,
+  longitudeDelta: 0.33,
 };
 
 const ListingsMap = ({ listings, snapPoints = ["50%"] }: Props) => {

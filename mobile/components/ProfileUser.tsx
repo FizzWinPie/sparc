@@ -109,7 +109,7 @@ const ProfileUser = () => {
     >
       <Avatar />
       <Text
-        style={{ fontFamily: "bold", fontSize: Spacing.md, marginBottom: 4 }}
+        style={{ fontFamily: "bold", fontSize: Spacing.md, marginBottom: 4, marginTop: 12 }}
       >
         {firstName || "User"}
       </Text>

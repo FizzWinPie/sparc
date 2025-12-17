@@ -1,8 +1,7 @@
-# macOS
 .DS_Store
 *.pem
+.env
 
-# typescript
 *.tsbuildinfo
 
 node_modules
